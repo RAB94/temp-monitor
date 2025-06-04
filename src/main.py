@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """
-Enhanced Network Intelligence Monitor - Main Application
-======================================================
+Enhanced Network Intelligence Monitor - Complete Main Application
+===============================================================
 
-Updated main application that integrates all enhanced components:
-- Enhanced LSTM anomaly detection
-- Mimir/Prometheus integration
-- Advanced network metrics collection
-- Prometheus metrics export for Alloy
-- Edge device optimization
-- Intelligent alerting
+Complete integration with Alloy→Mimir pipeline:
+1. Collects enhanced network metrics
+2. Exports metrics in Prometheus format for Alloy to scrape
+3. Uses Mimir for historical baseline analysis
+4. Provides AI-powered anomaly detection
+5. Supports edge device deployment
 """
 
 import asyncio
@@ -25,95 +24,562 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from src.config import Config
-from src.utils.logger import setup_logging
-from enhanced_integration import EnhancedNetworkIntelligenceMonitor, create_example_config, create_deployment_scripts
+from src.utils.logger import setup_logging, get_network_logger, get_ai_logger
+from src.utils.database import Database
+from src.collector import EnhancedNetworkCollector
+from src.lstm_auto import EnhancedLSTMAnomalyDetector
+from src.mimir_integration import MimirClient, integrate_with_existing_detector  # Fixed import
+from src.prom_export import PrometheusMetricsServer, MetricsAggregator
+from src.api.server import APIServer
+from src.alerts import AlertManager, AlertSeverity
+from src.dynamic_thresh import DynamicThresholdManager
+from src.edge_opt import EdgeOptimizer
+from src.websocket_server import WebSocketManager, WebSocketIntegration
 
 logger = logging.getLogger(__name__)
 
-class EnhancedMonitorManager:
-    """Manager for the enhanced monitoring system"""
+class EnhancedNetworkIntelligenceMonitor:
+    """Complete enhanced monitoring system with Alloy→Mimir integration"""
     
-    def __init__(self):
-        self.monitor = None
+    def __init__(self, config_path: str = "config.yaml"):
+        self.config_path = config_path
+        self.config = None
+        self.running = False
+        
+        # Core components
+        self.database = None
+        self.enhanced_collector = None
+        self.ai_detector = None
+        self.mimir_client = None
+        self.alert_manager = None
+        self.threshold_manager = None
+        self.edge_optimizer = None
+        
+        # Monitoring components
+        self.metrics_server = None
+        self.metrics_aggregator = None
+        self.api_server = None
+        self.websocket_manager = None
+        self.websocket_integration = None
+        
+        # Specialized loggers
+        self.network_logger = get_network_logger()
+        self.ai_logger = get_ai_logger()
+        
+        # Threading and monitoring
+        self.main_loop_task = None
+        self.api_task = None
+        self.baseline_update_task = None
+        
+        # Performance tracking
+        self.performance_stats = {
+            'system_start_time': time.time(),
+            'total_measurements': 0,
+            'anomalies_detected': 0,
+            'alerts_sent': 0,
+            'model_trainings': 0,
+            'baseline_updates': 0,
+            'average_collection_time': 0.0,
+            'system_health_score': 100.0
+        }
+        
+        # Shutdown handling
         self.shutdown_event = asyncio.Event()
         
-    async def initialize(self, config_path: str = "config.yaml"):
-        """Initialize the enhanced monitor"""
+    async def initialize(self):
+        """Initialize all system components"""
         
-        logger.info("Initializing Enhanced Network Intelligence Monitor...")
-        
-        # Check if config exists, create example if not
-        if not Path(config_path).exists():
-            logger.warning(f"Configuration file {config_path} not found")
-            create_example_config()
-            logger.info("Created example configuration: config-enhanced.yaml")
-            logger.info("Please review and customize the configuration before running again")
-            return False
+        logger.info("Initializing Enhanced Network Intelligence Monitor with Alloy→Mimir integration...")
         
         try:
-            # Create enhanced monitor
-            self.monitor = EnhancedNetworkIntelligenceMonitor(config_path)
-            await self.monitor.initialize()
+            # Load and validate configuration
+            await self._load_configuration()
             
-            logger.info("Enhanced Network Intelligence Monitor initialized successfully")
+            # Detect and optimize for environment
+            await self._detect_environment()
+            
+            # Initialize core database
+            await self._initialize_database()
+            
+            # Initialize enhanced network collector
+            await self._initialize_enhanced_collector()
+            
+            # Initialize AI detection system
+            await self._initialize_ai_system()
+            
+            # Initialize Mimir integration (no Prometheus!)
+            await self._initialize_mimir_integration()
+            
+            # Initialize alerting system
+            await self._initialize_alerting_system()
+            
+            # Initialize dynamic thresholds
+            await self._initialize_dynamic_thresholds()
+            
+            # Initialize Prometheus metrics export (for Alloy to scrape)
+            await self._initialize_metrics_export()
+            
+            # Initialize API server
+            await self._initialize_api_server()
+            
+            # Initialize WebSocket server
+            await self._initialize_websocket_server()
+            
+            # Apply edge optimizations if needed
+            await self._apply_edge_optimizations()
+            
+            # Verify Alloy→Mimir integration
+            await self._verify_integration_setup()
+            
+            logger.info("Enhanced Network Intelligence Monitor initialization complete")
             return True
             
         except Exception as e:
             logger.error(f"Failed to initialize enhanced monitor: {e}")
-            return False
-    
-    async def run(self):
-        """Run the enhanced monitoring system"""
-        
-        if not self.monitor:
-            logger.error("Monitor not initialized")
-            return
-        
-        # Setup signal handlers
-        self._setup_signal_handlers()
-        
-        try:
-            logger.info("Starting Enhanced Network Intelligence Monitor...")
-            
-            # Start monitor in background
-            monitor_task = asyncio.create_task(self._run_monitor())
-            
-            # Wait for shutdown signal
-            await self.shutdown_event.wait()
-            
-            logger.info("Shutdown signal received, stopping monitor...")
-            
-            # Cancel monitor task
-            monitor_task.cancel()
-            
-            try:
-                await monitor_task
-            except asyncio.CancelledError:
-                pass
-            
-            # Stop monitor
-            self.monitor.stop()
-            
-        except Exception as e:
-            logger.error(f"Error running enhanced monitor: {e}")
             raise
     
-    async def _run_monitor(self):
-        """Run monitor in async context"""
+    async def _load_configuration(self):
+        """Load and validate configuration"""
         
-        def start_monitor():
-            self.monitor.start()
+        self.config = Config(self.config_path)
         
-        # Run monitor start in thread executor
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, start_monitor)
+        # Log configuration summary
+        logger.info(f"Configuration loaded from: {self.config_path}")
+        logger.info(f"Monitoring targets: {self.config.monitoring.targets}")
+        logger.info(f"Monitoring interval: {self.config.monitoring.interval}s")
+        logger.info(f"AI features enabled: {self.config.ai.auto_train}")
+        logger.info(f"Edge optimization: {self.config.deployment.edge_optimization}")
+        logger.info(f"Mimir enabled: {self.config.mimir.enabled}")
+        
+        # Validate Mimir configuration
+        if self.config.mimir.enabled and not self.config.mimir.mimir_url:
+            logger.warning("Mimir is enabled but no Mimir URL configured")
+    
+    async def _detect_environment(self):
+        """Detect deployment environment and apply optimizations"""
+        
+        from src.utils.network import NetworkEnvironmentDetector
+        
+        environment = NetworkEnvironmentDetector.detect_deployment_environment()
+        optimal_config = NetworkEnvironmentDetector.get_optimal_monitoring_config()
+        
+        logger.info(f"Environment detection:")
+        logger.info(f"  Platform: {environment['platform']}")
+        logger.info(f"  Is container: {environment['is_container']}")
+        logger.info(f"  Is cloud: {environment['is_cloud']}")
+        logger.info(f"  Is edge device: {environment['is_edge_device']}")
+        logger.info(f"  Constraints: {environment['constraints']}")
+        
+        # Apply optimal configuration
+        if environment['is_edge_device'] and not self.config.deployment.edge_optimization:
+            logger.info("Auto-enabling edge optimizations")
+            self.config.deployment.edge_optimization = True
+            self.config.deployment.quantize_models = True
+            self.config.monitoring.interval = optimal_config['monitoring_interval']
+    
+    async def _initialize_database(self):
+        """Initialize database with enhanced schema"""
+        
+        self.database = Database(self.config.database_path)
+        await self.database.initialize()
+        
+        logger.info(f"Database initialized: {self.config.database_path}")
+    
+    async def _initialize_enhanced_collector(self):
+        """Initialize enhanced network metrics collector"""
+        
+        collector_config = {
+            'targets': self.config.monitoring.targets,
+            'timeout': self.config.monitoring.timeout,
+            'enhanced_features': self.config.monitoring.enhanced_features,
+            'quality_metrics': True,
+            'path_analysis': True,
+            'interface_monitoring': True
+        }
+        
+        self.enhanced_collector = EnhancedNetworkCollector(collector_config)
+        await self.enhanced_collector.initialize()
+        
+        logger.info("Enhanced network collector initialized")
+    
+    async def _initialize_ai_system(self):
+        """Initialize AI detection system"""
+        
+        ai_config = {
+            'model_dir': self.config.ai.model_dir,
+            'sequence_length': 20,
+            'input_size': 14,  # Enhanced feature count
+            'hidden_size': 64,
+            'num_layers': 2,
+            'initial_epochs': self.config.ai.initial_epochs,
+            'enable_quantization': self.config.ai.enable_quantization,
+            'deployment_type': 'edge' if self.config.deployment.edge_optimization else 'standard'
+        }
+        
+        self.ai_detector = EnhancedLSTMAnomalyDetector(ai_config)
+        await self.ai_detector.initialize()
+        
+        # Try to load existing models
+        try:
+            self.ai_detector.load_models()
+            self.ai_logger.log_model_loaded('enhanced_lstm', self.config.ai.model_dir)
+            logger.info("Loaded existing AI models")
+        except FileNotFoundError:
+            logger.info("No existing AI models found - will train from scratch")
+        
+        logger.info("AI detection system initialized")
+    
+    async def _initialize_mimir_integration(self):
+        """Initialize Mimir integration (no Prometheus!)"""
+        
+        if not self.config.mimir.enabled:
+            logger.info("Mimir integration disabled")
+            return
+        
+        mimir_config = {
+            'mimir_url': self.config.mimir.mimir_url,
+            'tenant_id': self.config.mimir.tenant_id,
+            'timeout': 30,
+            'cache_ttl_seconds': 300
+        }
+        
+        if not mimir_config['mimir_url']:
+            logger.warning("Mimir URL not configured, skipping Mimir integration")
+            return
+        
+        self.mimir_client = MimirClient(mimir_config)
+        await self.mimir_client.initialize()
+        
+        # Test connectivity
+        connectivity = await self.mimir_client.test_connectivity()
+        logger.info(f"Mimir connectivity: {connectivity}")
+        
+        # Integrate with AI detector for historical baselines
+        if self.ai_detector:
+            await integrate_with_existing_detector(
+                self.ai_detector,
+                self.mimir_client,
+                target_hosts=self.config.monitoring.targets,
+                days_back=30
+            )
+        
+        logger.info("Mimir integration initialized")
+    
+    async def _initialize_alerting_system(self):
+        """Initialize intelligent alerting system"""
+        
+        if not self.config.alerts.enabled:
+            logger.info("Alerting system disabled")
+            return
+        
+        alert_config = {
+            'correlation': {
+                'correlation_window_seconds': 300,
+                'enable_grouping': True
+            },
+            'notifications': {
+                'channels': [],
+                'routing': {
+                    'critical': [],
+                    'high': [],
+                    'medium': [],
+                    'low': []
+                }
+            },
+            'escalation': {
+                'enabled': True,
+                'rules': []
+            },
+            'retention_hours': 168  # 1 week
+        }
+        
+        # Add webhook channel if configured
+        if self.config.alerts.webhook_url:
+            alert_config['notifications']['channels'].append({
+                'name': 'webhook',
+                'type': 'webhook',
+                'config': {'url': self.config.alerts.webhook_url},
+                'enabled': True
+            })
+            alert_config['notifications']['routing']['critical'] = ['webhook']
+            alert_config['notifications']['routing']['high'] = ['webhook']
+        
+        from src.alerts import create_alert_manager
+        self.alert_manager = create_alert_manager(alert_config)
+        
+        logger.info("Alerting system initialized")
+    
+    async def _initialize_dynamic_thresholds(self):
+        """Initialize dynamic threshold management"""
+        
+        threshold_config = {
+            'analysis_window_size': 1000,
+            'adjustment_interval_seconds': 3600,
+            'min_confidence': 0.3,
+            'max_adjustment_factor': 0.2
+        }
+        
+        from src.dynamic_thresh import setup_dynamic_thresholds
+        self.threshold_manager = setup_dynamic_thresholds(threshold_config)
+        
+        logger.info("Dynamic threshold management initialized")
+    
+    async def _initialize_metrics_export(self):
+        """Initialize Prometheus metrics export for Alloy"""
+        
+        metrics_config = {
+            'metrics_port': self.config.metrics.port,
+            'metrics_host': self.config.metrics.host,
+            'metrics_batch_size': self.config.metrics.batch_size,
+            'enable_aggregation': self.config.metrics.enable_aggregation
+        }
+        
+        # Create metrics server for Alloy to scrape
+        from src.prom_export import create_metrics_server, create_metrics_aggregator
+        self.metrics_server = create_metrics_server(metrics_config)
+        self.metrics_server.start()
+        
+        # Create metrics aggregator for efficiency
+        self.metrics_aggregator = create_metrics_aggregator(
+            self.metrics_server,
+            metrics_config
+        )
+        self.metrics_aggregator.start()
+        
+        logger.info(f"Prometheus metrics server started on port {metrics_config['metrics_port']} for Alloy to scrape")
+    
+    async def _initialize_api_server(self):
+        """Initialize enhanced API server"""
+        
+        self.api_server = EnhancedAPIServer(
+            self.config,
+            self.database,
+            self.ai_detector,
+            self.enhanced_collector,
+            self.mimir_client,
+            self.metrics_server,
+            self.alert_manager,
+            self.threshold_manager
+        )
+        
+        logger.info("Enhanced API server initialized")
+    
+    async def _initialize_websocket_server(self):
+        """Initialize WebSocket server for real-time updates"""
+        
+        self.websocket_manager = WebSocketManager(
+            host=self.config.api.host,
+            port=8001  # Different port from API
+        )
+        await self.websocket_manager.start_server()
+        
+        # Create integration
+        self.websocket_integration = WebSocketIntegration(self.websocket_manager)
+        
+        logger.info("WebSocket server initialized on port 8001")
+    
+    async def _apply_edge_optimizations(self):
+        """Apply edge device optimizations if needed"""
+        
+        if not self.config.deployment.edge_optimization:
+            return
+        
+        edge_config = {
+            'model_optimization': {
+                'enable_quantization': self.config.deployment.quantize_models,
+                'enable_pruning': False,
+                'quantization_method': 'dynamic'
+            },
+            'memory_management': {
+                'memory_limit_mb': self.config.deployment.max_memory_mb,
+                'gc_threshold_mb': self.config.deployment.max_memory_mb * 0.8,
+                'enable_monitoring': True
+            },
+            'cpu_optimization': {
+                'max_cpu_percent': 80,
+                'thread_count': 'auto'
+            }
+        }
+        
+        from src.edge_opt import create_edge_optimizer
+        self.edge_optimizer = create_edge_optimizer(edge_config)
+        
+        # Optimize AI model
+        if self.ai_detector and self.ai_detector.model:
+            optimized_model = self.edge_optimizer.optimize_for_edge(
+                model=self.ai_detector.model
+            )
+            self.ai_detector.model = optimized_model
+        
+        logger.info("Edge optimizations applied")
+    
+    async def _verify_integration_setup(self):
+        """Verify the Alloy→Mimir integration setup"""
+        
+        logger.info("Verifying Alloy→Mimir integration setup...")
+        
+        integration_status = {
+            'metrics_export': False,
+            'mimir_connectivity': False,
+            'alloy_config': False
+        }
+        
+        # Check metrics export endpoint
+        try:
+            import aiohttp
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"http://localhost:{self.config.metrics.port}/metrics") as response:
+                    if response.status == 200:
+                        metrics_text = await response.text()
+                        if 'network_' in metrics_text:
+                            integration_status['metrics_export'] = True
+                            logger.info("✓ Metrics export endpoint working")
+                        else:
+                            logger.warning("✗ Metrics endpoint accessible but no network metrics found")
+                    else:
+                        logger.warning(f"✗ Metrics endpoint returned status {response.status}")
+        except Exception as e:
+            logger.warning(f"✗ Could not verify metrics endpoint: {e}")
+        
+        # Check Mimir connectivity
+        if self.mimir_client:
+            try:
+                connectivity = await self.mimir_client.test_connectivity()
+                if connectivity.get('mimir', {}).get('status') == 'connected':
+                    integration_status['mimir_connectivity'] = True
+                    logger.info("✓ Mimir connectivity working")
+                else:
+                    logger.warning("✗ Mimir connectivity failed")
+            except Exception as e:
+                logger.warning(f"✗ Mimir connectivity test failed: {e}")
+        
+        # Check if Alloy config exists
+        alloy_config_path = Path("configs/alloy/alloy")
+        if alloy_config_path.exists():
+            integration_status['alloy_config'] = True
+            logger.info("✓ Alloy configuration file found")
+        else:
+            logger.warning("✗ Alloy configuration file not found")
+        
+        # Summary
+        working_components = sum(integration_status.values())
+        total_components = len(integration_status)
+        
+        if working_components == total_components:
+            logger.info("🎉 Alloy→Mimir integration setup is complete and working!")
+        else:
+            logger.warning(f"⚠️  Integration setup partially working: {working_components}/{total_components} components operational")
+            
+            # Provide guidance
+            if not integration_status['alloy_config']:
+                logger.info("📋 To complete setup: Start Grafana Alloy with the provided configuration")
+            if not integration_status['mimir_connectivity']:
+                logger.info("📋 Check Mimir URL and tenant configuration")
+    
+    async def start(self):
+        """Start the enhanced monitoring system"""
+        
+        logger.info("Starting Enhanced Network Intelligence Monitor...")
+        
+        if self.running:
+            logger.warning("Monitor already running")
+            return
+        
+        self.running = True
+        
+        # Setup signal handlers for graceful shutdown
+        self._setup_signal_handlers()
+        
+        # Start main monitoring loop
+        self.main_loop_task = asyncio.create_task(self._main_monitoring_loop())
+        
+        # Start API server
+        self.api_task = asyncio.create_task(self._run_api_server())
+        
+        # Start baseline updates if Mimir is enabled
+        if self.mimir_client:
+            self.baseline_update_task = asyncio.create_task(self._baseline_update_loop())
+        
+        logger.info("Enhanced Network Intelligence Monitor started successfully")
+        self._log_startup_summary()
+        
+        # Wait for shutdown signal
+        await self.shutdown_event.wait()
+        
+        # Cleanup
+        await self.stop()
+    
+    async def stop(self):
+        """Stop the enhanced monitoring system"""
+        
+        logger.info("Stopping Enhanced Network Intelligence Monitor...")
+        
+        self.running = False
+        
+        # Cancel tasks
+        tasks = [self.main_loop_task, self.api_task, self.baseline_update_task]
+        for task in tasks:
+            if task and not task.done():
+                task.cancel()
+        
+        # Wait for tasks to complete
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # Stop components
+        if self.threshold_manager:
+            self.threshold_manager.stop()
+        
+        if self.alert_manager:
+            self.alert_manager.stop()
+        
+        if self.metrics_aggregator:
+            self.metrics_aggregator.stop()
+        
+        if self.metrics_server:
+            self.metrics_server.stop()
+        
+        if self.websocket_manager:
+            await self.websocket_manager.stop_server()
+        
+        # Close async components
+        if self.enhanced_collector:
+            await self.enhanced_collector.close()
+        
+        if self.mimir_client:
+            await self.mimir_client.close()
+        
+        if self.database:
+            await self.database.close()
+        
+        # Save AI models
+        if self.ai_detector:
+            try:
+                self.ai_detector.save_models()
+                
+                if self.config.deployment.edge_optimization:
+                    self.ai_detector.quantize_for_edge()
+                
+                self.ai_logger.log_model_saved(
+                    'enhanced_lstm', 
+                    self.config.ai.model_dir,
+                    0.0  # File size would be calculated
+                )
+                logger.info("AI models saved")
+            except Exception as e:
+                logger.warning(f"Failed to save AI models: {e}")
+        
+        # Final performance report
+        self._log_final_performance_report()
+        
+        logger.info("Enhanced Network Intelligence Monitor stopped")
     
     def _setup_signal_handlers(self):
         """Setup signal handlers for graceful shutdown"""
         
         def signal_handler(signum, frame):
-            logger.info(f"Received signal {signum}, initiating shutdown...")
-            asyncio.create_task(self._shutdown())
+            logger.info(f"Received signal {signum}, initiating graceful shutdown...")
+            asyncio.create_task(self._initiate_shutdown())
         
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTERM, signal_handler)
@@ -121,354 +587,427 @@ class EnhancedMonitorManager:
         if hasattr(signal, 'SIGHUP'):
             signal.signal(signal.SIGHUP, signal_handler)
     
-    async def _shutdown(self):
+    async def _initiate_shutdown(self):
         """Initiate shutdown"""
         self.shutdown_event.set()
-
-def validate_environment():
-    """Validate environment and dependencies"""
     
-    logger.info("Validating environment...")
-    
-    issues = []
-    
-    # Check Python version
-    if sys.version_info < (3, 8):
-        issues.append("Python 3.8 or higher is required")
-    
-    # Check required directories
-    required_dirs = ['data', 'data/logs', 'data/models', 'data/database']
-    for directory in required_dirs:
-        Path(directory).mkdir(parents=True, exist_ok=True)
-    
-    # Check for required environment variables for production
-    env = os.getenv('ENVIRONMENT', 'development')
-    if env == 'production':
-        required_env_vars = ['MIMIR_ENDPOINT', 'MIMIR_TOKEN']
-        for var in required_env_vars:
-            if not os.getenv(var):
-                issues.append(f"Environment variable {var} is required for production deployment")
-    
-    # Check disk space
-    try:
-        import shutil
-        total, used, free = shutil.disk_usage('.')
-        free_gb = free // (1024**3)
-        if free_gb < 1:
-            issues.append(f"Low disk space: {free_gb}GB available (recommend at least 1GB)")
-    except Exception:
-        pass
-    
-    # Check memory
-    try:
-        import psutil
-        memory = psutil.virtual_memory()
-        if memory.available < 512 * 1024 * 1024:  # 512MB
-            issues.append(f"Low memory: {memory.available // (1024**2)}MB available (recommend at least 512MB)")
-    except ImportError:
-        logger.warning("psutil not available for memory check")
-    
-    if issues:
-        logger.warning("Environment validation issues found:")
-        for issue in issues:
-            logger.warning(f"  - {issue}")
-        return False
-    
-    logger.info("Environment validation passed")
-    return True
-
-def setup_edge_optimizations():
-    """Setup optimizations for edge devices"""
-    
-    deployment_type = os.getenv('DEPLOYMENT_TYPE', 'standard')
-    
-    if deployment_type == 'edge':
-        logger.info("Applying edge device optimizations...")
+    def _log_startup_summary(self):
+        """Log startup summary"""
         
-        # PyTorch optimizations
-        os.environ['PYTORCH_JIT'] = '0'  # Disable JIT for memory savings
-        os.environ['OMP_NUM_THREADS'] = '2'  # Limit threads on edge devices
+        logger.info("=== Enhanced Network Intelligence Monitor Started ===")
+        logger.info(f"API Server: http://0.0.0.0:{self.config.api.port}")
+        logger.info(f"Metrics Export (for Alloy): http://0.0.0.0:{self.config.metrics.port}/metrics")
+        logger.info(f"WebSocket Server: ws://0.0.0.0:8001/ws")
+        logger.info(f"Targets: {', '.join(self.config.monitoring.targets)}")
+        logger.info(f"AI Detection: {'Enabled' if self.ai_detector else 'Disabled'}")
+        logger.info(f"Mimir Integration: {'Enabled' if self.mimir_client else 'Disabled'}")
+        logger.info(f"Edge Optimization: {'Enabled' if self.edge_optimizer else 'Disabled'}")
+        logger.info(f"Alerting: {'Enabled' if self.alert_manager else 'Disabled'}")
+        logger.info("=====================================================")
         
-        # Set CPU-only mode if no GPU
-        os.environ['CUDA_VISIBLE_DEVICES'] = ''
-        
-        logger.info("Edge optimizations applied")
-
-def print_startup_banner():
-    """Print startup banner with system information"""
-    
-    banner = """
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                 Enhanced Network Intelligence Monitor                        ║
-║                              Version 1.0.0                                  ║
-╠══════════════════════════════════════════════════════════════════════════════╣
-║  Features:                                                                   ║
-║    • Advanced LSTM Anomaly Detection                                        ║
-║    • Mimir/Prometheus Historical Baselines                                  ║
-║    • Enhanced Network Metrics Collection                                    ║
-║    • Prometheus Metrics Export for Alloy                                    ║
-║    • Edge Device Optimization                                               ║
-║    • Real-time Quality Assessment (MOS Score)                               ║
-║    • Intelligent Dynamic Thresholds                                         ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-"""
-    
-    print(banner)
-    
-    # System information
-    import platform
-    import psutil
-    
-    system_info = f"""
-System Information:
-  Platform: {platform.platform()}
-  Python: {platform.python_version()}
-  CPU Cores: {psutil.cpu_count()}
-  Memory: {psutil.virtual_memory().total // (1024**3)}GB
-  Deployment: {os.getenv('DEPLOYMENT_TYPE', 'standard')}
-  Environment: {os.getenv('ENVIRONMENT', 'development')}
-"""
-    
-    print(system_info)
-
-async def run_health_check():
-    """Run initial health check"""
-    
-    logger.info("Running initial health check...")
-    
-    health_checks = []
-    
-    try:
-        # Test network connectivity
-        import socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(5)
-        result = sock.connect_ex(('8.8.8.8', 53))
-        sock.close()
-        
-        if result == 0:
-            health_checks.append(("Network connectivity", "✓ PASS"))
+        if self.mimir_client:
+            logger.info("📊 Data Flow: Monitor → Alloy (scrapes :8000/metrics) → Mimir")
         else:
-            health_checks.append(("Network connectivity", "✗ FAIL - No internet access"))
+            logger.info("📊 Data Flow: Monitor → Alloy (scrapes :8000/metrics)")
     
-    except Exception as e:
-        health_checks.append(("Network connectivity", f"✗ ERROR - {e}"))
+    async def _main_monitoring_loop(self):
+        """Main monitoring loop with all enhancements"""
+        
+        last_train_time = 0
+        last_health_check = 0
+        train_interval = self.config.ai.train_interval
+        
+        logger.info("Main monitoring loop started")
+        
+        while self.running:
+            try:
+                cycle_start = time.time()
+                
+                # Collect metrics from all targets
+                for target in self.config.monitoring.targets:
+                    try:
+                        # Collect enhanced metrics
+                        metrics = await self.enhanced_collector.collect_enhanced_metrics(target)
+                        
+                        if metrics:
+                            # Store in database
+                            await self.database.store_metrics(metrics.to_dict())
+                            
+                            # Update Prometheus metrics (for Alloy to scrape)
+                            if self.metrics_aggregator:
+                                self.metrics_aggregator.add_enhanced_metrics(metrics)
+                            
+                            # Update dynamic thresholds
+                            if self.threshold_manager:
+                                for metric_name, value in metrics.to_dict().items():
+                                    if isinstance(value, (int, float)) and value >= 0:
+                                        self.threshold_manager.add_measurement(
+                                            metric_name, value
+                                        )
+                            
+                            # AI anomaly detection
+                            if self.ai_detector:
+                                anomaly_result = await self.ai_detector.detect_anomaly(metrics)
+                                
+                                if anomaly_result.is_anomaly:
+                                    self.network_logger.log_anomaly_detected(
+                                        target,
+                                        anomaly_result.anomaly_score,
+                                        anomaly_result.confidence,
+                                        severity=anomaly_result.severity
+                                    )
+                                    
+                                    # Store anomaly
+                                    await self.database.store_anomaly(
+                                        metrics.timestamp,
+                                        {
+                                            'target_host': target,
+                                            'anomaly_score': anomaly_result.anomaly_score,
+                                            'confidence': anomaly_result.confidence,
+                                            'severity': anomaly_result.severity,
+                                            'baseline_values': anomaly_result.baseline_values,
+                                            'thresholds': anomaly_result.thresholds,
+                                            'feature_contributions': anomaly_result.feature_contributions,
+                                            'recommendation': anomaly_result.recommendation
+                                        }
+                                    )
+                                    
+                                    # Send alert
+                                    if self.alert_manager:
+                                        await self.alert_manager.create_alert(
+                                            title=f"Network Anomaly: {target}",
+                                            description=anomaly_result.recommendation,
+                                            severity=getattr(AlertSeverity, anomaly_result.severity.upper()),
+                                            source="ai_detector",
+                                            metric_name="anomaly_score",
+                                            current_value=anomaly_result.anomaly_score,
+                                            threshold=0.5,
+                                            target=target,
+                                            context=anomaly_result.feature_contributions
+                                        )
+                                        self.performance_stats['alerts_sent'] += 1
+                                    
+                                    # Send WebSocket notification
+                                    if self.websocket_integration:
+                                        await self.websocket_integration.on_anomaly_detected(
+                                            anomaly_result, target
+                                        )
+                                    
+                                    # Update metrics
+                                    if self.metrics_aggregator:
+                                        self.metrics_aggregator.add_anomaly_metrics(
+                                            anomaly_result, target
+                                        )
+                                    
+                                    self.performance_stats['anomalies_detected'] += 1
+                            
+                            # Send WebSocket metrics update
+                            if self.websocket_integration:
+                                await self.websocket_integration.on_metrics_collected(metrics)
+                            
+                            self.performance_stats['total_measurements'] += 1
+                            
+                            self.network_logger.log_metrics_collected(target, metrics.to_dict())
+                        
+                    except Exception as e:
+                        logger.error(f"Error collecting metrics for {target}: {e}")
+                        self.network_logger.log_connection_failure(target, "enhanced", str(e))
+                
+                # Periodic AI training
+                current_time = time.time()
+                if (self.ai_detector and 
+                    self.config.ai.auto_train and 
+                    current_time - last_train_time > train_interval):
+                    
+                    logger.info("Starting periodic AI training...")
+                    
+                    try:
+                        training_data = await self.database.get_metrics_for_training(hours=24)
+                        
+                        if len(training_data) >= 50:
+                            training_start = time.time()
+                            
+                            await self.ai_detector.train_online(training_data)
+                            
+                            training_time = time.time() - training_start
+                            
+                            self.ai_logger.log_training_complete(
+                                'enhanced_lstm',
+                                training_time * 1000,
+                                {'samples': len(training_data)}
+                            )
+                            
+                            self.performance_stats['model_trainings'] += 1
+                            last_train_time = current_time
+                            
+                            logger.info(f"AI training completed in {training_time:.2f}s")
+                        else:
+                            logger.info(f"Insufficient training data: {len(training_data)} samples")
+                    
+                    except Exception as e:
+                        logger.error(f"Error in AI training: {e}")
+                
+                # Health check
+                if current_time - last_health_check > 300:  # Every 5 minutes
+                    self.performance_stats['system_health_score'] = self._calculate_system_health()
+                    last_health_check = current_time
+                
+                # Update average collection time
+                cycle_time = time.time() - cycle_start
+                self.performance_stats['average_collection_time'] = (
+                    (self.performance_stats['average_collection_time'] * 0.9) + 
+                    (cycle_time * 0.1)
+                )
+                
+                # Sleep until next collection
+                sleep_time = max(1, self.config.monitoring.interval - cycle_time)
+                await asyncio.sleep(sleep_time)
+                
+            except Exception as e:
+                logger.error(f"Error in main monitoring loop: {e}")
+                await asyncio.sleep(60)  # Error backoff
+        
+        logger.info("Main monitoring loop stopped")
     
-    # Test DNS resolution
-    try:
-        import socket
-        socket.gethostbyname('google.com')
-        health_checks.append(("DNS resolution", "✓ PASS"))
-    except Exception as e:
-        health_checks.append(("DNS resolution", f"✗ FAIL - {e}"))
+    async def _run_api_server(self):
+        """Run API server"""
+        
+        try:
+            def run_server():
+                self.api_server.run(
+                    host=self.config.api.host,
+                    port=self.config.api.port,
+                    debug=self.config.api.debug
+                )
+            
+            # Run in executor to avoid blocking
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(None, run_server)
+        except Exception as e:
+            logger.error(f"API server error: {e}")
     
-    # Test PyTorch
-    try:
-        import torch
-        tensor = torch.tensor([1.0, 2.0, 3.0])
-        assert tensor.sum().item() == 6.0
-        health_checks.append(("PyTorch", f"✓ PASS - {torch.__version__}"))
-    except Exception as e:
-        health_checks.append(("PyTorch", f"✗ FAIL - {e}"))
+    async def _baseline_update_loop(self):
+        """Run periodic baseline updates from Mimir"""
+        
+        while self.running:
+            try:
+                logger.info("Updating baselines from Mimir...")
+                
+                baselines = await self.mimir_client.get_network_metrics_baselines(
+                    target_hosts=self.config.monitoring.targets,
+                    days_back=7
+                )
+                
+                if baselines:
+                    # Update AI detector baselines
+                    for query, baseline in baselines.items():
+                        # Store baseline update in database
+                        await self.database.store_baseline_update({
+                            'metric_name': query,
+                            'baseline_type': baseline.baseline_type,
+                            'new_value': baseline.values.get('overall_mean', 0),
+                            'confidence': 0.8,
+                            'source': 'mimir'
+                        })
+                    
+                    self.performance_stats['baseline_updates'] += 1
+                    logger.info(f"Updated {len(baselines)} baselines from Mimir")
+                
+                # Sleep for 6 hours
+                await asyncio.sleep(21600)
+                
+            except Exception as e:
+                logger.error(f"Error updating baselines: {e}")
+                await asyncio.sleep(3600)  # Retry in 1 hour
     
-    # Test database creation
-    try:
-        from src.utils.database import Database
-        test_db = Database(':memory:')
-        await test_db.initialize()
-        health_checks.append(("Database", "✓ PASS"))
-    except Exception as e:
-        health_checks.append(("Database", f"✗ FAIL - {e}"))
+    def _calculate_system_health(self) -> float:
+        """Calculate overall system health score"""
+        
+        score = 100.0
+        
+        try:
+            # Component health checks
+            if not self.database:
+                score -= 20
+            
+            if not self.enhanced_collector:
+                score -= 20
+            
+            if not self.ai_detector:
+                score -= 15
+            
+            if not self.metrics_server:
+                score -= 10
+            
+            # Performance checks
+            if self.performance_stats['average_collection_time'] > 30:
+                score -= 10
+            
+            # System resource checks
+            import psutil
+            if psutil.virtual_memory().percent > 90:
+                score -= 15
+            
+            if psutil.cpu_percent() > 90:
+                score -= 15
+            
+            # Recent activity check
+            if self.performance_stats['total_measurements'] == 0:
+                score -= 25
+            
+        except Exception as e:
+            logger.error(f"Error calculating system health: {e}")
+            score = 50
+        
+        return max(0, score)
     
-    # Print results
-    logger.info("Health check results:")
-    for check_name, result in health_checks:
-        logger.info(f"  {check_name}: {result}")
-    
-    # Return overall health
-    failed_checks = [check for check in health_checks if "FAIL" in check[1] or "ERROR" in check[1]]
-    return len(failed_checks) == 0
+    def _log_final_performance_report(self):
+        """Log final performance statistics"""
+        
+        uptime = time.time() - self.performance_stats['system_start_time']
+        
+        logger.info("=== Final Performance Report ===")
+        logger.info(f"System Uptime: {uptime/3600:.2f} hours")
+        logger.info(f"Total Measurements: {self.performance_stats['total_measurements']}")
+        logger.info(f"Anomalies Detected: {self.performance_stats['anomalies_detected']}")
+        logger.info(f"Alerts Sent: {self.performance_stats['alerts_sent']}")
+        logger.info(f"Model Trainings: {self.performance_stats['model_trainings']}")
+        logger.info(f"Baseline Updates: {self.performance_stats['baseline_updates']}")
+        logger.info(f"Average Collection Time: {self.performance_stats['average_collection_time']:.2f}s")
+        logger.info(f"Final Health Score: {self.performance_stats['system_health_score']:.1f}")
+        logger.info("================================")
 
-def create_startup_scripts():
-    """Create startup scripts for different environments"""
+class EnhancedAPIServer(APIServer):
+    """Enhanced API server with additional endpoints"""
     
-    # SystemD service file
-    systemd_service = """[Unit]
-Description=Enhanced Network Intelligence Monitor
-After=network.target
-Wants=network.target
-
-[Service]
-Type=simple
-User=networkmon
-Group=networkmon
-WorkingDirectory=/opt/network-intelligence-monitor
-ExecStart=/usr/bin/python3 -m src.main
-ExecReload=/bin/kill -HUP $MAINPID
-Restart=always
-RestartSec=10
-TimeoutStopSec=30
-
-# Environment
-Environment=PYTHONPATH=/opt/network-intelligence-monitor
-Environment=DEPLOYMENT_TYPE=edge
-Environment=ENVIRONMENT=production
-
-# Security
-NoNewPrivileges=yes
-ProtectSystem=strict
-ProtectHome=yes
-ReadWritePaths=/opt/network-intelligence-monitor/data
-PrivateTmp=yes
-
-# Logging
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=network-monitor
-
-[Install]
-WantedBy=multi-user.target
-"""
+    def __init__(self, config, database, detector, collector, mimir_client, 
+                 metrics_server, alert_manager=None, threshold_manager=None):
+        super().__init__(config, database, detector, collector)
+        
+        self.mimir_client = mimir_client
+        self.metrics_server = metrics_server
+        self.alert_manager = alert_manager
+        self.threshold_manager = threshold_manager
+        
+        # Add enhanced routes
+        self._setup_enhanced_routes()
     
-    # Supervisor configuration
-    supervisor_conf = """[program:network-monitor]
-command=/usr/bin/python3 -m src.main
-directory=/opt/network-intelligence-monitor
-user=networkmon
-group=networkmon
-autostart=true
-autorestart=true
-startsecs=10
-startretries=3
-exitcodes=0,2
-stopsignal=TERM
-stopwaitsecs=30
-redirect_stderr=true
-stdout_logfile=/var/log/network-monitor/supervisor.log
-stdout_logfile_maxbytes=50MB
-stdout_logfile_backups=3
-environment=PYTHONPATH="/opt/network-intelligence-monitor",DEPLOYMENT_TYPE="edge",ENVIRONMENT="production"
-"""
+    def _setup_enhanced_routes(self):
+        """Setup additional enhanced routes"""
+        
+        from flask import jsonify
+        import asyncio
+        
+        @self.app.route('/api/enhanced/status', methods=['GET'])
+        def get_enhanced_status():
+            """Get enhanced system status"""
+            return jsonify({
+                'system': 'Enhanced Network Intelligence Monitor',
+                'version': '1.0.0',
+                'integration': 'Alloy→Mimir',
+                'components': {
+                    'database': bool(self.database),
+                    'collector': bool(self.collector),
+                    'ai_detector': bool(self.detector),
+                    'mimir_client': bool(self.mimir_client),
+                    'metrics_server': bool(self.metrics_server),
+                    'alert_manager': bool(self.alert_manager),
+                    'threshold_manager': bool(self.threshold_manager)
+                },
+                'endpoints': {
+                    'metrics_export': f'http://localhost:{self.config.get("metrics", {}).get("port", 8000)}/metrics',
+                    'api_base': f'http://localhost:{self.config.get("api", {}).get("port", 5000)}/api',
+                    'websocket': 'ws://localhost:8001/ws'
+                }
+            })
+        
+        @self.app.route('/api/integration/verify', methods=['GET'])
+        def verify_integration():
+            """Verify Alloy→Mimir integration"""
+            return asyncio.run(self._verify_integration())
     
-    # Docker healthcheck script
-    healthcheck_script = """#!/bin/bash
-# Docker healthcheck script for Enhanced Network Intelligence Monitor
+    async def _verify_integration(self):
+        """Verify integration setup"""
+        
+        status = {
+            'metrics_endpoint': False,
+            'mimir_connectivity': False,
+            'alloy_config_exists': False
+        }
+        
+        # Check metrics endpoint
+        try:
+            import aiohttp
+            async with aiohttp.ClientSession() as session:
+                metrics_port = self.config.get('metrics', {}).get('port', 8000)
+                async with session.get(f"http://localhost:{metrics_port}/metrics") as response:
+                    if response.status == 200:
+                        text = await response.text()
+                        status['metrics_endpoint'] = 'network_' in text
+        except:
+            pass
+        
+        # Check Mimir
+        if self.mimir_client:
+            try:
+                result = await self.mimir_client.test_connectivity()
+                status['mimir_connectivity'] = result.get('mimir', {}).get('status') == 'connected'
+            except:
+                pass
+        
+        # Check Alloy config
+        from pathlib import Path
+        status['alloy_config_exists'] = Path("configs/alloy/alloy").exists()
+        
+        from flask import jsonify
+        return jsonify({
+            'status': status,
+            'integration_ready': all(status.values()),
+            'next_steps': self._get_integration_next_steps(status)
+        })
+    
+    def _get_integration_next_steps(self, status):
+        """Get next steps for integration setup"""
+        
+        steps = []
+        
+        if not status['metrics_endpoint']:
+            steps.append("Ensure metrics server is running and accessible")
+        
+        if not status['mimir_connectivity']:
+            steps.append("Configure Mimir URL and check connectivity")
+        
+        if not status['alloy_config_exists']:
+            steps.append("Deploy Alloy configuration from configs/alloy/alloy")
+        
+        if all(status.values()):
+            steps.append("Integration is complete! Monitor data flow in Mimir.")
+        
+        return steps
 
-set -e
-
-# Check if API is responding
-if curl -f -s http://localhost:5000/health > /dev/null; then
-    echo "API health check: PASS"
-else
-    echo "API health check: FAIL"
-    exit 1
-fi
-
-# Check if metrics endpoint is responding
-if curl -f -s http://localhost:8000/metrics > /dev/null; then
-    echo "Metrics health check: PASS"
-else
-    echo "Metrics health check: FAIL"
-    exit 1
-fi
-
-# Check if monitor is collecting metrics
-if curl -f -s http://localhost:5000/api/enhanced/health | grep -q '"overall_status": "healthy"'; then
-    echo "System health check: PASS"
-else
-    echo "System health check: FAIL"
-    exit 1
-fi
-
-echo "All health checks passed"
-exit 0
-"""
-    
-    # Create scripts directory
-    scripts_dir = Path("scripts")
-    scripts_dir.mkdir(exist_ok=True)
-    
-    # Write service files
-    with open(scripts_dir / "network-monitor.service", "w") as f:
-        f.write(systemd_service)
-    
-    with open(scripts_dir / "network-monitor.conf", "w") as f:
-        f.write(supervisor_conf)
-    
-    with open(scripts_dir / "healthcheck.sh", "w") as f:
-        f.write(healthcheck_script)
-    
-    # Make healthcheck executable
-    import stat
-    healthcheck_path = scripts_dir / "healthcheck.sh"
-    healthcheck_path.chmod(healthcheck_path.stat().st_mode | stat.S_IEXEC)
-    
-    logger.info("Startup scripts created in scripts/ directory")
-
+# Main execution
 async def main():
-    """Enhanced main function"""
+    """Main function"""
     
-    # Print startup banner
-    print_startup_banner()
-    
-    # Setup logging first
+    # Setup logging
     setup_logging()
     
-    # Setup edge optimizations if needed
-    setup_edge_optimizations()
+    # Create enhanced monitor
+    config_file = sys.argv[1] if len(sys.argv) > 1 else "config.yaml"
     
-    # Validate environment
-    if not validate_environment():
-        logger.error("Environment validation failed")
-        sys.exit(1)
-    
-    # Run health check
-    if not await run_health_check():
-        logger.warning("Some health checks failed, but continuing...")
-    
-    # Create startup scripts
-    create_startup_scripts()
-    
-    # Create deployment scripts
-    create_deployment_scripts()
-    
-    # Create monitor manager
-    manager = EnhancedMonitorManager()
+    monitor = EnhancedNetworkIntelligenceMonitor(config_file)
     
     try:
-        # Initialize monitor
-        config_path = sys.argv[1] if len(sys.argv) > 1 else "config.yaml"
-        
-        if not await manager.initialize(config_path):
-            logger.error("Failed to initialize monitor")
-            sys.exit(1)
-        
-        # Log startup completion
-        logger.info("=== Enhanced Network Intelligence Monitor Started ===")
-        logger.info("API Server: http://localhost:5000")
-        logger.info("Metrics Endpoint: http://localhost:8000/metrics")
-        logger.info("Health Check: http://localhost:5000/api/enhanced/health")
-        logger.info("Grafana Alloy Config: config.alloy")
-        logger.info("=========================================================")
-        
-        # Run monitor
-        await manager.run()
+        await monitor.initialize()
+        await monitor.start()
         
     except KeyboardInterrupt:
-        logger.info("Received keyboard interrupt")
+        logger.info("Shutdown requested by user")
     except Exception as e:
         logger.error(f"Fatal error: {e}")
-        sys.exit(1)
     finally:
-        logger.info("Enhanced Network Intelligence Monitor stopped")
+        if monitor.running:
+            await monitor.stop()
 
 if __name__ == "__main__":
-    # Set process title if available
-    try:
-        import setproctitle
-        setproctitle.setproctitle("network-intelligence-monitor")
-    except ImportError:
-        pass
-    
-    # Run main function
     asyncio.run(main())

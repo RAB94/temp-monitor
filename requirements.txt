@@ -1,7 +1,7 @@
 # Core ML and Data Science
-torch>=2.0.0,<2.2.0
+torch>=2.7.0
 torchvision>=0.15.0
-numpy>=1.21.0,<1.25.0
+numpy>=1.26.0
 scipy>=1.9.0
 scikit-learn>=1.1.0
 pandas>=1.5.0
@@ -29,3 +29,4 @@ rich>=13.0.0
 # Data processing
 statsmodels>=0.14.0
 fastdtw>=0.3.4
+structlog
