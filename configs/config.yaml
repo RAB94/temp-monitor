@@ -1,0 +1,52 @@
+logging:
+  level: INFO
+  file: data/logs/network_intelligence.log
+  max_size_mb: 10
+  backup_count: 5
+
+database:
+  path: data/database/network_intelligence.db
+  cleanup_days: 30
+  backup_enabled: true
+
+monitoring:
+  targets:
+    - 8.8.8.8
+    - 1.1.1.1
+    - google.com
+    - github.com
+  interval: 30
+  timeout: 10
+  enhanced_features: true
+
+ai:
+  model_dir: data/models
+  train_interval: 3600
+  initial_epochs: 100
+  auto_train: true
+  enable_quantization: false
+
+api:
+  host: 0.0.0.0
+  port: 5000
+  debug: false
+
+metrics:
+  port: 8000
+  host: 0.0.0.0
+  batch_size: 10
+
+mimir:
+  prometheus_url: ${PROMETHEUS_URL}
+  mimir_url: ${MIMIR_URL}
+  tenant_id: network-monitoring
+  enabled: true
+
+alerts:
+  enabled: true
+  webhook_url: ${WEBHOOK_URL}
+
+deployment:
+  edge_optimization: false
+  quantize_models: false
+  max_memory_mb: 512

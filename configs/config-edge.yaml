@@ -1,0 +1,26 @@
+logging:
+  level: INFO
+  file: data/logs/network_intelligence.log
+  max_size_mb: 5
+  backup_count: 2
+
+monitoring:
+  targets:
+    - 8.8.8.8
+    - 1.1.1.1
+  interval: 60
+  timeout: 15
+
+ai:
+  train_interval: 7200
+  initial_epochs: 50
+  enable_quantization: true
+
+deployment:
+  edge_optimization: true
+  quantize_models: true
+  max_memory_mb: 256
+
+metrics:
+  port: 8000
+  host: 0.0.0.0
