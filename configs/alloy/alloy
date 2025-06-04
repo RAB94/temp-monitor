@@ -1,0 +1,728 @@
+// Grafana Alloy Configuration for Network Intelligence Monitor
+// =============================================================
+//
+// This configuration:
+// 1. Scrapes metrics from the Network Intelligence Monitor
+// 2. Enriches metrics with labels and metadata
+// 3. Sends data to Mimir with multi-tenant support
+// 4. Includes service discovery for multiple monitor instances
+// 5. Provides logging and self-monitoring
+
+// ===================================================================
+// LOGGING CONFIGURATION
+// ===================================================================
+
+logging {
+    level  = "info"
+    format = "json"
+    
+    // Write logs to file for persistence on edge devices
+    write_to {
+        file {
+            path = "/var/log/alloy/network-intelligence.log"
+            max_size_mb = 100
+            max_age_days = 7
+            max_backups = 3
+        }
+    }
+    
+    // Also write to stdout for container environments
+    write_to {
+        console {}
+    }
+}
+
+// ===================================================================
+// DISCOVERY CONFIGURATION
+// ===================================================================
+
+// Static discovery for local network monitor instance
+discovery.static "network_monitor" {
+    targets = [
+        {
+            "__address__" = "localhost:8000",
+            "job"         = "network-intelligence-monitor",
+            "instance"    = env("HOSTNAME"),
+            "deployment"  = "edge",
+            "monitor_type" = "enhanced",
+        },
+    ]
+}
+
+// File-based discovery for multiple monitor instances
+discovery.file "network_monitors" {
+    path_targets = [
+        {
+            "__address__" = "network-monitor-1:8000",
+            "job"         = "network-intelligence-monitor",
+            "instance"    = "network-monitor-1",
+            "deployment"  = "distributed",
+            "zone"        = "zone-a",
+        },
+        {
+            "__address__" = "network-monitor-2:8000", 
+            "job"         = "network-intelligence-monitor",
+            "instance"    = "network-monitor-2",
+            "deployment"  = "distributed",
+            "zone"        = "zone-b",
+        },
+    ]
+}
+
+// Kubernetes discovery (if running in k8s)
+discovery.kubernetes "network_monitors_k8s" {
+    role = "pod"
+    
+    selectors {
+        role  = "pod"
+        field = "spec.nodeName=" + env("NODE_NAME")
+    }
+    
+    namespaces {
+        names = ["network-monitoring", "monitoring"]
+    }
+}
+
+// ===================================================================
+// METRIC SCRAPING CONFIGURATION
+// ===================================================================
+
+// Primary scrape configuration for network intelligence metrics
+prometheus.scrape "network_intelligence" {
+    targets    = discovery.static.network_monitor.targets
+    forward_to = [
+        prometheus.relabel.add_instance_labels.receiver,
+    ]
+    
+    job_name        = "network-intelligence-monitor"
+    scrape_interval = "30s"
+    scrape_timeout  = "10s"
+    metrics_path    = "/metrics"
+    scheme          = "http"
+    
+    // Honor target labels to preserve metric metadata
+    honor_labels = true
+    
+    // Additional HTTP configuration
+    follow_redirects = true
+    enable_http2     = false
+    
+    // Custom headers for authentication if needed
+    // authorization {
+    //     type = "Bearer"
+    //     credentials = env("MONITOR_API_TOKEN")
+    // }
+}
+
+// Scrape configuration for distributed monitors
+prometheus.scrape "network_intelligence_distributed" {
+    targets    = discovery.file.network_monitors.targets
+    forward_to = [
+        prometheus.relabel.add_instance_labels.receiver,
+    ]
+    
+    job_name        = "network-intelligence-monitor-distributed"
+    scrape_interval = "30s"
+    scrape_timeout  = "10s"
+    metrics_path    = "/metrics"
+    scheme          = "http"
+    
+    honor_labels = true
+}
+
+// Scrape configuration for Kubernetes deployment
+prometheus.scrape "network_intelligence_k8s" {
+    targets    = discovery.kubernetes.network_monitors_k8s.targets
+    forward_to = [
+        prometheus.relabel.kubernetes_labels.receiver,
+    ]
+    
+    job_name        = "network-intelligence-monitor-k8s"
+    scrape_interval = "30s"
+    scrape_timeout  = "10s"
+    
+    honor_labels = true
+}
+
+// ===================================================================
+// METRIC RELABELING AND ENRICHMENT
+// ===================================================================
+
+// Add standard instance labels and metadata
+prometheus.relabel "add_instance_labels" {
+    forward_to = [
+        prometheus.relabel.enrich_network_metrics.receiver,
+    ]
+    
+    // Preserve original job and instance labels
+    rule {
+        source_labels = ["job"]
+        target_label  = "__tmp_job"
+    }
+    
+    rule {
+        source_labels = ["instance"]
+        target_label  = "__tmp_instance"
+    }
+    
+    // Add deployment metadata
+    rule {
+        target_label = "collector_version"
+        replacement  = "1.0.0"
+    }
+    
+    rule {
+        target_label = "collection_method"
+        replacement  = "enhanced"
+    }
+    
+    // Add environment information
+    rule {
+        target_label = "environment"
+        replacement  = env("ENVIRONMENT")
+    }
+    
+    rule {
+        target_label = "region"
+        replacement  = env("REGION")
+    }
+    
+    // Add timestamp for metric freshness tracking
+    rule {
+        target_label = "scraped_at"
+        replacement  = "{{ now | unixEpoch }}"
+    }
+}
+
+// Kubernetes-specific label processing
+prometheus.relabel "kubernetes_labels" {
+    forward_to = [
+        prometheus.relabel.enrich_network_metrics.receiver,
+    ]
+    
+    // Extract pod information
+    rule {
+        source_labels = ["__meta_kubernetes_pod_name"]
+        target_label  = "pod"
+    }
+    
+    rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        target_label  = "namespace"
+    }
+    
+    rule {
+        source_labels = ["__meta_kubernetes_pod_node_name"]
+        target_label  = "node"
+    }
+    
+    // Extract custom annotations
+    rule {
+        source_labels = ["__meta_kubernetes_pod_annotation_network_monitor_zone"]
+        target_label  = "zone"
+    }
+    
+    rule {
+        source_labels = ["__meta_kubernetes_pod_annotation_network_monitor_region"]
+        target_label  = "region"
+    }
+}
+
+// Enrich network-specific metrics with additional context
+prometheus.relabel "enrich_network_metrics" {
+    forward_to = [
+        prometheus.relabel.tenant_routing.receiver,
+    ]
+    
+    // Normalize target hostnames for better grouping
+    rule {
+        source_labels = ["target"]
+        regex         = "^([^.]+)\\..*"
+        target_label  = "target_hostname"
+        replacement   = "${1}"
+    }
+    
+    // Classify target types
+    rule {
+        source_labels = ["target"]
+        regex         = "^\\d+\\.\\d+\\.\\d+\\.\\d+$"
+        target_label  = "target_type"
+        replacement   = "ip_address"
+    }
+    
+    rule {
+        source_labels = ["target"]
+        regex         = "^[^.]+\\.[^.]+\\.[^.]+.*"
+        target_label  = "target_type"
+        replacement   = "fqdn"
+    }
+    
+    // Add network segment classification
+    rule {
+        source_labels = ["target"]
+        regex         = "^(8\\.8\\.8\\.8|1\\.1\\.1\\.1|208\\.67\\.222\\.222)$"
+        target_label  = "target_category"
+        replacement   = "public_dns"
+    }
+    
+    rule {
+        source_labels = ["target"]
+        regex         = "^10\\..*|^172\\.(1[6-9]|2[0-9]|3[01])\\..*|^192\\.168\\..*"
+        target_label  = "target_category"
+        replacement   = "private_network"
+    }
+    
+    rule {
+        source_labels = ["target"]
+        regex         = ".*\\.(com|net|org|edu|gov).*"
+        target_label  = "target_category"
+        replacement   = "internet_service"
+    }
+    
+    // Quality classification based on MOS score
+    rule {
+        source_labels = ["__name__"]
+        regex         = "network_mos_score"
+        target_label  = "__tmp_mos_metric"
+        replacement   = "true"
+    }
+    
+    // Add SLA classification
+    rule {
+        source_labels = ["target_category"]
+        regex         = "public_dns"
+        target_label  = "sla_tier"
+        replacement   = "critical"
+    }
+    
+    rule {
+        source_labels = ["target_category"]
+        regex         = "internet_service"
+        target_label  = "sla_tier"
+        replacement   = "important"
+    }
+    
+    rule {
+        source_labels = ["target_category"]
+        regex         = "private_network"
+        target_label  = "sla_tier"
+        replacement   = "standard"
+    }
+}
+
+// Multi-tenant routing configuration
+prometheus.relabel "tenant_routing" {
+    forward_to = [
+        prometheus.remote_write.mimir_primary.receiver,
+        prometheus.remote_write.mimir_backup.receiver,
+    ]
+    
+    // Route critical metrics to high-priority tenant
+    rule {
+        source_labels = ["sla_tier"]
+        regex         = "critical"
+        target_label  = "__tenant_id__"
+        replacement   = "network-critical"
+    }
+    
+    // Route standard metrics to default tenant
+    rule {
+        source_labels = ["sla_tier"]
+        regex         = "(important|standard)"
+        target_label  = "__tenant_id__"
+        replacement   = "network-monitoring"
+    }
+    
+    // Default tenant for unclassified metrics
+    rule {
+        source_labels = ["__tenant_id__"]
+        regex         = "^$"
+        target_label  = "__tenant_id__"
+        replacement   = "network-default"
+    }
+}
+
+// ===================================================================
+// METRIC FILTERING AND SAMPLING
+// ===================================================================
+
+// Filter and sample metrics to reduce cardinality
+prometheus.relabel "metric_filtering" {
+    forward_to = [
+        prometheus.remote_write.mimir_primary.receiver,
+    ]
+    
+    // Drop debug metrics in production
+    rule {
+        source_labels = ["__name__"]
+        regex         = "network_collector_debug_.*"
+        action        = "drop"
+    }
+    
+    // Sample high-frequency histogram buckets
+    rule {
+        source_labels = ["__name__", "le"]
+        regex         = "network_.*_bucket;(0\\.001|0\\.005|0\\.075|0\\.125|0\\.175|0\\.225|0\\.275|0\\.375|0\\.425|0\\.475|0\\.525|0\\.575|0\\.625|0\\.675|0\\.725|0\\.775|0\\.825|0\\.875|0\\.925|0\\.975)"
+        action        = "drop"
+    }
+    
+    // Keep only essential interface metrics for high-cardinality interfaces
+    rule {
+        source_labels = ["__name__", "interface"]
+        regex         = "network_interface_.*;(lo|lo0|dummy.*|veth.*)"
+        action        = "drop"
+    }
+    
+    // Rate limiting for very high frequency metrics
+    rule {
+        source_labels = ["__name__"]
+        regex         = "network_measurement_duration_seconds"
+        action        = "keep"
+        # This keeps the metric but allows for potential sampling
+    }
+}
+
+// ===================================================================
+// REMOTE WRITE CONFIGURATION
+// ===================================================================
+
+// Primary Mimir remote write endpoint
+prometheus.remote_write "mimir_primary" {
+    endpoint {
+        url = env("MIMIR_ENDPOINT")
+        
+        // Multi-tenant header
+        headers = {
+            "X-Scope-OrgID" = "{{ .__tenant_id__ }}"
+        }
+        
+        // Authentication
+        bearer_token = env("MIMIR_TOKEN")
+        
+        // Or use basic auth if preferred
+        // basic_auth {
+        //     username = env("MIMIR_USERNAME")
+        //     password = env("MIMIR_PASSWORD")
+        // }
+        
+        // Queue configuration for reliability
+        queue_config {
+            capacity          = 10000
+            max_shards        = 50
+            min_shards        = 1
+            max_samples_per_send = 2000
+            batch_send_deadline = "5s"
+            min_backoff        = "30ms"
+            max_backoff        = "5s"
+            retry_on_http_429  = true
+        }
+        
+        // Metadata configuration
+        metadata_config {
+            send         = true
+            send_interval = "1m"
+        }
+        
+        // Write relabeling for final metric adjustments
+        write_relabel_config {
+            // Add global labels
+            rule {
+                target_label = "cluster"
+                replacement  = env("CLUSTER_NAME")
+            }
+            
+            rule {
+                target_label = "data_source"
+                replacement  = "network-intelligence-monitor"
+            }
+            
+            // Remove internal labels
+            rule {
+                regex  = "__.*"
+                action = "labeldrop"
+            }
+        }
+    }
+    
+    // External labels for global identification
+    external_labels = {
+        cluster     = env("CLUSTER_NAME")
+        datacenter  = env("DATACENTER")
+        environment = env("ENVIRONMENT")
+        collector   = "alloy-network-intelligence"
+    }
+    
+    // WAL configuration for durability
+    wal {
+        truncate_frequency = "2h"
+        min_keepalive_time = "5m"
+        max_keepalive_time = "8h"
+    }
+}
+
+// Backup Mimir endpoint for redundancy
+prometheus.remote_write "mimir_backup" {
+    endpoint {
+        url = env("MIMIR_BACKUP_ENDPOINT")
+        
+        headers = {
+            "X-Scope-OrgID" = "{{ .__tenant_id__ }}"
+        }
+        
+        bearer_token = env("MIMIR_BACKUP_TOKEN")
+        
+        // More conservative queue config for backup
+        queue_config {
+            capacity          = 5000
+            max_shards        = 25
+            min_shards        = 1
+            max_samples_per_send = 1000
+            batch_send_deadline = "10s"
+            min_backoff        = "1s"
+            max_backoff        = "30s"
+            retry_on_http_429  = true
+        }
+        
+        // Only send critical metrics to backup
+        write_relabel_config {
+            rule {
+                source_labels = ["sla_tier"]
+                regex         = "critical"
+                action        = "keep"
+            }
+        }
+    }
+    
+    external_labels = {
+        cluster     = env("CLUSTER_NAME")
+        datacenter  = env("DATACENTER")
+        environment = env("ENVIRONMENT")
+        collector   = "alloy-network-intelligence-backup"
+    }
+}
+
+// ===================================================================
+// SELF-MONITORING CONFIGURATION
+// ===================================================================
+
+// Monitor Alloy itself
+prometheus.scrape "alloy_self" {
+    targets = [
+        {"__address__" = "localhost:12345"},
+    ]
+    forward_to = [prometheus.remote_write.mimir_primary.receiver]
+    
+    job_name        = "alloy"
+    scrape_interval = "30s"
+    metrics_path    = "/metrics"
+    
+    scrape_config {
+        metric_relabel_config {
+            // Add labels to identify this Alloy instance
+            rule {
+                target_label = "component"
+                replacement  = "alloy-network-intelligence"
+            }
+        }
+    }
+}
+
+// Health check endpoint monitoring
+prometheus.scrape "network_monitor_health" {
+    targets = [
+        {"__address__" = "localhost:8000", "__metrics_path__" = "/health"},
+    ]
+    forward_to = [prometheus.remote_write.mimir_primary.receiver]
+    
+    job_name        = "network-monitor-health"
+    scrape_interval = "15s"
+    metrics_path    = "/health"
+    
+    // Custom metric creation for health status
+    metric_relabel_config {
+        rule {
+            source_labels = ["__name__"]
+            regex         = "up"
+            target_label  = "health_check_type"
+            replacement   = "network_monitor"
+        }
+    }
+}
+
+// ===================================================================
+// FLOW CONTROL AND RATE LIMITING
+// ===================================================================
+
+// Rate limiting component to prevent overwhelming Mimir
+rate_limit "mimir_writes" {
+    rate  = 1000  // samples per second
+    burst = 2000
+}
+
+// Flow control for metric processing
+prometheus.relabel "flow_control" {
+    forward_to = [
+        rate_limit.mimir_writes.receiver,
+    ]
+    
+    // Add flow control metadata
+    rule {
+        target_label = "__flow_controlled__"
+        replacement  = "true"
+    }
+}
+
+// ===================================================================
+// CONDITIONAL CONFIGURATIONS
+// ===================================================================
+
+// Development environment configuration
+if (env("ENVIRONMENT") == "development") {
+    // Enable debug logging
+    logging {
+        level = "debug"
+    }
+    
+    // Shorter scrape intervals for testing
+    prometheus.scrape "network_intelligence_dev" {
+        targets         = discovery.static.network_monitor.targets
+        scrape_interval = "5s"
+        forward_to      = [prometheus.remote_write.mimir_primary.receiver]
+    }
+}
+
+// Production environment configuration
+if (env("ENVIRONMENT") == "production") {
+    // Add production-specific relabeling
+    prometheus.relabel "production_labels" {
+        rule {
+            target_label = "environment"
+            replacement  = "production"
+        }
+        
+        rule {
+            target_label = "criticality"
+            replacement  = "high"
+        }
+    }
+}
+
+// Edge deployment specific configuration
+if (env("DEPLOYMENT_TYPE") == "edge") {
+    // Optimize for limited resources
+    prometheus.scrape "network_intelligence_edge" {
+        targets         = discovery.static.network_monitor.targets
+        scrape_interval = "60s"  // Longer interval for edge devices
+        scrape_timeout  = "15s"
+        forward_to      = [prometheus.remote_write.mimir_primary.receiver]
+        
+        // Reduce memory usage
+        sample_limit = 5000
+        target_limit = 10
+    }
+    
+    // More aggressive metric filtering for edge
+    prometheus.relabel "edge_filtering" {
+        // Drop high-cardinality metrics
+        rule {
+            source_labels = ["__name__"]
+            regex         = "network_.*_histogram_bucket"
+            action        = "drop"
+        }
+        
+        // Keep only essential quality metrics
+        rule {
+            source_labels = ["__name__"]
+            regex         = "(network_icmp_ping_duration_seconds|network_packet_loss_ratio|network_mos_score)"
+            action        = "keep"
+        }
+    }
+}
+
+// ===================================================================
+// ERROR HANDLING AND ALERTING
+// ===================================================================
+
+// Component to handle scrape failures
+prometheus.scrape "error_monitoring" {
+    targets = [
+        {"__address__" = "localhost:8000", "__metrics_path__" = "/metrics"},
+    ]
+    
+    job_name = "error-monitoring"
+    
+    // Custom error handling
+    honor_labels = false
+    
+    metric_relabel_config {
+        // Create custom metric for scrape failures
+        rule {
+            source_labels = ["__name__"]
+            regex         = "up"
+            target_label  = "__name__"
+            replacement   = "network_monitor_scrape_success"
+        }
+    }
+}
+
+// Dead letter queue for failed metrics
+prometheus.remote_write "dead_letter_queue" {
+    endpoint {
+        url = env("DLQ_ENDPOINT")
+        
+        // Only activate if DLQ endpoint is configured
+        send_exemplars = false
+        send_native_histograms = false
+        
+        queue_config {
+            capacity = 1000
+            max_shards = 5
+            retry_on_http_429 = false  // Don't retry for DLQ
+        }
+    }
+}
+
+// ===================================================================
+// CONFIGURATION VALIDATION
+// ===================================================================
+
+// Validate required environment variables
+assert {
+    condition = env("MIMIR_ENDPOINT") != ""
+    message   = "MIMIR_ENDPOINT environment variable must be set"
+}
+
+assert {
+    condition = env("MIMIR_TOKEN") != ""
+    message   = "MIMIR_TOKEN environment variable must be set"
+}
+
+// ===================================================================
+// EXAMPLE ENVIRONMENT VARIABLES
+// ===================================================================
+
+/*
+Required environment variables:
+
+# Mimir Configuration
+MIMIR_ENDPOINT=https://mimir.example.com/api/v1/push
+MIMIR_TOKEN=your_mimir_token_here
+MIMIR_BACKUP_ENDPOINT=https://backup-mimir.example.com/api/v1/push
+MIMIR_BACKUP_TOKEN=your_backup_token_here
+
+# Deployment Configuration  
+ENVIRONMENT=production
+REGION=us-west-2
+CLUSTER_NAME=network-monitoring-cluster
+DATACENTER=dc-west
+DEPLOYMENT_TYPE=edge
+HOSTNAME=network-monitor-edge-01
+
+# Optional Configuration
+NODE_NAME=worker-node-01
+DLQ_ENDPOINT=https://dlq.example.com/api/v1/push
+
+# Kubernetes specific (if applicable)
+POD_NAME=network-monitor-pod
+NAMESPACE=network-monitoring
+*/
