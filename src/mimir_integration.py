@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
 """
-Mimir Integration Module
-=======================
+Fixed Mimir Integration Module
+=============================
 
-Integration with Mimir for historical data analysis and baseline creation.
-Features:
-- Optimized PromQL queries for historical baselines
-- Time series aggregation and analysis
-- Seasonal pattern detection from historical data
-- Efficient data fetching with caching
-- Multi-tenancy support for Mimir
+Fixed version with the missing _process_baseline_query method and proper error handling.
 """
 
 import asyncio
@@ -48,7 +42,7 @@ class HistoricalBaseline:
     last_updated: float
 
 class MimirClient:
-    """Client for Mimir integration"""
+    """Client for Mimir integration with proper error handling"""
     
     def __init__(self, config: Dict[str, Any]):
         self.config = config
@@ -227,9 +221,172 @@ class MimirClient:
         
         return baselines
     
+    # THIS WAS THE MISSING METHOD:
+    async def _process_baseline_query(self, query: str, days_back: int) -> Optional[HistoricalBaseline]:
+        """Process a single baseline query"""
+        
+        all_data = []
+        end_time = time.time()
+        
+        # Process in chunks to avoid memory issues and query timeouts
+        for chunk in range(0, days_back * 24, self.chunk_size):
+            chunk_end = end_time - (chunk * 3600)
+            chunk_start = end_time - ((chunk + self.chunk_size) * 3600)
+            
+            try:
+                chunk_data = await self._execute_query(
+                    query, chunk_start, chunk_end, self.max_resolution
+                )
+                all_data.extend(chunk_data)
+                
+                # Small delay to avoid overwhelming the server
+                await asyncio.sleep(0.1)
+                
+            except Exception as e:
+                logger.warning(f"Failed to fetch chunk {chunk}-{chunk + self.chunk_size}: {e}")
+                continue
+        
+        if not all_data:
+            return None
+        
+        # Process data in executor to avoid blocking
+        return await asyncio.get_event_loop().run_in_executor(
+            self.executor, self._calculate_baseline_statistics, all_data, query
+        )
+    
+    def _calculate_baseline_statistics(self, data: List[MimirQueryResult], 
+                                     query: str) -> HistoricalBaseline:
+        """Calculate baseline statistics from historical data"""
+        
+        # Combine all time series data
+        all_values = []
+        timestamps = []
+        
+        for result in data:
+            for timestamp, value in result.values:
+                all_values.append(value)
+                timestamps.append(timestamp)
+        
+        if not all_values:
+            return None
+        
+        # Convert to numpy arrays for efficient processing
+        values_array = np.array(all_values)
+        timestamps_array = np.array(timestamps)
+        
+        # Create DataFrame for time-based analysis
+        df = pd.DataFrame({
+            'timestamp': pd.to_datetime(timestamps_array, unit='s'),
+            'value': values_array
+        })
+        
+        # Calculate hourly baselines
+        df['hour'] = df['timestamp'].dt.hour
+        hourly_baselines = df.groupby('hour')['value'].agg([
+            'mean', 'median', 'std', 
+            lambda x: np.percentile(x, 25),
+            lambda x: np.percentile(x, 75)
+        ]).to_dict('index')
+        
+        # Calculate daily baselines
+        df['day_of_week'] = df['timestamp'].dt.dayofweek
+        daily_baselines = df.groupby('day_of_week')['value'].agg([
+            'mean', 'median', 'std',
+            lambda x: np.percentile(x, 25),
+            lambda x: np.percentile(x, 75)
+        ]).to_dict('index')
+        
+        # Detect seasonal patterns using FFT
+        seasonal_patterns = self._detect_seasonal_patterns(values_array, timestamps_array)
+        
+        # Create comprehensive baseline
+        baseline_values = {}
+        confidence_intervals = {}
+        
+        # Process hourly baselines
+        for hour, stats in hourly_baselines.items():
+            baseline_values[f"hour_{hour}"] = stats['mean']
+            confidence_intervals[f"hour_{hour}"] = (
+                stats['<lambda_0>'], stats['<lambda_1>']  # Q25, Q75
+            )
+        
+        # Process daily baselines
+        for day, stats in daily_baselines.items():
+            baseline_values[f"day_{day}"] = stats['mean']
+            confidence_intervals[f"day_{day}"] = (
+                stats['<lambda_0>'], stats['<lambda_1>']  # Q25, Q75
+            )
+        
+        # Overall statistics
+        baseline_values['overall_mean'] = float(np.mean(values_array))
+        baseline_values['overall_median'] = float(np.median(values_array))
+        baseline_values['overall_std'] = float(np.std(values_array))
+        
+        return HistoricalBaseline(
+            metric_name=query,
+            baseline_type='comprehensive',
+            time_period='multi',
+            values=baseline_values,
+            confidence_intervals=confidence_intervals,
+            seasonal_patterns=seasonal_patterns,
+            last_updated=time.time()
+        )
+    
+    def _detect_seasonal_patterns(self, values: np.ndarray, 
+                                timestamps: np.ndarray) -> Dict[str, float]:
+        """Detect seasonal patterns using FFT"""
+        
+        if len(values) < 48:  # Need at least 48 data points
+            return {}
+        
+        try:
+            # Sort by timestamp to ensure proper ordering
+            sorted_indices = np.argsort(timestamps)
+            sorted_values = values[sorted_indices]
+            
+            # Normalize values
+            normalized_values = (sorted_values - np.mean(sorted_values)) / (np.std(sorted_values) + 1e-8)
+            
+            # Apply FFT
+            fft_values = np.fft.fft(normalized_values)
+            freqs = np.fft.fftfreq(len(normalized_values))
+            
+            # Calculate power spectrum
+            power = np.abs(fft_values) ** 2
+            
+            # Find dominant frequencies
+            dominant_indices = np.argsort(power)[-10:]  # Top 10 frequencies
+            
+            patterns = {}
+            
+            # Convert frequencies to periods (in hours)
+            sample_rate = len(normalized_values) / (np.max(timestamps) - np.min(timestamps)) * 3600
+            
+            for idx in dominant_indices:
+                if freqs[idx] > 0:  # Only positive frequencies
+                    period_hours = 1.0 / (freqs[idx] * sample_rate)
+                    
+                    # Classify patterns
+                    if 0.8 <= period_hours <= 1.2:  # ~1 hour
+                        patterns['hourly'] = float(power[idx])
+                    elif 23 <= period_hours <= 25:  # ~24 hours
+                        patterns['daily'] = float(power[idx])
+                    elif 167 <= period_hours <= 169:  # ~168 hours (7 days)
+                        patterns['weekly'] = float(power[idx])
+            
+            return patterns
+            
+        except Exception as e:
+            logger.warning(f"Failed to detect seasonal patterns: {e}")
+            return {}
+    
     async def get_network_metrics_baselines(self, target_hosts: List[str] = None,
                                           days_back: int = 30) -> Dict[str, HistoricalBaseline]:
         """Get network-specific metrics baselines from Mimir"""
+        
+        if not self.mimir_url:
+            logger.info("Mimir URL not configured, skipping baseline collection")
+            return {}
         
         if not target_hosts:
             target_hosts = ['.*']  # Match all hosts
@@ -289,8 +446,6 @@ class MimirClient:
             }
         
         return test_results
-    
-    # ... rest of the methods remain the same but with Prometheus references changed to Mimir
 
 # Utility functions for integration
 
