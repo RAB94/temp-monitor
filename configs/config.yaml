@@ -1,52 +1,135 @@
+# config.yaml (or config-enhanced.yaml)
+
 logging:
-  level: INFO
+  level: INFO # DEBUG, INFO, WARNING, ERROR, CRITICAL
   file: data/logs/network_intelligence.log
   max_size_mb: 10
   backup_count: 5
+  console_enabled: True
+  json_format: False # Set to true for structured JSON logs
 
 database:
   path: data/database/network_intelligence.db
-  cleanup_days: 30
-  backup_enabled: true
+  cleanup_days: 30 # Data older than this will be removed
+  backup_enabled: True
+  backup_interval_hours: 24 # How often to backup the database
 
 monitoring:
   targets:
     - 8.8.8.8
     - 1.1.1.1
     - google.com
-    - github.com
-  interval: 30
-  timeout: 10
-  enhanced_features: true
+    - "https://cloudflare.com" # Example of an HTTP target for other collectors
+  interval: 30 # Default interval in seconds for standard monitoring
+  timeout: 10 # Default timeout in seconds for standard tests
+  enabled: True
+  enhanced_features: True # Enable collection of more detailed metrics
 
 ai:
   model_dir: data/models
-  train_interval: 3600
+  train_interval: 3600 # Retrain model every 1 hour
   initial_epochs: 100
-  auto_train: true
-  enable_quantization: false
+  baseline_window: 1000 # Number of data points for baseline calculation
+  training_hours: 24 # Use last 24 hours of data for training
+  auto_train: True
+  enable_quantization: True # Quantize models for better performance, esp. on edge
 
 api:
-  host: 0.0.0.0
+  host: '0.0.0.0'
   port: 5000
-  debug: false
+  debug: False
+  cors_enabled: True
 
-metrics:
+metrics: # For Prometheus exporter
   port: 8000
-  host: 0.0.0.0
-  batch_size: 10
+  host: '0.0.0.0'
+  batch_size: 10 # Aggregate metrics before exposing
+  enable_aggregation: True
 
 mimir:
-  prometheus_url: ${PROMETHEUS_URL}
-  mimir_url: ${MIMIR_URL}
+  # prometheus_url: http://localhost:9090 # If scraping local Prometheus
+  mimir_url: ${MIMIR_URL} # Example: https://your-mimir-instance.grafana.net/api/prom
   tenant_id: network-monitoring
-  enabled: true
+  enabled: ${MIMIR_ENABLED} # Set to true if Mimir URL is configured
 
 alerts:
-  enabled: true
-  webhook_url: ${WEBHOOK_URL}
+  enabled: True
+  webhook_url: ${WEBHOOK_URL} # Example: https://hooks.slack.com/services/...
+  # email_enabled: False
+  # smtp_server: smtp.example.com
+  # smtp_port: 587
+  # email_recipients:
+  #   - admin@example.com
 
 deployment:
-  edge_optimization: false
-  quantize_models: false
+  edge_optimization: False # Set to true for edge devices
+  quantize_models: False   # Tied to edge_optimization or can be enabled separately
+  reduce_memory_usage: False
   max_memory_mb: 512
+
+# --- New section for networkquality-rs integration ---
+networkquality:
+  enabled: True # Master switch for this specific type of monitoring
+
+  client:
+    # Path to the compiled 'networkquality' client binary
+    binary_path: "/usr/local/bin/networkquality"
+    # Default duration for each networkquality test in seconds
+    test_duration: 15
+    # Default number of parallel streams for the test
+    parallel_streams: 10
+
+  server:
+    # Type of server to test against:
+    # 'self_hosted': The application will manage a local 'networkquality-server' process.
+    # 'external': The application will test against a pre-existing server URL.
+    type: "self_hosted" # or "external"
+
+    # URL of the networkquality-server.
+    # If type is 'self_hosted', this is typically http://<bind_address>:<port>
+    # If type is 'external', this must be the full URL of the remote server.
+    url: "http://127.0.0.1:9090" # This will be used by the client.
+
+    # --- Settings for 'self_hosted' server type ---
+    # If true, the application will attempt to start and stop the networkquality-server binary.
+    auto_start: True
+    # Path to the compiled 'networkquality-server' binary.
+    binary_path: "/usr/local/bin/networkquality-server"
+    # Port for the self-hosted server to listen on.
+    port: 9090
+    # Bind address for the self-hosted server.
+    bind_address: "0.0.0.0" # Use 0.0.0.0 to listen on all interfaces
+    # Log level for the networkquality-server process (e.g., "info", "debug", "warn", "error").
+    log_level: "info"
+    # Optional additional command-line arguments to pass to networkquality-server
+    # Example: ["--some-flag", "value"]
+    additional_args: []
+
+  thresholds: # For classifying results from networkquality tests
+    bufferbloat_ms:
+      mild: 30
+      moderate: 70
+      severe: 120
+    rpm: # Rounds Per Minute
+      poor: 100
+      fair: 300
+      good: 600
+      excellent: 800 # Higher is better
+    quality_score: # Overall score (0-1000, derived in collector)
+      poor: 300
+      fair: 500
+      good: 750
+      excellent: 900
+
+  testing: # Configuration for how often to run networkquality tests
+    strategy: "adaptive" # 'adaptive' (adjusts based on results) or 'fixed'
+    # Intervals for adaptive strategy (in seconds)
+    adaptive_intervals:
+      excellent: 7200 # 2 hours
+      good: 3600      # 1 hour
+      fair: 1800      # 30 minutes
+      poor: 600       # 10 minutes
+      error: 300      # 5 minutes (if previous test failed)
+    # Default interval if strategy is 'fixed' or for fallback
+    default_interval_seconds: 900 # 15 minutes
+

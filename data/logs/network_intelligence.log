@@ -923,3 +923,94 @@ websockets.exceptions.InvalidUpgrade: missing Connection header
 2025-06-04 08:46:42,198 - __main__ - INFO - Final Health Score: 100.0
 2025-06-04 08:46:42,198 - __main__ - INFO - ================================
 2025-06-04 08:46:42,198 - __main__ - INFO - Enhanced Network Intelligence Monitor stopped
+2025-06-05 16:58:55,526 - src.utils.logger - INFO - Logging system initialized
+2025-06-05 16:58:55,526 - src.utils.logger - INFO - Log level: 20
+2025-06-05 16:58:55,526 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-05 16:58:55,526 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-05 16:58:55,527 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-05 16:58:55,527 - src.config - INFO - Configuration validation completed.
+2025-06-05 16:58:55,527 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-05 16:58:55,527 - __main__ - INFO - NetworkQuality-RS enabled: False
+2025-06-05 16:58:55,527 - __main__ - ERROR - Failed to initialize enhanced monitor: 'EnhancedNetworkIntelligenceMonitor' object has no attribute '_detect_environment'
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 100, in initialize
+    await self._detect_environment()
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EnhancedNetworkIntelligenceMonitor' object has no attribute '_detect_environment'
+2025-06-05 16:58:55,530 - __main__ - CRITICAL - Unhandled exception in main: 'EnhancedNetworkIntelligenceMonitor' object has no attribute '_detect_environment'
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 619, in main
+    if await monitor.initialize(): # Ensure initialization is successful
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/main.py", line 100, in initialize
+    await self._detect_environment()
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EnhancedNetworkIntelligenceMonitor' object has no attribute '_detect_environment'
+2025-06-05 16:58:55,532 - __main__ - INFO - Application shutdown complete.
+2025-06-05 16:59:29,815 - src.utils.logger - INFO - Logging system initialized
+2025-06-05 16:59:29,815 - src.utils.logger - INFO - Log level: 20
+2025-06-05 16:59:29,815 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-05 16:59:29,815 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-05 16:59:29,816 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-05 16:59:29,817 - src.config - INFO - Configuration validation completed.
+2025-06-05 16:59:29,817 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-05 16:59:29,817 - __main__ - INFO - NetworkQuality-RS enabled: False
+2025-06-05 16:59:29,817 - __main__ - ERROR - Failed to initialize enhanced monitor: 'EnhancedNetworkIntelligenceMonitor' object has no attribute '_detect_environment'
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 100, in initialize
+    await self._detect_environment()
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EnhancedNetworkIntelligenceMonitor' object has no attribute '_detect_environment'
+2025-06-05 16:59:29,819 - __main__ - CRITICAL - Unhandled exception in main: 'EnhancedNetworkIntelligenceMonitor' object has no attribute '_detect_environment'
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 619, in main
+    if await monitor.initialize(): # Ensure initialization is successful
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/main.py", line 100, in initialize
+    await self._detect_environment()
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EnhancedNetworkIntelligenceMonitor' object has no attribute '_detect_environment'
+2025-06-05 16:59:29,822 - __main__ - INFO - Application shutdown complete.
+2025-06-05 17:03:24,818 - src.utils.logger - INFO - Logging system initialized
+2025-06-05 17:03:24,819 - src.utils.logger - INFO - Log level: 20
+2025-06-05 17:03:24,819 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-05 17:03:24,819 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-05 17:03:24,820 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-05 17:03:24,820 - src.config - INFO - Configuration validation completed.
+2025-06-05 17:03:24,820 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-05 17:03:24,820 - __main__ - INFO - NetworkQuality-RS enabled: False
+2025-06-05 17:03:24,820 - __main__ - INFO - Detecting environment...
+2025-06-05 17:03:24,821 - __main__ - INFO -   Platform: linux
+2025-06-05 17:03:24,821 - __main__ - INFO -   Is container: True
+2025-06-05 17:03:24,821 - __main__ - INFO -   Is cloud: False
+2025-06-05 17:03:24,821 - __main__ - INFO -   Is edge device: False
+2025-06-05 17:03:24,821 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-05 17:03:24,822 - src.utils.database - INFO - Database tables created
+2025-06-05 17:03:24,823 - src.utils.database - INFO - Database indexes created
+2025-06-05 17:03:24,823 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 17:03:24,824 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-05 17:03:24,824 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 17:03:24,824 - src.collector - INFO - Enhanced network collector initialized
+2025-06-05 17:03:24,824 - __main__ - INFO - Enhanced network collector initialized
+2025-06-05 17:03:24,825 - __main__ - ERROR - Failed to initialize enhanced monitor: 'AIConfig' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 105, in initialize
+    await self._initialize_ai_system()
+  File "/opt/network-monitor-ml/src/main.py", line 246, in _initialize_ai_system
+    'sequence_length': self.config.ai.get('sequence_length', 20), # Use get for safety
+                       ^^^^^^^^^^^^^^^^^^
+AttributeError: 'AIConfig' object has no attribute 'get'
+2025-06-05 17:03:24,825 - __main__ - CRITICAL - Unhandled exception in main: 'AIConfig' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 673, in main
+    if await monitor.initialize():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/main.py", line 105, in initialize
+    await self._initialize_ai_system()
+  File "/opt/network-monitor-ml/src/main.py", line 246, in _initialize_ai_system
+    'sequence_length': self.config.ai.get('sequence_length', 20), # Use get for safety
+                       ^^^^^^^^^^^^^^^^^^
+AttributeError: 'AIConfig' object has no attribute 'get'
+2025-06-05 17:03:24,825 - __main__ - INFO - Application shutdown sequence complete.
+2025-06-05 17:03:24,825 - asyncio - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x790f77cb16d0>
