@@ -36,7 +36,11 @@ class AIConfig:
     baseline_window: int = 1000
     training_hours: int = 24
     auto_train: bool = True
-    enable_quantization: bool = True # Was False, often true for edge
+    enable_quantization: bool = True 
+    sequence_length: int = 20
+    input_size: int = 14
+    hidden_size: int = 64
+    num_layers: int = 2
 
 @dataclass
 class APIConfig:
@@ -45,6 +49,8 @@ class APIConfig:
     port: int = 5000
     debug: bool = False
     cors_enabled: bool = True
+    websocket_enabled: bool = True  # New: Default to True
+    websocket_port: int = 8001      # New: Default port
 
 @dataclass
 class DatabaseConfig:
@@ -91,18 +97,17 @@ class DeploymentConfig:
 @dataclass
 class NetworkQualityRSClientConfig:
     """networkquality-rs client configuration"""
-    binary_path: str = '/usr/local/bin/networkquality' # Path to the networkquality CLI
-    test_duration: int = 10 # Default duration in seconds for CLI tests
-    parallel_streams: int = 8 # Default parallel streams for CLI tests
-    # detailed_results: bool = True # If CLI supports different levels of detail via JSON
+    binary_path: str = '/usr/local/bin/networkquality' 
+    test_duration: int = 10 
+    parallel_streams: int = 8 
 
 @dataclass
 class NetworkQualityRSServerConfig:
     """networkquality-rs server configuration (for self-hosting)"""
-    type: str = 'external' # 'self_hosted' or 'external'
-    url: Optional[str] = None # URL if external or for client to connect to self-hosted
-    auto_start: bool = False # If true, the application tries to manage the server process
-    binary_path: str = '/usr/local/bin/networkquality-server' # Path to the server binary
+    type: str = 'external' 
+    url: Optional[str] = None 
+    auto_start: bool = False 
+    binary_path: str = '/usr/local/bin/networkquality-server' 
     port: int = 9090
     bind_address: str = '0.0.0.0'
     log_level: str = 'info'
@@ -112,7 +117,6 @@ class NetworkQualityRSServerConfig:
 class NetworkQualityRSConfig:
     """Overall configuration for networkquality-rs integration"""
     enabled: bool = False
-    # server_url: Optional[str] = None # Kept under server config for clarity
     client: NetworkQualityRSClientConfig = field(default_factory=NetworkQualityRSClientConfig)
     server: NetworkQualityRSServerConfig = field(default_factory=NetworkQualityRSServerConfig)
     thresholds: Dict[str, Dict[str, float]] = field(default_factory=lambda: {
@@ -120,29 +124,13 @@ class NetworkQualityRSConfig:
         'rpm': {'poor': 100, 'fair': 300, 'good': 600, 'excellent': 800},
         'quality_score': {'poor': 200, 'fair': 500, 'good': 750, 'excellent': 900}
     })
-    testing: Dict[str, Any] = field(default_factory=lambda: { # For adaptive testing
-        'strategy': 'fixed', # 'adaptive', 'fixed'
+    testing: Dict[str, Any] = field(default_factory=lambda: { 
+        'strategy': 'fixed', 
         'adaptive_intervals': {
             'excellent': 3600, 'good': 1800, 'fair': 600, 'poor': 300, 'error': 300
         },
-        'default_interval_seconds': 300 # Fallback or fixed interval
+        'default_interval_seconds': 300
     })
-
-@dataclass
-class AIConfig:
-    """AI/ML configuration"""
-    model_dir: str = 'data/models'
-    train_interval: int = 3600
-    initial_epochs: int = 100
-    baseline_window: int = 1000
-    training_hours: int = 24
-    auto_train: bool = True
-    enable_quantization: bool = True
-    # Add these new fields
-    sequence_length: int = 20
-    input_size: int = 14
-    hidden_size: int = 64
-    num_layers: int = 2
 
 class Config:
     """Main configuration class"""
@@ -151,7 +139,6 @@ class Config:
         self.config_path = Path(config_path)
         self._config_data = {}
 
-        # Initialize configuration sections
         self.monitoring = MonitoringConfig()
         self.ai = AIConfig()
         self.api = APIConfig()
@@ -160,7 +147,7 @@ class Config:
         self.metrics = MetricsConfig()
         self.alerts = AlertsConfig()
         self.deployment = DeploymentConfig()
-        self.networkquality = NetworkQualityRSConfig() # New section
+        self.networkquality = NetworkQualityRSConfig() 
 
         self.load_config()
 
@@ -193,12 +180,12 @@ class Config:
             'metrics': self.metrics,
             'alerts': self.alerts,
             'deployment': self.deployment,
-            'networkquality': self.networkquality # New section
+            'networkquality': self.networkquality 
         }
 
         for section_name, section_obj in config_sections.items():
             section_data = self._config_data.get(section_name, {})
-            if isinstance(section_obj, NetworkQualityRSConfig): # Handle nested dataclasses for networkquality
+            if isinstance(section_obj, NetworkQualityRSConfig): 
                 if 'client' in section_data:
                     for key, value in section_data['client'].items():
                          if hasattr(section_obj.client, key):
@@ -207,9 +194,9 @@ class Config:
                     for key, value in section_data['server'].items():
                          if hasattr(section_obj.server, key):
                             setattr(section_obj.server, key, value)
-                if 'thresholds' in section_data: # Direct assignment for dict
+                if 'thresholds' in section_data: 
                     section_obj.thresholds = section_data['thresholds']
-                if 'testing' in section_data: # Direct assignment for dict
+                if 'testing' in section_data: 
                     section_obj.testing = section_data['testing']
                 if 'enabled' in section_data:
                     section_obj.enabled = section_data['enabled']
@@ -222,28 +209,22 @@ class Config:
     def _load_environment_overrides(self):
         """Load configuration overrides from environment variables"""
         env_mappings = {
-            # Monitoring
             'MONITORING_INTERVAL': (self.monitoring, 'interval', int),
             'MONITORING_TIMEOUT': (self.monitoring, 'timeout', int),
             'MONITORING_TARGETS': (self.monitoring, 'targets', lambda x: x.split(',')),
-            # API
             'API_HOST': (self.api, 'host', str),
             'API_PORT': (self.api, 'port', int),
-            # Database
+            'API_WEBSOCKET_ENABLED': (self.api, 'websocket_enabled', lambda x: x.lower() == 'true'), # New Env Var
+            'API_WEBSOCKET_PORT': (self.api, 'websocket_port', int), # New Env Var
             'DATABASE_PATH': (self.database, 'path', str),
-            # Mimir
-            'MIMIR_ENDPOINT': (self.mimir, 'mimir_url', str), # Corrected key
-            'PROMETHEUS_ENDPOINT': (self.mimir, 'prometheus_url', str), # Corrected key
+            'MIMIR_ENDPOINT': (self.mimir, 'mimir_url', str), 
+            'PROMETHEUS_ENDPOINT': (self.mimir, 'prometheus_url', str), 
             'MIMIR_TENANT_ID': (self.mimir, 'tenant_id', str),
             'MIMIR_ENABLED':(self.mimir, 'enabled', lambda x: x.lower() == 'true'),
-            # Metrics
             'METRICS_PORT': (self.metrics, 'port', int),
-            # Alerts
             'ALERTS_WEBHOOK_URL':(self.alerts, 'webhook_url', str),
             'ALERTS_ENABLED':(self.alerts, 'enabled', lambda x: x.lower() == 'true'),
-            # Deployment
             'DEPLOYMENT_EDGE_OPTIMIZATION': (self.deployment, 'edge_optimization', lambda x: x.lower() == 'true'),
-            # NetworkQualityRS
             'NQ_ENABLED': (self.networkquality, 'enabled', lambda x: x.lower() == 'true'),
             'NQ_SERVER_URL': (self.networkquality.server, 'url', str),
             'NQ_CLIENT_BINARY_PATH': (self.networkquality.client, 'binary_path', str),
@@ -268,19 +249,17 @@ class Config:
             self.monitoring.targets = ['8.8.8.8']
             logger.warning("No monitoring targets specified, using default ['8.8.8.8']")
 
-        # Ensure networkquality paths are absolute or resolve them
         if self.networkquality.enabled:
             nq_client_bin = Path(self.networkquality.client.binary_path)
             if not nq_client_bin.is_absolute() and not nq_client_bin.exists():
-                # Try to find it in common locations if not absolute
                 common_paths = [Path("/usr/local/bin/networkquality"), Path("/usr/bin/networkquality"), Path("./networkquality")]
                 for p in common_paths:
                     if p.exists():
                         self.networkquality.client.binary_path = str(p.resolve())
                         logger.info(f"Resolved networkquality client binary to: {self.networkquality.client.binary_path}")
                         break
-                else: # if still not found after checking common paths
-                     if not Path(self.networkquality.client.binary_path).exists(): # final check
+                else: 
+                     if not Path(self.networkquality.client.binary_path).exists(): 
                         logger.warning(f"networkquality client binary not found at {self.networkquality.client.binary_path}")
 
 
@@ -293,12 +272,12 @@ class Config:
                             self.networkquality.server.binary_path = str(p.resolve())
                             logger.info(f"Resolved networkquality server binary to: {self.networkquality.server.binary_path}")
                             break
-                    else: # if still not found after checking common paths
-                        if not Path(self.networkquality.server.binary_path).exists(): # final check
+                    else: 
+                        if not Path(self.networkquality.server.binary_path).exists(): 
                             logger.warning(f"networkquality-server binary not found at {self.networkquality.server.binary_path} for self-hosting.")
             elif self.networkquality.server.type == 'external' and not self.networkquality.server.url:
                  logger.error("networkquality server type is 'external' but no URL is provided ('networkquality.server.url').")
-                 self.networkquality.enabled = False # Disable if misconfigured
+                 self.networkquality.enabled = False 
 
         logger.info("Configuration validation completed.")
 
@@ -309,11 +288,11 @@ class Config:
         obj = self
         try:
             for part in parts:
-                if isinstance(obj, dict): # For direct access to _config_data if needed
+                if isinstance(obj, dict): 
                     obj = obj.get(part)
-                else: # Access dataclass attributes
+                else: 
                     obj = getattr(obj, part)
-                if obj is None and default is not None : return default # If intermediate part is None
+                if obj is None and default is not None : return default 
             return obj if obj is not None else default
         except (AttributeError, TypeError):
             return default
@@ -335,7 +314,6 @@ class Config:
         """Save current configuration to file"""
         save_path = Path(path) if path else self.config_path
         try:
-            # Reconstruct _config_data from dataclass objects before saving
             self._config_data = self.to_dict()
             with open(save_path, 'w') as f:
                 yaml.dump(self._config_data, f, default_flow_style=False, indent=2)
@@ -354,7 +332,7 @@ class Config:
             'metrics': self.metrics.__dict__,
             'alerts': self.alerts.__dict__,
             'deployment': self.deployment.__dict__,
-            'networkquality': { # Manually construct for nested dataclasses
+            'networkquality': { 
                 'enabled': self.networkquality.enabled,
                 'client': self.networkquality.client.__dict__,
                 'server': self.networkquality.server.__dict__,
@@ -397,12 +375,9 @@ class Config:
 
 def create_default_config_dict() -> Dict[str, Any]:
     """Create default configuration dictionary for initial save"""
-    # Create an instance with defaults, then convert to dict
     default_cfg = Config()
-    # Ensure paths in default_cfg are strings for YAML serialization
     default_dict = default_cfg.to_dict()
 
-    # Manually ensure model_dir and database.path are strings if they were Path objects
     if isinstance(default_dict['ai']['model_dir'], Path):
         default_dict['ai']['model_dir'] = str(default_dict['ai']['model_dir'])
     if isinstance(default_dict['database']['path'], Path):
@@ -425,18 +400,17 @@ def create_config_file_if_not_exists(config_path_str: str = "config.yaml"):
             logger.error(f"Could not create default configuration file: {e}")
 
 if __name__ == '__main__':
-    # Example of creating a default config if it doesn't exist
     create_config_file_if_not_exists("example_config.yaml")
 
-    # Example usage:
     cfg = Config("example_config.yaml")
     print(f"Monitoring Interval: {cfg.monitoring.interval}")
     print(f"NetworkQuality Enabled: {cfg.networkquality.enabled}")
     print(f"NetworkQuality Client Binary: {cfg.networkquality.client.binary_path}")
     print(f"NetworkQuality Server URL (if external or self-hosted): {cfg.networkquality.server.url}")
     print(f"NetworkQuality Server Type: {cfg.networkquality.server.type}")
+    print(f"API WebSocket Enabled: {cfg.api.websocket_enabled}")
+    print(f"API WebSocket Port: {cfg.api.websocket_port}")
 
-    cfg.networkquality.enabled = True
-    cfg.networkquality.client.test_duration = 15
-    # To save changes:
+    cfg.api.websocket_enabled = False
+    cfg.api.websocket_port = 11560
     # cfg.save_config("example_config_updated.yaml")

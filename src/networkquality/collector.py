@@ -11,10 +11,12 @@ from typing import Dict, Any, List, Optional
 from dataclasses import dataclass, asdict
 import statistics
 import numpy as np # For potential statistical calculations if needed later
+import json # For storing recommendations
 
 # Assuming bridge.py is in the same directory or accessible in PYTHONPATH
 from .bridge import NetworkQualityBinaryBridge, NetworkQualityMeasurement
-from ..utils.database import Database # Adjusted for typical project structure
+# Adjusted for typical project structure, assuming utils is a sibling to networkquality
+from ..utils.database import Database
 
 logger = logging.getLogger(__name__)
 
@@ -65,60 +67,83 @@ class NetworkQualityCollector:
     Collector for network quality metrics using NetworkQualityBinaryBridge.
     """
 
-    def __init__(self, config: Dict[str, Any], database: Optional[Database] = None):
-        self.config = config.get('networkquality', {}) # Expects a 'networkquality' sub-config
-        self.database = database # Optional: for storing results
+    def __init__(self, nq_config: Any, database: Optional[Database] = None): # nq_config is NetworkQualityRSConfig
+        """
+        Initializes the collector.
+        Args:
+            nq_config: An instance of NetworkQualityRSConfig from src.config.py
+            database: Optional database instance for storing results.
+        """
+        self.nq_config = nq_config # Store the NetworkQualityRSConfig object directly
+        self.database = database
         self.logger = logger
 
-        # Initialize bridge
-        self.bridge = NetworkQualityBinaryBridge(self.config)
+        # Initialize bridge, passing the client sub-config (which is a dict in the original plan)
+        # or directly if NetworkQualityBinaryBridge expects NetworkQualityRSClientConfig
+        # For now, assuming NetworkQualityBinaryBridge expects a dict for its 'config' param.
+        # If NetworkQualityBinaryBridge was updated to take NetworkQualityRSClientConfig, this would be:
+        # self.bridge = NetworkQualityBinaryBridge(nq_config.client)
+        client_config_dict = nq_config.client.__dict__ if hasattr(nq_config, 'client') else {}
+        self.bridge = NetworkQualityBinaryBridge({'client': client_config_dict})
+
 
         # Server URL to test against - this is crucial
-        self.server_url = self.config.get('server', {}).get('url')
-        if not self.server_url:
+        self.server_url = getattr(nq_config.server, 'url', None)
+        if not self.server_url and nq_config.server.type == 'self_hosted':
+            # Construct for self_hosted if not explicitly set, and bind_address is known
+            bind_addr = getattr(nq_config.server, 'bind_address', '127.0.0.1')
+            port = getattr(nq_config.server, 'port', 9090)
+            connect_address = '127.0.0.1' if bind_addr == '0.0.0.0' else bind_addr
+            self.server_url = f"http://{connect_address}:{port}"
+
+
+        if not self.server_url and nq_config.enabled:
             self.logger.error(
-                "NetworkQuality server URL ('networkquality.server.url') is not configured. "
-                "Measurements will not be performed."
+                "NetworkQuality server URL ('networkquality.server.url' or derived from self-hosted) "
+                "is not configured. Measurements will not be performed."
             )
 
-        # Test parameters
-        self.test_duration = self.config.get('client',{}).get('test_duration', 10)
-        self.parallel_streams = self.config.get('client',{}).get('parallel_streams', 8)
+        # Test parameters from client config
+        self.test_duration = getattr(nq_config.client, 'test_duration', 10)
+        self.parallel_streams = getattr(nq_config.client, 'parallel_streams', 8)
 
         # Classification thresholds from config
-        self.thresholds = self.config.get('thresholds', {
-            'bufferbloat_ms': {'mild': 30, 'moderate': 60, 'severe': 100}, # in ms
+        self.thresholds_config = nq_config.thresholds if hasattr(nq_config, 'thresholds') else {}
+        self.default_thresholds = { # Default thresholds if not in config
+            'bufferbloat_ms': {'mild': 30, 'moderate': 60, 'severe': 100},
             'rpm': {'poor': 100, 'fair': 300, 'good': 600, 'excellent': 800},
-            # Overall quality score can be a composite, e.g. 0-1000
             'quality_score': {'poor': 200, 'fair': 500, 'good': 750, 'excellent': 900}
-        })
+        }
 
-        # Adaptive testing (optional, can be implemented if needed)
-        self.adaptive_intervals = self.config.get('testing', {}).get('adaptive_intervals', {
+        # Adaptive testing
+        testing_conf = nq_config.testing if hasattr(nq_config, 'testing') else {}
+        self.adaptive_intervals = testing_conf.get('adaptive_intervals', {
             'excellent': 3600, 'good': 1800, 'fair': 600, 'poor': 300, 'error': 300
         })
+        self.default_interval = testing_conf.get('default_interval_seconds', 300)
         self.target_next_test_time = {}
 
 
     async def collect_network_quality(self, target_host: Optional[str] = None, force: bool = False) -> ResponsivenessMetrics:
         """
-        Collects network quality metrics for the configured server or a specific target (if server_url can be dynamic).
-        For networkquality-rs, target_host is typically the measurement server itself.
+        Collects network quality metrics for the configured server.
+        The 'target_host' argument is mostly for consistency but the actual server tested against
+        is self.server_url derived from networkquality.server.url or self-hosted settings.
         """
-        measurement_server_url = target_host or self.server_url
+        measurement_server_url = self.server_url # Primarily use the configured server URL
         current_time = time.time()
 
         if not measurement_server_url:
-            self.logger.warning("No NetworkQuality server URL specified. Skipping measurement.")
-            return self._create_error_metrics(measurement_server_url or "unknown", "Server URL not configured")
+            self.logger.warning("No NetworkQuality server URL specified for collector. Skipping measurement.")
+            return self._create_error_metrics(target_host or "unknown_target", "Collector's server_url not configured")
 
-        if not force:
+        # Adaptive testing logic
+        testing_strategy = getattr(self.nq_config.testing, 'strategy', 'fixed')
+        if not force and testing_strategy == 'adaptive':
             next_test_time = self.target_next_test_time.get(measurement_server_url, 0)
             if current_time < next_test_time:
                 self.logger.debug(f"Skipping NetworkQuality test for {measurement_server_url}, next test at {time.ctime(next_test_time)}")
-                # Optionally return last known good result or specific "skipped" status
                 return self._create_error_metrics(measurement_server_url, "Skipped due to adaptive interval")
-
 
         self.logger.info(f"Collecting NetworkQuality metrics for server: {measurement_server_url}")
         test_start_time = time.monotonic()
@@ -143,23 +168,27 @@ class NetworkQualityCollector:
             metrics = self._create_error_metrics(measurement_server_url, str(e), measurement_duration_ms)
 
         # Update adaptive testing interval
-        next_interval = self.adaptive_intervals.get(metrics.quality_rating, self.adaptive_intervals['fair'])
-        self.target_next_test_time[measurement_server_url] = current_time + next_interval
+        if testing_strategy == 'adaptive':
+            next_interval = self.adaptive_intervals.get(metrics.quality_rating, self.default_interval)
+            self.target_next_test_time[measurement_server_url] = current_time + next_interval
 
-        if self.database and metrics.error is None: # Only store successful/processed metrics
+        if self.database and metrics.error is None:
             await self._store_metrics(metrics)
 
         return metrics
 
+    def _get_threshold(self, category: str, level: str) -> float:
+        """Safely get a threshold value."""
+        return self.thresholds_config.get(category, self.default_thresholds.get(category, {})).get(level, 0)
+
+
     def _process_raw_measurement(self, raw: NetworkQualityMeasurement, duration_ms: float) -> ResponsivenessMetrics:
-        """Processes raw measurement data to compute derived metrics and classifications."""
         dl_rpm = raw.rpm_download
         ul_rpm = raw.rpm_upload
         base_rtt = raw.base_rtt_ms
         loaded_dl_rtt = raw.loaded_rtt_download_ms
         loaded_ul_rtt = raw.loaded_rtt_upload_ms
 
-        # --- Derived Metrics ---
         rpm_average = None
         if dl_rpm is not None and ul_rpm is not None:
             rpm_average = (dl_rpm + ul_rpm) / 2
@@ -180,45 +209,38 @@ class NetworkQualityCollector:
         elif ul_bufferbloat is not None:
             max_bufferbloat = ul_bufferbloat
 
-
-        # --- Classifications & Scores ---
         bufferbloat_severity = "unknown"
         if max_bufferbloat is not None:
-            if max_bufferbloat >= self.thresholds['bufferbloat_ms']['severe']:
+            if max_bufferbloat >= self._get_threshold('bufferbloat_ms', 'severe'):
                 bufferbloat_severity = "severe"
-            elif max_bufferbloat >= self.thresholds['bufferbloat_ms']['moderate']:
+            elif max_bufferbloat >= self._get_threshold('bufferbloat_ms', 'moderate'):
                 bufferbloat_severity = "moderate"
-            elif max_bufferbloat >= self.thresholds['bufferbloat_ms']['mild']:
+            elif max_bufferbloat >= self._get_threshold('bufferbloat_ms', 'mild'):
                 bufferbloat_severity = "mild"
             else:
                 bufferbloat_severity = "none"
 
-        # Overall Quality Score (example heuristic, can be refined)
-        # This needs to be carefully designed based on how RPM, RTT, and throughput interplay.
-        quality_score = 0
+        quality_score = 0.0
         if rpm_average is not None:
-            quality_score += min(rpm_average / 10, 400) # Max 400 points for RPM (e.g. 1000 RPM = 100 pts)
+            quality_score += min(rpm_average * 0.4, 400) # Max 400 points for RPM (scaled)
         if max_bufferbloat is not None:
-            quality_score -= min(max_bufferbloat / 2, 300) # Penalty for bufferbloat
+            # Higher penalty for higher bufferbloat
+            if max_bufferbloat > self._get_threshold('bufferbloat_ms', 'severe'): quality_score -= 300
+            elif max_bufferbloat > self._get_threshold('bufferbloat_ms', 'moderate'): quality_score -= 150
+            elif max_bufferbloat > self._get_threshold('bufferbloat_ms', 'mild'): quality_score -= 75
         if raw.download_throughput_mbps is not None and raw.upload_throughput_mbps is not None:
-             # Max 300 for throughput (e.g. 100Mbps combined = 300 pts)
-            quality_score += min((raw.download_throughput_mbps + raw.upload_throughput_mbps), 300)
+            quality_score += min((raw.download_throughput_mbps + raw.upload_throughput_mbps) * 2, 300) # Max 300 for throughput
 
-        quality_score = max(0, min(1000, quality_score)) # Normalize to 0-1000
+        quality_score = max(0.0, min(1000.0, quality_score))
 
         quality_rating = "unknown"
-        if quality_score >= self.thresholds['quality_score']['excellent']:
-            quality_rating = "excellent"
-        elif quality_score >= self.thresholds['quality_score']['good']:
-            quality_rating = "good"
-        elif quality_score >= self.thresholds['quality_score']['fair']:
-            quality_rating = "fair"
-        else:
-            quality_rating = "poor"
+        if quality_score >= self._get_threshold('quality_score', 'excellent'): quality_rating = "excellent"
+        elif quality_score >= self._get_threshold('quality_score', 'good'): quality_rating = "good"
+        elif quality_score >= self._get_threshold('quality_score', 'fair'): quality_rating = "fair"
+        else: quality_rating = "poor"
 
         congestion_detected = bufferbloat_severity in ["moderate", "severe"] or \
-                              (rpm_average is not None and rpm_average < self.thresholds['rpm']['fair'])
-
+                              (rpm_average is not None and rpm_average < self._get_threshold('rpm', 'fair'))
 
         metrics = ResponsivenessMetrics(
             timestamp=raw.timestamp,
@@ -247,7 +269,6 @@ class NetworkQualityCollector:
         return metrics
 
     def _create_error_metrics(self, target_url: str, error_msg: str, duration_ms: Optional[float] = None) -> ResponsivenessMetrics:
-        """Creates a ResponsivenessMetrics object representing a failed test."""
         return ResponsivenessMetrics(
             timestamp=time.time(),
             target_host=target_url,
@@ -258,7 +279,6 @@ class NetworkQualityCollector:
         )
 
     def _generate_recommendations(self, metrics: ResponsivenessMetrics) -> List[str]:
-        """Generate actionable recommendations based on metrics."""
         recs = []
         if metrics.error:
             recs.append(f"Test failed: {metrics.error}. Check server and binary configuration.")
@@ -272,48 +292,41 @@ class NetworkQualityCollector:
                         "If issues persist, investigate network usage or consider QoS.")
 
         if metrics.rpm_average is not None:
-            if metrics.rpm_average < self.thresholds['rpm']['poor']:
+            if metrics.rpm_average < self._get_threshold('rpm', 'poor'):
                 recs.append(f"Very low responsiveness (RPM: {metrics.rpm_average:.0f}). "
                             "Real-time applications will suffer. Investigate network congestion or ISP issues.")
-            elif metrics.rpm_average < self.thresholds['rpm']['fair']:
+            elif metrics.rpm_average < self._get_threshold('rpm', 'fair'):
                 recs.append(f"Low responsiveness (RPM: {metrics.rpm_average:.0f}). "
                             "May impact gaming or video conferencing.")
-
-        if (metrics.download_throughput_mbps is not None and metrics.download_throughput_mbps < 5) or \
-           (metrics.upload_throughput_mbps is not None and metrics.upload_throughput_mbps < 1):
-            recs.append("Low throughput detected. Check your internet plan or look for bandwidth-heavy devices.")
 
         if not recs and metrics.quality_rating in ["excellent", "good"]:
             recs.append("Network quality appears good.")
         elif not recs:
             recs.append("Review individual metrics for potential issues.")
-
         return recs
 
     async def _store_metrics(self, metrics: ResponsivenessMetrics):
-        """Stores responsiveness metrics in the database."""
-        if not self.database:
+        if not self.database or not self.database.db: # Ensure db object is available
             return
-
-        # Adapt this to your actual database schema for network_quality_metrics
-        # This is a placeholder for the fields defined in the previous SQL schema suggestion
         query = """
-            INSERT INTO network_quality_metrics (
+            INSERT INTO network_quality_rs_metrics (
                 timestamp, target_host, rpm_download, rpm_upload, rpm_average,
                 base_rtt_ms, loaded_rtt_download_ms, loaded_rtt_upload_ms,
                 download_bufferbloat_ms, upload_bufferbloat_ms, bufferbloat_severity,
                 download_mbps, upload_mbps, overall_quality_score, quality_rating,
-                download_responsiveness, upload_responsiveness, -- Assuming these are scores
-                congestion_detected, measurement_duration, recommendations, error
+                download_responsiveness_score, upload_responsiveness_score,
+                congestion_detected, measurement_duration_ms, recommendations, error
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
+        # Ensure recommendations is a JSON string or None
+        recommendations_json = json.dumps(metrics.recommendations) if metrics.recommendations else None
         values = (
             metrics.timestamp, metrics.target_host, metrics.rpm_download, metrics.rpm_upload, metrics.rpm_average,
             metrics.base_rtt_ms, metrics.loaded_rtt_download_ms, metrics.loaded_rtt_upload_ms,
             metrics.download_bufferbloat_ms, metrics.upload_bufferbloat_ms, metrics.bufferbloat_severity,
             metrics.download_throughput_mbps, metrics.upload_throughput_mbps, metrics.overall_quality_score, metrics.quality_rating,
-            metrics.download_responsiveness_score, metrics.upload_responsiveness_score, # Use the scores
-            metrics.congestion_detected, metrics.measurement_duration_ms, json.dumps(metrics.recommendations), metrics.error
+            metrics.download_responsiveness_score, metrics.upload_responsiveness_score,
+            metrics.congestion_detected, metrics.measurement_duration_ms, recommendations_json, metrics.error
         )
         try:
             await self.database.db.execute(query, values)
@@ -323,23 +336,21 @@ class NetworkQualityCollector:
             self.logger.error(f"Failed to store NetworkQuality metrics for {metrics.target_host}: {e}")
 
 async def main_collector_test():
-    # Example usage for NetworkQualityCollector
     logging.basicConfig(level=logging.DEBUG)
-    mock_db_path = "test_nq_collector.db" # Use a temporary DB for testing
+    mock_db_path = "test_nq_collector.db"
     db = Database(mock_db_path)
-    await db.initialize() # Ensure tables are created if your DB class does this
+    await db.initialize()
 
-    # Create a dummy network_quality_metrics table for testing if it doesn't exist
     try:
         await db.db.execute("""
-            CREATE TABLE IF NOT EXISTS network_quality_metrics (
+            CREATE TABLE IF NOT EXISTS network_quality_rs_metrics (
                 id INTEGER PRIMARY KEY AUTOINCREMENT, timestamp REAL, target_host TEXT,
                 rpm_download REAL, rpm_upload REAL, rpm_average REAL, base_rtt_ms REAL,
                 loaded_rtt_download_ms REAL, loaded_rtt_upload_ms REAL,
                 download_bufferbloat_ms REAL, upload_bufferbloat_ms REAL, bufferbloat_severity TEXT,
                 download_mbps REAL, upload_mbps REAL, overall_quality_score REAL, quality_rating TEXT,
-                download_responsiveness REAL, upload_responsiveness REAL,
-                congestion_detected BOOLEAN, measurement_duration REAL, recommendations TEXT, error TEXT,
+                download_responsiveness_score REAL, upload_responsiveness_score REAL,
+                congestion_detected BOOLEAN, measurement_duration_ms REAL, recommendations TEXT, error TEXT,
                 created_at REAL DEFAULT (strftime('%s', 'now'))
             )
         """)
@@ -347,26 +358,34 @@ async def main_collector_test():
     except Exception as e:
         logger.error(f"Could not create test table: {e}")
 
-
-    config = {
-        "networkquality": {
-             "client": {
-                "binary_path": "/usr/local/bin/networkquality", # ADJUST THIS PATH
-                "test_duration": 7,
-                "parallel_streams": 4
-            },
-            "server": {
-                "url": "http://localhost:9090" # Replace with your actual server
-            },
-            "thresholds": { # Example thresholds
-                "bufferbloat_ms": {'mild': 25, 'moderate': 50, 'severe': 75},
-                "rpm": {'poor': 150, 'fair': 350, 'good': 650, 'excellent': 850},
-                "quality_score": {'poor': 250, 'fair': 550, 'good': 750, 'excellent': 950}
-            }
+    # This config now matches the structure of NetworkQualityRSConfig dataclass
+    test_nq_config_obj = type('NetworkQualityRSConfigMock', (), {
+        'enabled': True,
+        'client': type('ClientMock', (), {
+            'binary_path': "/usr/local/bin/networkquality", # ADJUST
+            'test_duration': 7,
+            'parallel_streams': 4
+        })(),
+        'server': type('ServerMock', (), {
+            'type': 'self_hosted', # or 'external'
+            'url': "http://localhost:9090", # ADJUST if external or self-hosted with different URL
+            'auto_start': False, # For testing, assume server is already running or external
+            'port': 9090,
+            'bind_address':'127.0.0.1'
+        })(),
+        'thresholds': {
+            'bufferbloat_ms': {'mild': 25, 'moderate': 50, 'severe': 75},
+            'rpm': {'poor': 150, 'fair': 350, 'good': 650, 'excellent': 850},
+            'quality_score': {'poor': 250, 'fair': 550, 'good': 750, 'excellent': 950}
+        },
+        'testing': {
+            'strategy': 'fixed',
+            'default_interval_seconds': 10 # Short for test
         }
-    }
-    collector = NetworkQualityCollector(config, db)
-    target_server = config["networkquality"]["server"]["url"]
+    })()
+
+    collector = NetworkQualityCollector(test_nq_config_obj, db)
+    target_server = collector.server_url # Use the URL resolved by the collector
 
     logger.info(f"Testing NetworkQualityCollector against {target_server}...")
     metrics = await collector.collect_network_quality()
@@ -376,16 +395,14 @@ async def main_collector_test():
         logger.error(f"Collector returned an error: {metrics.error}")
     elif metrics:
         logger.info(f"Quality Rating: {metrics.quality_rating}")
-        logger.info(f"Bufferbloat: {metrics.bufferbloat_severity} ({metrics.max_bufferbloat_ms:.2f} ms)")
-        logger.info(f"RPM Avg: {metrics.rpm_average:.2f} RPM")
+        logger.info(f"Bufferbloat: {metrics.bufferbloat_severity} ({metrics.max_bufferbloat_ms if metrics.max_bufferbloat_ms is not None else 'N/A'} ms)")
+        logger.info(f"RPM Avg: {metrics.rpm_average if metrics.rpm_average is not None else 'N/A'} RPM")
         logger.info(f"Recommendations: {metrics.recommendations}")
 
     await db.close()
-    Path(mock_db_path).unlink(missing_ok=True) # Clean up test DB
+    Path(mock_db_path).unlink(missing_ok=True)
 
 if __name__ == "__main__":
-    # This part is for direct testing of the collector.
-    # Ensure networkquality binary is installed and a server is running.
     # asyncio.run(main_collector_test())
     print("NetworkQualityCollector defined. To test, uncomment asyncio.run(main_collector_test()) "
           "and ensure the networkquality binary and a server are available, "

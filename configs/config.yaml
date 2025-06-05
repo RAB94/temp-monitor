@@ -39,9 +39,11 @@ api:
   port: 5000
   debug: False
   cors_enabled: True
+  websocket_enabled: false  # Disable WebSocket server
+  websocket_port: 11560
 
 metrics: # For Prometheus exporter
-  port: 8000
+  port: 8890
   host: '0.0.0.0'
   batch_size: 10 # Aggregate metrics before exposing
   enable_aggregation: True

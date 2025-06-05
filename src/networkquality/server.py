@@ -10,6 +10,11 @@ import subprocess # Using subprocess for consistency with the binary bridge appr
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 
+# Import the dataclass definitions from config.py to understand the structure
+# This is for type hinting and clarity; direct import might cause circular dependency issues
+# if server.py were imported by config.py. For now, this is illustrative.
+# from src.config import NetworkQualityRSConfig # Illustrative
+
 logger = logging.getLogger(__name__)
 
 class NetworkQualityServerManager:
@@ -17,34 +22,39 @@ class NetworkQualityServerManager:
     Manages the lifecycle of a self-hosted networkquality-rs server binary.
     """
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, nq_config: Any): # nq_config is expected to be NetworkQualityRSConfig instance
         """
         Initializes the server manager.
 
         Args:
-            config: A dictionary containing the 'networkquality.server' configuration.
-                    Expected keys:
-                    - 'type': "self_hosted" or "external". This manager only acts if "self_hosted".
-                    - 'auto_start': boolean, if true, this manager will try to start/stop the server.
-                    - 'binary_path': Path to the 'networkquality-server' executable.
-                    - 'port': Port for the server to listen on.
-                    - 'bind_address': Address for the server to bind to.
-                    - 'log_level': Log level for the server (e.g., "info", "debug").
-                    - 'additional_args': Optional list of additional command-line arguments for the server.
+            nq_config: An instance of NetworkQualityRSConfig (from src.config.py).
         """
-        self.server_config = config.get('server', {})
-        self.client_config = config.get('client', {}) # For getting server URL if needed
         self.logger = logger
         self.server_process: Optional[asyncio.subprocess.Process] = None
         self.running_tasks: List[asyncio.Task] = []
 
-        self.server_type = self.server_config.get('type', 'external')
-        self.auto_start = self.server_config.get('auto_start', False)
-        self.server_binary = Path(self.server_config.get('binary_path', '/usr/local/bin/networkquality-server'))
-        self.port = self.server_config.get('port', 9090)
-        self.bind_address = self.server_config.get('bind_address', '0.0.0.0')
-        self.server_log_level = self.server_config.get('log_level', 'info')
-        self.additional_args = self.server_config.get('additional_args', [])
+        # Access attributes directly from the nq_config (NetworkQualityRSConfig) object
+        # and its nested server and client config objects.
+        # Fallback to defaults if attributes are missing (though dataclasses should have them)
+
+        # self.server_config = nq_config.server if hasattr(nq_config, 'server') else {} # This would be NetworkQualityRSServerConfig
+        # self.client_config = nq_config.client if hasattr(nq_config, 'client') else {} # This would be NetworkQualityRSClientConfig
+
+        # More robust access using getattr with defaults for nested objects
+        _server_details = getattr(nq_config, 'server', None)
+        _client_details = getattr(nq_config, 'client', None)
+
+
+        self.server_type = getattr(_server_details, 'type', 'external')
+        self.auto_start = getattr(_server_details, 'auto_start', False)
+        self.server_binary = Path(getattr(_server_details, 'binary_path', '/usr/local/bin/networkquality-server'))
+        self.port = getattr(_server_details, 'port', 9090)
+        self.bind_address = getattr(_server_details, 'bind_address', '0.0.0.0')
+        self.server_log_level = getattr(_server_details, 'log_level', 'info')
+        self.additional_args = getattr(_server_details, 'additional_args', [])
+
+        # We might not need client_config here unless the server manager needs client details.
+        # For now, keeping it minimal.
 
     async def start(self) -> bool:
         """
@@ -65,11 +75,31 @@ class NetworkQualityServerManager:
             return True
 
         if not self.server_binary.exists():
-            self.logger.error(
-                f"NetworkQuality server binary not found at '{self.server_binary}'. "
-                "Cannot start self-hosted server. Please install or update path in config."
-            )
-            return False
+            # Attempt to resolve common paths if the configured path doesn't exist and is not absolute
+            if not self.server_binary.is_absolute():
+                common_paths = [
+                    Path("/usr/local/bin/networkquality-server"),
+                    Path("/usr/bin/networkquality-server"),
+                    Path("./networkquality-server") # Check local directory
+                ]
+                for p in common_paths:
+                    if p.exists():
+                        self.server_binary = p
+                        self.logger.info(f"Resolved networkquality-server binary to: {self.server_binary}")
+                        break
+                else: # If still not found
+                    self.logger.error(
+                        f"NetworkQuality server binary not found at '{self.server_config.binary_path}' or common locations. "
+                        "Cannot start self-hosted server. Please install or update path in config."
+                    )
+                    return False
+            else: # If absolute path was given and it doesn't exist
+                 self.logger.error(
+                    f"NetworkQuality server binary not found at absolute path '{self.server_binary}'. "
+                    "Cannot start self-hosted server."
+                )
+                 return False
+
 
         cmd = [
             str(self.server_binary),
@@ -92,7 +122,6 @@ class NetworkQualityServerManager:
                 f"on {self.bind_address}:{self.port}."
             )
 
-            # Start monitoring tasks for stdout and stderr
             stdout_task = asyncio.create_task(self._log_stream(self.server_process.stdout, "stdout"))
             stderr_task = asyncio.create_task(self._log_stream(self.server_process.stderr, "stderr"))
             monitor_task = asyncio.create_task(self._monitor_process())
@@ -109,12 +138,11 @@ class NetworkQualityServerManager:
         if not stream:
             return
         try:
-            while not stream.at_eof():
+            while self.server_process and not stream.at_eof(): # Check if server_process still exists
                 line = await stream.readline()
                 if line:
                     self.logger.info(f"[networkquality-server-{stream_name}]: {line.decode().strip()}")
                 else:
-                    # Stream closed
                     break
         except asyncio.CancelledError:
             self.logger.debug(f"Stream logging ({stream_name}) cancelled.")
@@ -127,12 +155,12 @@ class NetworkQualityServerManager:
             return
 
         try:
+            pid = self.server_process.pid # Store pid before await
             return_code = await self.server_process.wait()
             self.logger.warning(
-                f"NetworkQuality server process (PID: {self.server_process.pid}) exited with code {return_code}."
+                f"NetworkQuality server process (PID: {pid}) exited with code {return_code}."
             )
-            # Optionally, add restart logic here if desired
-            self.server_process = None # Mark as not running
+            self.server_process = None
         except asyncio.CancelledError:
             self.logger.debug("Server process monitoring cancelled.")
         except Exception as e:
@@ -141,22 +169,32 @@ class NetworkQualityServerManager:
 
     async def stop(self):
         """Stops the self-hosted networkquality-server if it's running."""
-        if not self.server_process or not self.is_running():
+        if not self.server_process or self.server_process.returncode is not None: # Check returncode to see if already exited
             self.logger.info("NetworkQuality server process is not running or not managed.")
+            # Ensure tasks are cleaned up if process died unexpectedly
+            for task in self.running_tasks:
+                if not task.done():
+                    task.cancel()
+            if self.running_tasks:
+                 await asyncio.gather(*self.running_tasks, return_exceptions=True)
+            self.running_tasks.clear()
+            self.server_process = None
             return
 
-        self.logger.info(f"Stopping NetworkQuality server process (PID: {self.server_process.pid})...")
+        pid = self.server_process.pid
+        self.logger.info(f"Stopping NetworkQuality server process (PID: {pid})...")
         try:
             self.server_process.terminate()
             await asyncio.wait_for(self.server_process.wait(), timeout=10.0)
-            self.logger.info("NetworkQuality server process terminated.")
+            self.logger.info(f"NetworkQuality server process (PID: {pid}) terminated.")
         except asyncio.TimeoutError:
-            self.logger.warning("NetworkQuality server process did not terminate gracefully, killing.")
-            self.server_process.kill()
-            await self.server_process.wait()
-            self.logger.info("NetworkQuality server process killed.")
+            self.logger.warning(f"NetworkQuality server process (PID: {pid}) did not terminate gracefully, killing.")
+            if self.server_process and self.server_process.returncode is None: # Check again before kill
+                self.server_process.kill()
+                await self.server_process.wait()
+            self.logger.info(f"NetworkQuality server process (PID: {pid}) killed.")
         except Exception as e:
-            self.logger.error(f"Error stopping NetworkQuality server process: {e}")
+            self.logger.error(f"Error stopping NetworkQuality server process (PID: {pid}): {e}")
         finally:
             for task in self.running_tasks:
                 if not task.done():
@@ -174,71 +212,72 @@ class NetworkQualityServerManager:
     def get_server_url(self) -> Optional[str]:
         """
         Returns the URL of the self-hosted server if it's configured and supposed to be running.
-        This is used by the collector to know where to send measurements.
         """
         if self.server_type == 'self_hosted':
-            return f"http://{self.bind_address}:{self.port}"
+            # For self_hosted, construct from bind_address and port
+            # If bind_address is 0.0.0.0, client might need to use localhost or actual IP
+            connect_address = '127.0.0.1' if self.bind_address == '0.0.0.0' else self.bind_address
+            return f"http://{connect_address}:{self.port}"
         elif self.server_type == 'external':
-            # For external, the URL is directly specified in the config.
-            return self.server_config.get('url')
+            # For external, the URL is directly specified in nq_config.server.url
+            # This should be accessed by the collector directly from its config.
+            # This method is more for confirming the self-hosted URL.
+            # The NetworkQualityRSServerConfig dataclass has a 'url' field.
+            # We can access it via the original nq_config if it was stored,
+            # or the collector can look it up.
+            # For clarity, this manager primarily provides the self-hosted URL.
+            # The collector should rely on its own config for external URLs.
+            return None # Or raise an error if called for external type by this manager
         return None
 
 
 async def main_server_manager_test():
-    # Example usage for NetworkQualityServerManager
     logging.basicConfig(level=logging.DEBUG)
+    from src.config import Config # Import for test
 
-    # Configuration for a self-hosted server that auto-starts
-    config_self_hosted = {
-        "networkquality": {
-            "server": {
-                "type": "self_hosted",
-                "auto_start": True,
-                "binary_path": "/usr/local/bin/networkquality-server", # ADJUST THIS PATH
-                "port": 9091, # Using a different port for testing
-                "bind_address": "127.0.0.1",
-                "log_level": "debug"
-            }
-        }
-    }
+    # Create a dummy config file for testing
+    test_config_content = """
+networkquality:
+  enabled: true
+  server:
+    type: "self_hosted"
+    auto_start: true
+    binary_path: "/usr/local/bin/networkquality-server" # ADJUST IF NEEDED
+    port: 9092 # Use a different port for testing
+    bind_address: "127.0.0.1"
+    log_level: "debug"
+  client:
+    binary_path: "/usr/local/bin/networkquality"
+"""
+    with open("test_nq_config.yaml", "w") as f:
+        f.write(test_config_content)
 
-    manager = NetworkQualityServerManager(config_self_hosted.get("networkquality", {}))
+    config_instance = Config("test_nq_config.yaml")
+    nq_config_obj = config_instance.networkquality # This is the NetworkQualityRSConfig object
+
+    manager = NetworkQualityServerManager(nq_config_obj)
 
     logger.info("Attempting to start self-hosted server...")
     started = await manager.start()
 
     if started and manager.is_running():
-        logger.info(f"Server started. URL: {manager.get_server_url()}")
+        logger.info(f"Server started. URL for client to connect: {manager.get_server_url()}")
         logger.info("Server will run for 15 seconds for testing...")
         await asyncio.sleep(15)
         logger.info("Stopping server...")
         await manager.stop()
         logger.info("Server stopped.")
     elif started and not manager.is_running():
-        logger.error("Manager reported start, but server is not running. Check logs.")
+        logger.error("Manager reported start, but server is not running. Check logs for networkquality-server output.")
     else:
-        logger.error("Server did not start. Check binary path and permissions.")
+        logger.error("Server did not start. Check binary path and permissions for networkquality-server.")
 
-    # Configuration for an external server (manager should not start anything)
-    config_external = {
-         "networkquality": {
-            "server": {
-                "type": "external",
-                "url": "http://some-external-rpm-server.com:9090"
-            }
-        }
-    }
-    external_manager = NetworkQualityServerManager(config_external.get("networkquality", {}))
-    logger.info("Testing external server configuration (should not start a local server):")
-    await external_manager.start() # Should do nothing but log
-    logger.info(f"External server URL from config: {external_manager.get_server_url()}")
-    await external_manager.stop() # Should do nothing
+    Path("test_nq_config.yaml").unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
-    # This part is for direct testing of the server manager.
-    # Ensure networkquality-server binary is installed and path is correct in main_server_manager_test.
     # asyncio.run(main_server_manager_test())
     print("NetworkQualityServerManager defined. To test, uncomment asyncio.run(main_server_manager_test()) "
           "and ensure the networkquality-server binary is available, and paths in the test are correct.")
+
 

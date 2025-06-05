@@ -1414,3 +1414,712 @@ NameError: name 'APIServer' is not defined
 2025-06-05 17:40:15,180 - __main__ - INFO - Application shutdown sequence complete.
 2025-06-05 17:40:15,180 - asyncio - ERROR - Unclosed client session
 client_session: <aiohttp.client.ClientSession object at 0x7ed1a5b0ecc0>
+2025-06-05 17:45:12,323 - src.utils.logger - INFO - Logging system initialized
+2025-06-05 17:45:12,324 - src.utils.logger - INFO - Log level: 20
+2025-06-05 17:45:12,324 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-05 17:45:12,324 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-05 17:45:12,325 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-05 17:45:12,325 - src.config - INFO - Configuration validation completed.
+2025-06-05 17:45:12,325 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-05 17:45:12,325 - __main__ - INFO - NetworkQuality-RS enabled: False
+2025-06-05 17:45:12,325 - __main__ - INFO - Detecting environment...
+2025-06-05 17:45:12,326 - __main__ - INFO -   Platform: linux
+2025-06-05 17:45:12,326 - __main__ - INFO -   Is container: True
+2025-06-05 17:45:12,326 - __main__ - INFO -   Is cloud: False
+2025-06-05 17:45:12,326 - __main__ - INFO -   Is edge device: False
+2025-06-05 17:45:12,326 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-05 17:45:12,327 - src.utils.database - INFO - Database tables created
+2025-06-05 17:45:12,328 - src.utils.database - INFO - Database indexes created
+2025-06-05 17:45:12,328 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 17:45:12,328 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-05 17:45:12,328 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 17:45:12,328 - src.collector - INFO - Enhanced network collector initialized
+2025-06-05 17:45:12,328 - __main__ - INFO - Enhanced network collector initialized
+2025-06-05 17:45:12,804 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-05 17:45:12,804 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-05 17:45:12,804 - __main__ - INFO - Loaded existing AI models
+2025-06-05 17:45:12,804 - __main__ - INFO - AI detection system initialized
+2025-06-05 17:45:12,804 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-05 17:45:12,804 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-05 17:45:12,805 - src.alerts - INFO - Alert management system started
+2025-06-05 17:45:12,805 - __main__ - INFO - Alerting system initialized
+2025-06-05 17:45:12,805 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-05 17:45:12,805 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-05 17:45:12,806 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:8540
+2025-06-05 17:45:12,806 - src.prom_export - INFO - Metrics aggregator started
+2025-06-05 17:45:12,806 - __main__ - INFO - Prometheus metrics server configured on port 8540
+2025-06-05 17:45:12,809 - __main__ - INFO - Enhanced API server initialized
+2025-06-05 17:45:12,820 - websockets.server - INFO - server listening on 0.0.0.0:8001
+2025-06-05 17:45:12,820 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:8001
+2025-06-05 17:45:12,820 - __main__ - INFO - WebSocket server initialized on port 8001
+2025-06-05 17:45:12,820 - __main__ - INFO - NetworkQuality-RS monitoring is disabled in configuration.
+2025-06-05 17:45:12,820 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-05 17:45:12,820 - __main__ - INFO - Integration verification setup completed.
+2025-06-05 17:45:12,820 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-05 17:45:12,820 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-05 17:45:12,820 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-05 17:45:12,820 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-05 17:45:12,820 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-05 17:45:12,820 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:8540/metrics
+2025-06-05 17:45:12,820 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:8001/ws
+2025-06-05 17:45:12,820 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com, github.com
+2025-06-05 17:45:12,820 - __main__ - INFO - NetworkQuality-RS Monitoring: Disabled
+2025-06-05 17:45:12,820 - __main__ - INFO - =====================================================
+2025-06-05 17:45:12,820 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-05 17:45:12,821 - src.api.server - INFO - Starting API server on 0.0.0.0:5000
+2025-06-05 17:45:38,380 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 17:45:38,381 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 17:45:42,772 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 17:45:42,773 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 17:45:45,155 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 17:45:45,155 - __main__ - INFO - Stopping Enhanced Network Intelligence Monitor...
+2025-06-05 17:45:45,155 - __main__ - INFO - API server task cancelled.
+2025-06-05 17:45:45,155 - __main__ - INFO - Main monitoring loop cancelled.
+2025-06-05 17:45:45,156 - __main__ - INFO - Main (enhanced_collector) monitoring loop stopped
+2025-06-05 17:45:50,156 - src.prom_export - INFO - Metrics aggregator stopped
+2025-06-05 17:45:50,156 - src.prom_export - INFO - Prometheus metrics server stopped
+2025-06-05 17:45:50,156 - websockets.server - INFO - server closing
+2025-06-05 17:45:50,156 - websockets.server - INFO - server closed
+2025-06-05 17:45:50,157 - src.websocket_server - INFO - WebSocket server stopped
+2025-06-05 17:45:50,161 - src.utils.database - INFO - Database connection closed
+2025-06-05 17:45:50,162 - __main__ - INFO - AI models saved
+2025-06-05 17:45:50,162 - __main__ - INFO - === Final Performance Report ===
+2025-06-05 17:45:50,162 - __main__ - INFO - System Uptime: 0.01 hours
+2025-06-05 17:45:50,162 - __main__ - INFO - Total Standard Measurements: 3
+2025-06-05 17:45:50,162 - __main__ - INFO - Total NetworkQuality-RS Measurements: 0
+2025-06-05 17:45:50,162 - __main__ - INFO - Anomalies Detected: 0
+2025-06-05 17:45:50,162 - __main__ - INFO - Alerts Sent: 0
+2025-06-05 17:45:50,162 - __main__ - INFO - Model Trainings: 0
+2025-06-05 17:45:50,162 - __main__ - INFO - Baseline Updates: 0
+2025-06-05 17:45:50,162 - __main__ - INFO - Average Collection Time: 0.00s
+2025-06-05 17:45:50,162 - __main__ - INFO - Final Health Score: 100.0
+2025-06-05 17:45:50,162 - __main__ - INFO - ================================
+2025-06-05 17:45:50,162 - __main__ - INFO - Enhanced Network Intelligence Monitor stopped
+2025-06-05 17:45:50,162 - __main__ - INFO - Monitor shutdown was initiated, ensuring cleanup.
+2025-06-05 17:45:50,162 - __main__ - INFO - Application shutdown sequence complete.
+2025-06-05 17:45:57,090 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 17:45:57,913 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 17:46:58,623 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 17:46:59,815 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 17:47:00,053 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 17:47:00,254 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 17:47:03,898 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 17:47:45,541 - __main__ - INFO - Received signal SIGTERM, initiating graceful shutdown...
+2025-06-05 18:11:57,832 - src.utils.logger - INFO - Logging system initialized
+2025-06-05 18:11:57,832 - src.utils.logger - INFO - Log level: 20
+2025-06-05 18:11:57,832 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-05 18:11:57,832 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-05 18:11:57,834 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-05 18:11:57,834 - src.config - INFO - Configuration validation completed.
+2025-06-05 18:11:57,834 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-05 18:11:57,834 - __main__ - INFO - NetworkQuality-RS enabled: False
+2025-06-05 18:11:57,834 - __main__ - INFO - Detecting environment...
+2025-06-05 18:11:57,835 - __main__ - INFO -   Platform: linux
+2025-06-05 18:11:57,835 - __main__ - INFO -   Is container: True
+2025-06-05 18:11:57,835 - __main__ - INFO -   Is cloud: False
+2025-06-05 18:11:57,835 - __main__ - INFO -   Is edge device: False
+2025-06-05 18:11:57,835 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-05 18:11:57,836 - src.utils.database - INFO - Database tables created
+2025-06-05 18:11:57,836 - src.utils.database - INFO - Database indexes created
+2025-06-05 18:11:57,836 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 18:11:57,836 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-05 18:11:57,836 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 18:11:57,836 - src.collector - INFO - Enhanced network collector initialized
+2025-06-05 18:11:57,836 - __main__ - INFO - Enhanced network collector initialized
+2025-06-05 18:11:58,312 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-05 18:11:58,312 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-05 18:11:58,312 - __main__ - INFO - Loaded existing AI models
+2025-06-05 18:11:58,312 - __main__ - INFO - AI detection system initialized
+2025-06-05 18:11:58,312 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-05 18:11:58,312 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-05 18:11:58,312 - src.alerts - INFO - Alert management system started
+2025-06-05 18:11:58,312 - __main__ - INFO - Alerting system initialized
+2025-06-05 18:11:58,312 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-05 18:11:58,312 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-05 18:11:58,313 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:8540
+2025-06-05 18:11:58,314 - src.prom_export - INFO - Metrics aggregator started
+2025-06-05 18:11:58,314 - __main__ - INFO - Prometheus metrics server configured on port 8540
+2025-06-05 18:11:58,317 - __main__ - INFO - Enhanced API server initialized
+2025-06-05 18:11:58,319 - websockets.server - INFO - server listening on 0.0.0.0:8001
+2025-06-05 18:11:58,320 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:8001
+2025-06-05 18:11:58,320 - __main__ - INFO - WebSocket server initialized on port 8001
+2025-06-05 18:11:58,320 - __main__ - INFO - NetworkQuality-RS monitoring is disabled in configuration.
+2025-06-05 18:11:58,320 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-05 18:11:58,320 - __main__ - INFO - Integration verification setup completed.
+2025-06-05 18:11:58,320 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-05 18:11:58,320 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-05 18:11:58,320 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-05 18:11:58,321 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-05 18:11:58,321 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-05 18:11:58,321 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:8540/metrics
+2025-06-05 18:11:58,321 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:8001/ws
+2025-06-05 18:11:58,321 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com, github.com
+2025-06-05 18:11:58,321 - __main__ - INFO - NetworkQuality-RS Monitoring: Disabled
+2025-06-05 18:11:58,321 - __main__ - INFO - =====================================================
+2025-06-05 18:11:58,321 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-05 18:11:58,321 - src.api.server - INFO - Starting API server on 0.0.0.0:5000
+2025-06-05 18:12:08,379 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:12:08,380 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 18:12:10,766 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 18:12:10,767 - __main__ - INFO - Stopping Enhanced Network Intelligence Monitor...
+2025-06-05 18:12:10,767 - __main__ - INFO - API server task cancelled.
+2025-06-05 18:12:10,767 - __main__ - INFO - Main monitoring loop cancelled.
+2025-06-05 18:12:10,767 - __main__ - INFO - Main (enhanced_collector) monitoring loop stopped
+2025-06-05 18:12:15,767 - src.prom_export - INFO - Metrics aggregator stopped
+2025-06-05 18:12:15,767 - src.prom_export - INFO - Prometheus metrics server stopped
+2025-06-05 18:12:15,768 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 18:12:15,768 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 18:12:15,768 - websockets.server - INFO - server closing
+2025-06-05 18:12:15,768 - websockets.server - INFO - connection rejected (503 Service Unavailable)
+2025-06-05 18:12:15,769 - websockets.server - INFO - server closed
+2025-06-05 18:12:15,769 - src.websocket_server - INFO - WebSocket server stopped
+2025-06-05 18:12:15,770 - src.utils.database - INFO - Database connection closed
+2025-06-05 18:12:15,770 - __main__ - INFO - AI models saved
+2025-06-05 18:12:15,770 - __main__ - INFO - === Final Performance Report ===
+2025-06-05 18:12:15,770 - __main__ - INFO - System Uptime: 0.00 hours
+2025-06-05 18:12:15,770 - __main__ - INFO - Total Standard Measurements: 0
+2025-06-05 18:12:15,770 - __main__ - INFO - Total NetworkQuality-RS Measurements: 0
+2025-06-05 18:12:15,770 - __main__ - INFO - Anomalies Detected: 0
+2025-06-05 18:12:15,770 - __main__ - INFO - Alerts Sent: 0
+2025-06-05 18:12:15,770 - __main__ - INFO - Model Trainings: 0
+2025-06-05 18:12:15,770 - __main__ - INFO - Baseline Updates: 0
+2025-06-05 18:12:15,770 - __main__ - INFO - Average Collection Time: 0.00s
+2025-06-05 18:12:15,770 - __main__ - INFO - Final Health Score: 100.0
+2025-06-05 18:12:15,770 - __main__ - INFO - ================================
+2025-06-05 18:12:15,770 - __main__ - INFO - Enhanced Network Intelligence Monitor stopped
+2025-06-05 18:12:15,770 - __main__ - INFO - Monitor shutdown was initiated, ensuring cleanup.
+2025-06-05 18:12:15,770 - __main__ - INFO - Application shutdown sequence complete.
+2025-06-05 18:20:45,351 - src.utils.logger - INFO - Logging system initialized
+2025-06-05 18:20:45,351 - src.utils.logger - INFO - Log level: 20
+2025-06-05 18:20:45,351 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-05 18:20:45,351 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-05 18:20:45,353 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-05 18:20:45,353 - src.config - INFO - Configuration validation completed.
+2025-06-05 18:20:45,353 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-05 18:20:45,353 - __main__ - INFO - NetworkQuality-RS enabled: False
+2025-06-05 18:20:45,353 - __main__ - INFO - Detecting environment...
+2025-06-05 18:20:45,354 - __main__ - INFO -   Platform: linux
+2025-06-05 18:20:45,354 - __main__ - INFO -   Is container: True
+2025-06-05 18:20:45,354 - __main__ - INFO -   Is cloud: False
+2025-06-05 18:20:45,354 - __main__ - INFO -   Is edge device: False
+2025-06-05 18:20:45,354 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-05 18:20:45,355 - src.utils.database - INFO - Database tables created
+2025-06-05 18:20:45,355 - src.utils.database - INFO - Database indexes created
+2025-06-05 18:20:45,355 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 18:20:45,355 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-05 18:20:45,355 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 18:20:45,355 - src.collector - INFO - Enhanced network collector initialized
+2025-06-05 18:20:45,356 - __main__ - INFO - Enhanced network collector initialized
+2025-06-05 18:20:45,831 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-05 18:20:45,831 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-05 18:20:45,831 - __main__ - INFO - Loaded existing AI models
+2025-06-05 18:20:45,831 - __main__ - INFO - AI detection system initialized
+2025-06-05 18:20:45,831 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-05 18:20:45,831 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-05 18:20:45,831 - src.alerts - INFO - Alert management system started
+2025-06-05 18:20:45,831 - __main__ - INFO - Alerting system initialized
+2025-06-05 18:20:45,831 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-05 18:20:45,831 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-05 18:20:45,832 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:8540
+2025-06-05 18:20:45,833 - src.prom_export - INFO - Metrics aggregator started
+2025-06-05 18:20:45,833 - __main__ - INFO - Prometheus metrics server configured on port 8540
+2025-06-05 18:20:45,836 - __main__ - INFO - Enhanced API server initialized
+2025-06-05 18:20:45,839 - websockets.server - INFO - server listening on 0.0.0.0:8001
+2025-06-05 18:20:45,839 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:8001
+2025-06-05 18:20:45,839 - __main__ - INFO - WebSocket server initialized on port 8001
+2025-06-05 18:20:45,839 - __main__ - INFO - NetworkQuality-RS monitoring is disabled in configuration.
+2025-06-05 18:20:45,839 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-05 18:20:45,839 - __main__ - INFO - Integration verification setup completed.
+2025-06-05 18:20:45,839 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-05 18:20:45,840 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-05 18:20:45,840 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-05 18:20:45,840 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-05 18:20:45,840 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-05 18:20:45,840 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:8540/metrics
+2025-06-05 18:20:45,840 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:8001/ws
+2025-06-05 18:20:45,840 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com, github.com
+2025-06-05 18:20:45,840 - __main__ - INFO - NetworkQuality-RS Monitoring: Disabled
+2025-06-05 18:20:45,840 - __main__ - INFO - =====================================================
+2025-06-05 18:20:45,840 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-05 18:20:45,840 - src.api.server - INFO - Starting API server on 0.0.0.0:5000
+2025-06-05 18:21:08,380 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:21:08,381 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 18:21:12,773 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:21:12,774 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 18:21:20,427 - __main__ - INFO - Received signal SIGTERM, initiating graceful shutdown...
+2025-06-05 18:21:20,427 - __main__ - INFO - Stopping Enhanced Network Intelligence Monitor...
+2025-06-05 18:21:20,427 - __main__ - INFO - API server task cancelled.
+2025-06-05 18:21:20,427 - __main__ - INFO - Main monitoring loop cancelled.
+2025-06-05 18:21:20,427 - __main__ - INFO - Main (enhanced_collector) monitoring loop stopped
+2025-06-05 18:21:25,428 - src.prom_export - INFO - Metrics aggregator stopped
+2025-06-05 18:21:25,428 - src.prom_export - INFO - Prometheus metrics server stopped
+2025-06-05 18:21:25,428 - websockets.server - INFO - server closing
+2025-06-05 18:21:25,428 - websockets.server - INFO - server closed
+2025-06-05 18:21:25,428 - src.websocket_server - INFO - WebSocket server stopped
+2025-06-05 18:21:25,437 - src.utils.database - INFO - Database connection closed
+2025-06-05 18:21:25,438 - __main__ - INFO - AI models saved
+2025-06-05 18:21:25,438 - __main__ - INFO - === Final Performance Report ===
+2025-06-05 18:21:25,438 - __main__ - INFO - System Uptime: 0.01 hours
+2025-06-05 18:21:25,438 - __main__ - INFO - Total Standard Measurements: 3
+2025-06-05 18:21:25,438 - __main__ - INFO - Total NetworkQuality-RS Measurements: 0
+2025-06-05 18:21:25,438 - __main__ - INFO - Anomalies Detected: 0
+2025-06-05 18:21:25,438 - __main__ - INFO - Alerts Sent: 0
+2025-06-05 18:21:25,438 - __main__ - INFO - Model Trainings: 0
+2025-06-05 18:21:25,438 - __main__ - INFO - Baseline Updates: 0
+2025-06-05 18:21:25,438 - __main__ - INFO - Average Collection Time: 0.00s
+2025-06-05 18:21:25,438 - __main__ - INFO - Final Health Score: 100.0
+2025-06-05 18:21:25,438 - __main__ - INFO - ================================
+2025-06-05 18:21:25,438 - __main__ - INFO - Enhanced Network Intelligence Monitor stopped
+2025-06-05 18:21:25,438 - __main__ - INFO - Monitor shutdown was initiated, ensuring cleanup.
+2025-06-05 18:21:25,438 - __main__ - INFO - Application shutdown sequence complete.
+2025-06-05 18:21:28,573 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 18:21:28,754 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 18:23:05,600 - src.utils.logger - INFO - Logging system initialized
+2025-06-05 18:23:05,600 - src.utils.logger - INFO - Log level: 20
+2025-06-05 18:23:05,600 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-05 18:23:05,600 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-05 18:23:05,601 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-05 18:23:05,601 - src.config - INFO - Configuration validation completed.
+2025-06-05 18:23:05,601 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-05 18:23:05,601 - __main__ - INFO - NetworkQuality-RS enabled: False
+2025-06-05 18:23:05,601 - __main__ - INFO - Detecting environment...
+2025-06-05 18:23:05,602 - __main__ - INFO -   Platform: linux
+2025-06-05 18:23:05,603 - __main__ - INFO -   Is container: True
+2025-06-05 18:23:05,603 - __main__ - INFO -   Is cloud: False
+2025-06-05 18:23:05,603 - __main__ - INFO -   Is edge device: False
+2025-06-05 18:23:05,603 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-05 18:23:05,604 - src.utils.database - INFO - Database tables created
+2025-06-05 18:23:05,604 - src.utils.database - INFO - Database indexes created
+2025-06-05 18:23:05,604 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 18:23:05,604 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-05 18:23:05,604 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 18:23:05,604 - src.collector - INFO - Enhanced network collector initialized
+2025-06-05 18:23:05,604 - __main__ - INFO - Enhanced network collector initialized
+2025-06-05 18:23:06,075 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-05 18:23:06,075 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-05 18:23:06,075 - __main__ - INFO - Loaded existing AI models
+2025-06-05 18:23:06,075 - __main__ - INFO - AI detection system initialized
+2025-06-05 18:23:06,075 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-05 18:23:06,075 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-05 18:23:06,075 - src.alerts - INFO - Alert management system started
+2025-06-05 18:23:06,075 - __main__ - INFO - Alerting system initialized
+2025-06-05 18:23:06,075 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-05 18:23:06,075 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-05 18:23:06,076 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:8540
+2025-06-05 18:23:06,077 - src.prom_export - INFO - Metrics aggregator started
+2025-06-05 18:23:06,077 - __main__ - INFO - Prometheus metrics server configured on port 8540
+2025-06-05 18:23:06,080 - __main__ - INFO - Enhanced API server initialized
+2025-06-05 18:23:06,082 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-05 18:23:06,083 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-05 18:23:06,083 - __main__ - INFO - WebSocket server initialized on port 11450
+2025-06-05 18:23:06,083 - __main__ - INFO - NetworkQuality-RS monitoring is disabled in configuration.
+2025-06-05 18:23:06,083 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-05 18:23:06,083 - __main__ - INFO - Integration verification setup completed.
+2025-06-05 18:23:06,083 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-05 18:23:06,083 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-05 18:23:06,083 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-05 18:23:06,083 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-05 18:23:06,083 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-05 18:23:06,083 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:8540/metrics
+2025-06-05 18:23:06,083 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:8001/ws
+2025-06-05 18:23:06,084 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com, github.com
+2025-06-05 18:23:06,084 - __main__ - INFO - NetworkQuality-RS Monitoring: Disabled
+2025-06-05 18:23:06,084 - __main__ - INFO - =====================================================
+2025-06-05 18:23:06,084 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-05 18:23:06,084 - src.api.server - INFO - Starting API server on 0.0.0.0:5000
+2025-06-05 18:24:05,825 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:24:05,832 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: invalid Connection header: keep-alive
+2025-06-05 18:24:05,893 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:24:05,903 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: invalid Connection header: keep-alive
+2025-06-05 18:27:53,945 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-05 18:27:53,945 - __main__ - INFO - Stopping Enhanced Network Intelligence Monitor...
+2025-06-05 18:27:53,945 - __main__ - INFO - API server task cancelled.
+2025-06-05 18:27:53,945 - __main__ - INFO - Main monitoring loop cancelled.
+2025-06-05 18:27:53,945 - __main__ - INFO - Main (enhanced_collector) monitoring loop stopped
+2025-06-05 18:27:58,946 - src.prom_export - INFO - Metrics aggregator stopped
+2025-06-05 18:27:58,946 - src.prom_export - INFO - Prometheus metrics server stopped
+2025-06-05 18:27:58,946 - websockets.server - INFO - server closing
+2025-06-05 18:27:58,946 - websockets.server - INFO - server closed
+2025-06-05 18:27:58,946 - src.websocket_server - INFO - WebSocket server stopped
+2025-06-05 18:27:58,947 - src.utils.database - INFO - Database connection closed
+2025-06-05 18:27:58,947 - __main__ - INFO - AI models saved
+2025-06-05 18:27:58,947 - __main__ - INFO - === Final Performance Report ===
+2025-06-05 18:27:58,947 - __main__ - INFO - System Uptime: 0.08 hours
+2025-06-05 18:27:58,947 - __main__ - INFO - Total Standard Measurements: 8
+2025-06-05 18:27:58,948 - __main__ - INFO - Total NetworkQuality-RS Measurements: 0
+2025-06-05 18:27:58,948 - __main__ - INFO - Anomalies Detected: 0
+2025-06-05 18:27:58,948 - __main__ - INFO - Alerts Sent: 0
+2025-06-05 18:27:58,948 - __main__ - INFO - Model Trainings: 0
+2025-06-05 18:27:58,948 - __main__ - INFO - Baseline Updates: 0
+2025-06-05 18:27:58,948 - __main__ - INFO - Average Collection Time: 0.00s
+2025-06-05 18:27:58,948 - __main__ - INFO - Final Health Score: 100.0
+2025-06-05 18:27:58,948 - __main__ - INFO - ================================
+2025-06-05 18:27:58,948 - __main__ - INFO - Enhanced Network Intelligence Monitor stopped
+2025-06-05 18:27:58,948 - __main__ - INFO - Monitor shutdown was initiated, ensuring cleanup.
+2025-06-05 18:27:58,948 - __main__ - INFO - Application shutdown sequence complete.
+2025-06-05 18:31:04,751 - src.utils.logger - INFO - Logging system initialized
+2025-06-05 18:31:04,751 - src.utils.logger - INFO - Log level: 20
+2025-06-05 18:31:04,751 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-05 18:31:04,751 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-05 18:31:04,753 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-05 18:31:04,753 - src.config - INFO - Configuration validation completed.
+2025-06-05 18:31:04,753 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-05 18:31:04,753 - __main__ - INFO - NetworkQuality-RS enabled: False
+2025-06-05 18:31:04,753 - __main__ - INFO - Detecting environment...
+2025-06-05 18:31:04,754 - __main__ - INFO -   Platform: linux
+2025-06-05 18:31:04,754 - __main__ - INFO -   Is container: True
+2025-06-05 18:31:04,754 - __main__ - INFO -   Is cloud: False
+2025-06-05 18:31:04,754 - __main__ - INFO -   Is edge device: False
+2025-06-05 18:31:04,754 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-05 18:31:04,755 - src.utils.database - INFO - Database tables created
+2025-06-05 18:31:04,756 - src.utils.database - INFO - Database indexes created
+2025-06-05 18:31:04,756 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 18:31:04,756 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-05 18:31:04,756 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 18:31:04,756 - src.collector - INFO - Enhanced network collector initialized
+2025-06-05 18:31:04,756 - __main__ - INFO - Enhanced network collector initialized
+2025-06-05 18:31:05,231 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-05 18:31:05,231 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-05 18:31:05,231 - __main__ - INFO - Loaded existing AI models
+2025-06-05 18:31:05,231 - __main__ - INFO - AI detection system initialized
+2025-06-05 18:31:05,231 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-05 18:31:05,231 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-05 18:31:05,231 - src.alerts - INFO - Alert management system started
+2025-06-05 18:31:05,231 - __main__ - INFO - Alerting system initialized
+2025-06-05 18:31:05,232 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-05 18:31:05,232 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-05 18:31:05,233 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:8540
+2025-06-05 18:31:05,233 - src.prom_export - INFO - Metrics aggregator started
+2025-06-05 18:31:05,233 - __main__ - INFO - Prometheus metrics server configured on port 8540
+2025-06-05 18:31:05,236 - __main__ - INFO - Enhanced API server initialized
+2025-06-05 18:31:05,238 - websockets.server - INFO - server listening on 0.0.0.0:8001
+2025-06-05 18:31:05,239 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:8001
+2025-06-05 18:31:05,239 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:8001
+2025-06-05 18:31:05,239 - __main__ - INFO - NetworkQuality-RS monitoring is disabled in configuration.
+2025-06-05 18:31:05,239 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-05 18:31:05,239 - __main__ - INFO - Integration verification setup completed.
+2025-06-05 18:31:05,239 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-05 18:31:05,239 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-05 18:31:05,239 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-05 18:31:05,239 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-05 18:31:05,239 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-05 18:31:05,239 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:8540/metrics
+2025-06-05 18:31:05,239 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:8001/ws
+2025-06-05 18:31:05,239 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com, github.com
+2025-06-05 18:31:05,239 - __main__ - INFO - NetworkQuality-RS Monitoring: Disabled
+2025-06-05 18:31:05,239 - __main__ - INFO - =====================================================
+2025-06-05 18:31:05,239 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-05 18:31:05,240 - src.api.server - INFO - Starting API server on 0.0.0.0:5000
+2025-06-05 18:31:15,253 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:31:15,253 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:31:15,254 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 18:31:15,255 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 18:32:29,378 - src.utils.logger - INFO - Logging system initialized
+2025-06-05 18:32:29,378 - src.utils.logger - INFO - Log level: 20
+2025-06-05 18:32:29,378 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-05 18:32:29,378 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-05 18:32:29,380 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-05 18:32:29,380 - src.config - INFO - Configuration validation completed.
+2025-06-05 18:32:29,380 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-05 18:32:29,380 - __main__ - INFO - NetworkQuality-RS enabled: False
+2025-06-05 18:32:29,380 - __main__ - INFO - Detecting environment...
+2025-06-05 18:32:29,381 - __main__ - INFO -   Platform: linux
+2025-06-05 18:32:29,381 - __main__ - INFO -   Is container: True
+2025-06-05 18:32:29,381 - __main__ - INFO -   Is cloud: False
+2025-06-05 18:32:29,381 - __main__ - INFO -   Is edge device: False
+2025-06-05 18:32:29,381 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-05 18:32:29,382 - src.utils.database - INFO - Database tables created
+2025-06-05 18:32:29,383 - src.utils.database - INFO - Database indexes created
+2025-06-05 18:32:29,383 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 18:32:29,383 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-05 18:32:29,383 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 18:32:29,383 - src.collector - INFO - Enhanced network collector initialized
+2025-06-05 18:32:29,383 - __main__ - INFO - Enhanced network collector initialized
+2025-06-05 18:32:31,457 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-05 18:32:31,457 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-05 18:32:31,457 - __main__ - INFO - Loaded existing AI models
+2025-06-05 18:32:31,457 - __main__ - INFO - AI detection system initialized
+2025-06-05 18:32:31,457 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-05 18:32:31,457 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-05 18:32:31,458 - src.alerts - INFO - Alert management system started
+2025-06-05 18:32:31,458 - __main__ - INFO - Alerting system initialized
+2025-06-05 18:32:31,458 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-05 18:32:31,458 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-05 18:32:31,459 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:8540
+2025-06-05 18:32:31,459 - src.prom_export - INFO - Metrics aggregator started
+2025-06-05 18:32:31,459 - __main__ - INFO - Prometheus metrics server configured on port 8540
+2025-06-05 18:32:31,462 - __main__ - INFO - Enhanced API server initialized
+2025-06-05 18:32:31,474 - websockets.server - INFO - server listening on 0.0.0.0:8001
+2025-06-05 18:32:31,474 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:8001
+2025-06-05 18:32:31,474 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:8001
+2025-06-05 18:32:31,474 - __main__ - INFO - NetworkQuality-RS monitoring is disabled in configuration.
+2025-06-05 18:32:31,474 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-05 18:32:31,474 - __main__ - INFO - Integration verification setup completed.
+2025-06-05 18:32:31,475 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-05 18:32:31,475 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-05 18:32:31,475 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-05 18:32:31,475 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-05 18:32:31,475 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-05 18:32:31,475 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:8540/metrics
+2025-06-05 18:32:31,475 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:8001/ws
+2025-06-05 18:32:31,475 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com, github.com
+2025-06-05 18:32:31,475 - __main__ - INFO - NetworkQuality-RS Monitoring: Disabled
+2025-06-05 18:32:31,475 - __main__ - INFO - =====================================================
+2025-06-05 18:32:31,475 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-05 18:32:31,475 - src.api.server - INFO - Starting API server on 0.0.0.0:5000
+2025-06-05 18:32:41,489 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:32:41,495 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 18:32:42,774 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:32:42,776 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 18:33:08,382 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:33:08,383 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 18:33:12,774 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:33:12,779 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 18:33:38,381 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:33:38,382 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 18:33:42,773 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:33:42,774 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 18:36:30,428 - src.utils.logger - INFO - Logging system initialized
+2025-06-05 18:36:30,428 - src.utils.logger - INFO - Log level: 20
+2025-06-05 18:36:30,428 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-05 18:36:30,428 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-05 18:36:30,430 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-05 18:36:30,430 - src.config - INFO - Configuration validation completed.
+2025-06-05 18:36:30,430 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-05 18:36:30,430 - __main__ - INFO - NetworkQuality-RS enabled: False
+2025-06-05 18:36:30,430 - __main__ - INFO - Detecting environment...
+2025-06-05 18:36:30,431 - __main__ - INFO -   Platform: linux
+2025-06-05 18:36:30,431 - __main__ - INFO -   Is container: True
+2025-06-05 18:36:30,431 - __main__ - INFO -   Is cloud: False
+2025-06-05 18:36:30,431 - __main__ - INFO -   Is edge device: False
+2025-06-05 18:36:30,431 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-05 18:36:30,432 - src.utils.database - INFO - Database tables created
+2025-06-05 18:36:30,433 - src.utils.database - INFO - Database indexes created
+2025-06-05 18:36:30,433 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 18:36:30,433 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-05 18:36:30,433 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-05 18:36:30,433 - src.collector - INFO - Enhanced network collector initialized
+2025-06-05 18:36:30,433 - __main__ - INFO - Enhanced network collector initialized
+2025-06-05 18:36:30,918 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-05 18:36:30,918 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-05 18:36:30,918 - __main__ - INFO - Loaded existing AI models
+2025-06-05 18:36:30,918 - __main__ - INFO - AI detection system initialized
+2025-06-05 18:36:30,918 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-05 18:36:30,918 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-05 18:36:30,918 - src.alerts - INFO - Alert management system started
+2025-06-05 18:36:30,918 - __main__ - INFO - Alerting system initialized
+2025-06-05 18:36:30,918 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-05 18:36:30,919 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-05 18:36:30,920 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:8540
+2025-06-05 18:36:30,920 - src.prom_export - INFO - Metrics aggregator started
+2025-06-05 18:36:30,920 - __main__ - INFO - Prometheus metrics server configured on port 8540
+2025-06-05 18:36:30,923 - __main__ - INFO - Enhanced API server initialized
+2025-06-05 18:36:30,926 - websockets.server - INFO - server listening on 0.0.0.0:8001
+2025-06-05 18:36:30,926 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:8001
+2025-06-05 18:36:30,926 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:8001
+2025-06-05 18:36:30,926 - __main__ - INFO - NetworkQuality-RS monitoring is disabled in configuration.
+2025-06-05 18:36:30,926 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-05 18:36:30,926 - __main__ - INFO - Integration verification setup completed.
+2025-06-05 18:36:30,926 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-05 18:36:30,926 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-05 18:36:30,926 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-05 18:36:30,926 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-05 18:36:30,926 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-05 18:36:30,926 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:8540/metrics
+2025-06-05 18:36:30,926 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:8001/ws
+2025-06-05 18:36:30,926 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com, github.com
+2025-06-05 18:36:30,926 - __main__ - INFO - NetworkQuality-RS Monitoring: Disabled
+2025-06-05 18:36:30,926 - __main__ - INFO - =====================================================
+2025-06-05 18:36:30,926 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-05 18:36:30,927 - src.api.server - INFO - Starting API server on 0.0.0.0:5000
+2025-06-05 18:36:40,940 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:36:40,941 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+2025-06-05 18:36:42,773 - websockets.server - INFO - connection rejected (426 Upgrade Required)
+2025-06-05 18:36:42,774 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header

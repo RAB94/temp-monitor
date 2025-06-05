@@ -1,0 +1,94 @@
+ai:
+  auto_train: true
+  baseline_window: 1000
+  enable_quantization: true
+  hidden_size: 64
+  initial_epochs: 100
+  input_size: 14
+  model_dir: data/models
+  num_layers: 2
+  sequence_length: 20
+  train_interval: 3600
+  training_hours: 24
+alerts:
+  email_enabled: false
+  email_recipients: []
+  enabled: true
+  smtp_port: 587
+  smtp_server: null
+  webhook_url: null
+api:
+  cors_enabled: true
+  debug: true
+  host: 0.0.0.0
+  port: 5000
+  websocket_enabled: true
+  websocket_port: 11450
+database:
+  backup_enabled: true
+  backup_interval_hours: 24
+  cleanup_days: 30
+  path: data/database/network_intelligence.db
+deployment:
+  edge_optimization: false
+  max_memory_mb: 512
+  quantize_models: false
+  reduce_memory_usage: false
+metrics:
+  batch_size: 10
+  enable_aggregation: true
+  host: 0.0.0.0
+  port: 11455
+mimir:
+  enabled: false
+  mimir_url: null
+  prometheus_url: null
+  tenant_id: network-monitoring
+monitoring:
+  enabled: true
+  enhanced_features: true
+  interval: 30
+  targets:
+  - 8.8.8.8
+  - 1.1.1.1
+  - google.com
+  timeout: 10
+networkquality:
+  client:
+    binary_path: /usr/local/bin/networkquality
+    parallel_streams: 8
+    test_duration: 10
+  enabled: true
+  server:
+    additional_args: []
+    auto_start: true
+    binary_path: /usr/local/bin/networkquality
+    bind_address: 192.168.25.104
+    log_level: info
+    port: 7500
+    type: self_hosted
+    url: http://127.0.0.1:7500
+  testing:
+    adaptive_intervals:
+      error: 300
+      excellent: 3600
+      fair: 600
+      good: 1800
+      poor: 300
+    default_interval_seconds: 300
+    strategy: fixed
+  thresholds:
+    bufferbloat_ms:
+      mild: 30
+      moderate: 60
+      severe: 100
+    quality_score:
+      excellent: 900
+      fair: 500
+      good: 750
+      poor: 200
+    rpm:
+      excellent: 800
+      fair: 300
+      good: 600
+      poor: 100

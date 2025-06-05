@@ -35,11 +35,10 @@ from src.alerts import AlertManager, AlertSeverity, create_alert_manager
 from src.dynamic_thresh import DynamicThresholdManager, setup_dynamic_thresholds
 from src.edge_opt import EdgeOptimizer, create_edge_optimizer
 from src.websocket_server import WebSocketManager, WebSocketIntegration
-
+from src.api.server import APIServer
 # New imports for networkquality-rs
 from src.networkquality.collector import NetworkQualityCollector, ResponsivenessMetrics
 from src.networkquality.server import NetworkQualityServerManager
-
 
 logger = logging.getLogger(__name__)
 
@@ -388,18 +387,31 @@ class EnhancedNetworkIntelligenceMonitor:
             logger.warning("Main config not found, skipping API server initialization.")
 
     async def _initialize_websocket_server(self):
-        if self.config and self.config.api: # API config for host
-            websocket_port = self.config.get('websocket_port', 8001) # Get from general config or default
+        """Initializes the WebSocket server if enabled in the configuration."""
+        if self.config and self.config.api and self.config.api.websocket_enabled:
+            websocket_host = self.config.api.host
+            websocket_port = self.config.api.websocket_port # Use port from APIConfig
+
             self.websocket_manager = WebSocketManager(
-                host=self.config.api.host,
+                host=websocket_host,
                 port=websocket_port
             )
-            await self.websocket_manager.start_server()
-            self.websocket_integration = WebSocketIntegration(self.websocket_manager)
-            logger.info(f"WebSocket server initialized on port {websocket_port}")
+            try:
+                await self.websocket_manager.start_server()
+                self.websocket_integration = WebSocketIntegration(self.websocket_manager)
+                logger.info(f"WebSocket server initialized and started on ws://{websocket_host}:{websocket_port}")
+            except Exception as e:
+                logger.error(f"Failed to start WebSocket server on ws://{websocket_host}:{websocket_port}: {e}")
+                self.websocket_manager = None # Ensure it's None if start failed
+                self.websocket_integration = None
+        elif self.config and self.config.api and not self.config.api.websocket_enabled:
+            logger.info("WebSocket server is disabled in the configuration.")
+            self.websocket_manager = None
+            self.websocket_integration = None
         else:
-            logger.warning("API or main config not found, skipping WebSocket server initialization.")
-
+            logger.warning("API configuration not found or incomplete, skipping WebSocket server initialization.")
+            self.websocket_manager = None
+            self.websocket_integration = None
 
     async def _apply_edge_optimizations(self):
         if self.config and self.config.deployment and self.config.deployment.edge_optimization:
