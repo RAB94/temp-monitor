@@ -128,6 +128,21 @@ class NetworkQualityRSConfig:
         'default_interval_seconds': 300 # Fallback or fixed interval
     })
 
+@dataclass
+class AIConfig:
+    """AI/ML configuration"""
+    model_dir: str = 'data/models'
+    train_interval: int = 3600
+    initial_epochs: int = 100
+    baseline_window: int = 1000
+    training_hours: int = 24
+    auto_train: bool = True
+    enable_quantization: bool = True
+    # Add these new fields
+    sequence_length: int = 20
+    input_size: int = 14
+    hidden_size: int = 64
+    num_layers: int = 2
 
 class Config:
     """Main configuration class"""

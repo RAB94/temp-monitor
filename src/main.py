@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 import json # For storing list of recommendations as JSON
 from typing import Optional # Added for type hinting
-
+from dataclasses import asdict
 # Add project root to Python path
 project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root))
@@ -243,10 +243,10 @@ class EnhancedNetworkIntelligenceMonitor:
         if self.config and self.config.ai:
             ai_config = {
                 'model_dir': self.config.ai.model_dir,
-                'sequence_length': self.config.ai.get('sequence_length', 20), # Use get for safety
-                'input_size': self.config.ai.get('input_size', 14),
-                'hidden_size': self.config.ai.get('hidden_size', 64),
-                'num_layers': self.config.ai.get('num_layers', 2),
+                'sequence_length': self.config.ai.sequence_length,  # Direct attribute access
+                'input_size': self.config.ai.input_size,            # Direct attribute access
+                'hidden_size': self.config.ai.hidden_size,          # Direct attribute access
+                'num_layers': self.config.ai.num_layers,            # Direct attribute access
                 'initial_epochs': self.config.ai.initial_epochs,
                 'enable_quantization': self.config.ai.enable_quantization,
                 'deployment_type': 'edge' if self.config.deployment and self.config.deployment.edge_optimization else 'standard'
@@ -255,7 +255,7 @@ class EnhancedNetworkIntelligenceMonitor:
             await self.ai_detector.initialize()
             try:
                 self.ai_detector.load_models()
-                if self.ai_logger: # Check if logger exists
+                if self.ai_logger:  # Check if logger exists
                     self.ai_logger.log_model_loaded('enhanced_lstm', self.config.ai.model_dir)
                 logger.info("Loaded existing AI models")
             except FileNotFoundError:
@@ -263,7 +263,6 @@ class EnhancedNetworkIntelligenceMonitor:
             logger.info("AI detection system initialized")
         else:
             logger.warning("AI configuration not found, skipping AI system initialization.")
-
 
     async def _initialize_mimir_integration(self):
         if self.config and self.config.mimir and self.config.mimir.enabled:
@@ -292,13 +291,50 @@ class EnhancedNetworkIntelligenceMonitor:
 
     async def _initialize_alerting_system(self):
         if self.config and self.config.alerts and self.config.alerts.enabled:
-            alert_config = self.config.alerts.to_dict() if hasattr(self.config.alerts, 'to_dict') else \
-                           self.config.get('alerts') # Fallback if to_dict not present
+            # Convert dataclass to dictionary
+            alert_config = asdict(self.config.alerts)
+            
+            # The alert manager expects a specific structure, so we need to wrap it properly
+            alert_config = {
+                'correlation': {
+                    'correlation_window_seconds': 300,
+                    'enable_grouping': True
+                },
+                'notifications': {
+                    'channels': [
+                        {
+                            'name': 'webhook',
+                            'type': 'webhook',
+                            'config': {'url': self.config.alerts.webhook_url},
+                            'enabled': bool(self.config.alerts.webhook_url)
+                        }
+                    ],
+                    'routing': {
+                        'critical': ['webhook'],
+                        'high': ['webhook'],
+                        'medium': [],
+                        'low': []
+                    }
+                },
+                'escalation': {
+                    'enabled': True,
+                    'rules': [
+                        {
+                            'name': 'critical_escalation',
+                            'conditions': {'severity': ['critical']},
+                            'delay_seconds': 300,
+                            'channels': ['webhook'],
+                            'enabled': True
+                        }
+                    ]
+                },
+                'retention_hours': 168  # 1 week
+            }
+            
             self.alert_manager = create_alert_manager(alert_config)
             logger.info("Alerting system initialized")
         else:
             logger.info("Alerting system disabled or alerts config missing.")
-
 
     async def _initialize_dynamic_thresholds(self):
         if self.config:
@@ -333,15 +369,23 @@ class EnhancedNetworkIntelligenceMonitor:
 
     async def _initialize_api_server(self):
         if self.config:
-            self.api_server = EnhancedAPIServer(
-                self.config, self.database, self.ai_detector, self.enhanced_collector,
-                self.mimir_client, self.metrics_server, self.alert_manager,
-                self.threshold_manager
+            # Create API server with only the expected parameters
+            self.api_server = APIServer(
+                self.config, 
+                self.database, 
+                self.ai_detector, 
+                self.enhanced_collector
             )
+            
+            # Add additional components as attributes after creation
+            self.api_server.mimir_client = self.mimir_client
+            self.api_server.metrics_server = self.metrics_server
+            self.api_server.alert_manager = self.alert_manager
+            self.api_server.threshold_manager = self.threshold_manager
+            
             logger.info("Enhanced API server initialized")
         else:
             logger.warning("Main config not found, skipping API server initialization.")
-
 
     async def _initialize_websocket_server(self):
         if self.config and self.config.api: # API config for host
