@@ -169,6 +169,7 @@ class Config:
         self._load_environment_overrides()
         self._validate_config()
 
+
     def _update_config_objects(self):
         """Update configuration objects from loaded data"""
         config_sections = {
@@ -182,6 +183,40 @@ class Config:
             'deployment': self.deployment,
             'networkquality': self.networkquality 
         }
+
+        for section_name, section_obj in config_sections.items():
+            section_data = self._config_data.get(section_name, {})
+            if isinstance(section_obj, NetworkQualityRSConfig): 
+                # Handle enabled flag first
+                if 'enabled' in section_data:
+                    section_obj.enabled = section_data['enabled']
+                    
+                # Handle client configuration
+                if 'client' in section_data:
+                    client_data = section_data['client']
+                    for key, value in client_data.items():
+                         if hasattr(section_obj.client, key):
+                            setattr(section_obj.client, key, value)
+                            
+                # Handle server configuration        
+                if 'server' in section_data:
+                    server_data = section_data['server']
+                    for key, value in server_data.items():
+                         if hasattr(section_obj.server, key):
+                            setattr(section_obj.server, key, value)
+                            
+                # Handle thresholds
+                if 'thresholds' in section_data: 
+                    section_obj.thresholds.update(section_data['thresholds'])
+                    
+                # Handle testing configuration
+                if 'testing' in section_data: 
+                    section_obj.testing.update(section_data['testing'])
+            else:
+                # Handle other configuration objects normally
+                for key, value in section_data.items():
+                    if hasattr(section_obj, key):
+                        setattr(section_obj, key, value)
 
         for section_name, section_obj in config_sections.items():
             section_data = self._config_data.get(section_name, {})

@@ -390,11 +390,13 @@ class EnhancedNetworkIntelligenceMonitor:
         """Initializes the WebSocket server if enabled in the configuration."""
         if self.config and self.config.api and self.config.api.websocket_enabled:
             websocket_host = self.config.api.host
-            websocket_port = self.config.api.websocket_port # Use port from APIConfig
-
+            websocket_port = self.config.api.websocket_port  # Use port from config
+            
+            logger.info(f"WebSocket config: host={websocket_host}, port={websocket_port}")
+            
             self.websocket_manager = WebSocketManager(
                 host=websocket_host,
-                port=websocket_port
+                port=websocket_port  # This should use the config port, not hardcoded 8001
             )
             try:
                 await self.websocket_manager.start_server()
@@ -402,7 +404,7 @@ class EnhancedNetworkIntelligenceMonitor:
                 logger.info(f"WebSocket server initialized and started on ws://{websocket_host}:{websocket_port}")
             except Exception as e:
                 logger.error(f"Failed to start WebSocket server on ws://{websocket_host}:{websocket_port}: {e}")
-                self.websocket_manager = None # Ensure it's None if start failed
+                self.websocket_manager = None
                 self.websocket_integration = None
         elif self.config and self.config.api and not self.config.api.websocket_enabled:
             logger.info("WebSocket server is disabled in the configuration.")
@@ -533,6 +535,7 @@ class EnhancedNetworkIntelligenceMonitor:
         logger.info(f"Received signal {sig.name if isinstance(sig, signal.Signals) else sig}, initiating graceful shutdown...")
         self.shutdown_event.set()
 
+
     def _log_startup_summary(self):
         logger.info("=== Enhanced Network Intelligence Monitor Started ===")
         if self.config:
@@ -540,9 +543,10 @@ class EnhancedNetworkIntelligenceMonitor:
                 logger.info(f"API Server: http://{self.config.api.host}:{self.config.api.port}")
             if self.config.metrics:
                 logger.info(f"Metrics Export (for Alloy): http://{self.config.metrics.host}:{self.config.metrics.port}/metrics")
-            if self.websocket_manager and self.config.api:
-                 websocket_port = self.config.get('websocket_port', 8001)
-                 logger.info(f"WebSocket Server: ws://{self.config.api.host}:{websocket_port}/ws")
+            if self.websocket_manager and self.config.api and self.config.api.websocket_enabled:
+                # Use the actual port the WebSocket manager is running on
+                actual_port = self.websocket_manager.port
+                logger.info(f"WebSocket Server: ws://{self.config.api.host}:{actual_port}/ws")
             if self.config.monitoring:
                 logger.info(f"Targets: {', '.join(self.config.monitoring.targets)}")
             if self.config.networkquality:

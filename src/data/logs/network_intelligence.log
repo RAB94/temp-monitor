@@ -816,3 +816,104 @@ For more information, try '--help'.
 2025-06-06 06:16:26,030 - __main__ - INFO - Enhanced Network Intelligence Monitor stopped
 2025-06-06 06:16:26,030 - __main__ - INFO - Monitor shutdown was initiated, ensuring cleanup.
 2025-06-06 06:16:26,030 - __main__ - INFO - Application shutdown sequence complete.
+2025-06-06 12:34:29,098 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 12:34:29,099 - src.utils.logger - INFO - Log level: 20
+2025-06-06 12:34:29,099 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 12:34:29,099 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 12:34:29,101 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 12:34:29,101 - src.config - ERROR - networkquality server type is 'external' but no URL is provided ('networkquality.server.url').
+2025-06-06 12:34:29,101 - src.config - INFO - Configuration validation completed.
+2025-06-06 12:34:29,101 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 12:34:29,101 - __main__ - INFO - NetworkQuality-RS enabled: False
+2025-06-06 12:34:29,101 - __main__ - INFO - Detecting environment...
+2025-06-06 12:34:29,102 - __main__ - INFO -   Platform: linux
+2025-06-06 12:34:29,102 - __main__ - INFO -   Is container: True
+2025-06-06 12:34:29,102 - __main__ - INFO -   Is cloud: False
+2025-06-06 12:34:29,102 - __main__ - INFO -   Is edge device: False
+2025-06-06 12:34:29,102 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 12:34:29,103 - src.utils.database - INFO - Database tables created
+2025-06-06 12:34:29,104 - src.utils.database - INFO - Database indexes created
+2025-06-06 12:34:29,104 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 12:34:29,104 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 12:34:29,104 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 12:34:29,104 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 12:34:29,104 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 12:34:29,586 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 12:34:29,586 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 12:34:29,586 - __main__ - INFO - Loaded existing AI models
+2025-06-06 12:34:29,586 - __main__ - INFO - AI detection system initialized
+2025-06-06 12:34:29,586 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 12:34:29,586 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 12:34:29,586 - src.alerts - INFO - Alert management system started
+2025-06-06 12:34:29,586 - __main__ - INFO - Alerting system initialized
+2025-06-06 12:34:29,586 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 12:34:29,586 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 12:34:29,588 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 12:34:29,588 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 12:34:29,588 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 12:34:29,589 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 12:34:29,589 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 12:34:29,593 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 12:34:29,593 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 12:34:29,593 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 12:34:29,593 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 12:34:29,593 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 12:34:29,593 - __main__ - INFO - NetworkQuality-RS monitoring is disabled in configuration.
+2025-06-06 12:34:29,593 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 12:34:29,593 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 12:34:29,593 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 12:34:29,593 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 12:34:29,593 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 12:34:29,593 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 12:34:29,593 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 12:34:29,593 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 12:34:29,593 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 12:34:29,593 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 12:34:29,593 - __main__ - INFO - NetworkQuality-RS Monitoring: Disabled
+2025-06-06 12:34:29,594 - __main__ - INFO - =====================================================
+2025-06-06 12:34:29,594 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 12:34:39,606 - __main__ - ERROR - API server error: signal only works in main thread of the main interpreter
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 681, in _run_api_server
+    await loop.run_in_executor(None, self.api_server.run)
+  File "/usr/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/api/server.py", line 472, in run
+    self.app.run(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/flask/app.py", line 662, in run
+    run_simple(t.cast(str, host), port, self, **options)
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/werkzeug/serving.py", line 1115, in run_simple
+    run_with_reloader(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/werkzeug/_reloader.py", line 452, in run_with_reloader
+    signal.signal(signal.SIGTERM, lambda *args: sys.exit(0))
+  File "/usr/lib/python3.12/signal.py", line 58, in signal
+    handler = _signal.signal(_enum_to_int(signalnum), _enum_to_int(handler))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: signal only works in main thread of the main interpreter
+2025-06-06 12:35:42,382 - __main__ - INFO - Received signal SIGTERM, initiating graceful shutdown...
+2025-06-06 12:35:42,383 - __main__ - INFO - Stopping Enhanced Network Intelligence Monitor...
+2025-06-06 12:35:42,383 - __main__ - INFO - Main monitoring loop cancelled.
+2025-06-06 12:35:42,383 - __main__ - INFO - Main (enhanced_collector) monitoring loop stopped
+2025-06-06 12:35:47,383 - src.prom_export - INFO - Metrics aggregator stopped
+2025-06-06 12:35:47,383 - src.prom_export - INFO - Prometheus metrics server stopped
+2025-06-06 12:35:47,384 - src.websocket_server - INFO - Stopping WebSocket server...
+2025-06-06 12:35:47,384 - websockets.server - INFO - server closing
+2025-06-06 12:35:47,384 - websockets.server - INFO - server closed
+2025-06-06 12:35:47,384 - src.websocket_server - INFO - WebSocket server stopped
+2025-06-06 12:35:47,385 - src.utils.database - INFO - Database connection closed
+2025-06-06 12:35:47,385 - __main__ - INFO - AI models saved
+2025-06-06 12:35:47,385 - __main__ - INFO - === Final Performance Report ===
+2025-06-06 12:35:47,385 - __main__ - INFO - System Uptime: 0.02 hours
+2025-06-06 12:35:47,385 - __main__ - INFO - Total Standard Measurements: 3
+2025-06-06 12:35:47,385 - __main__ - INFO - Total NetworkQuality-RS Measurements: 0
+2025-06-06 12:35:47,385 - __main__ - INFO - Anomalies Detected: 0
+2025-06-06 12:35:47,385 - __main__ - INFO - Alerts Sent: 0
+2025-06-06 12:35:47,385 - __main__ - INFO - Model Trainings: 0
+2025-06-06 12:35:47,386 - __main__ - INFO - Baseline Updates: 0
+2025-06-06 12:35:47,386 - __main__ - INFO - Average Collection Time: 0.00s
+2025-06-06 12:35:47,386 - __main__ - INFO - Final Health Score: 100.0
+2025-06-06 12:35:47,386 - __main__ - INFO - ================================
+2025-06-06 12:35:47,386 - __main__ - INFO - Enhanced Network Intelligence Monitor stopped
+2025-06-06 12:35:47,386 - __main__ - INFO - Monitor shutdown was initiated, ensuring cleanup.
+2025-06-06 12:35:47,386 - __main__ - INFO - Application shutdown sequence complete.

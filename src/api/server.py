@@ -1,741 +1,477 @@
 #!/usr/bin/env python3
+# src/api/server.py - Updated with NetworkQuality integration
 """
-Flask API Server
-===============
-
-RESTful API server for the Network Intelligence Monitor.
-Provides endpoints for metrics, anomalies, health checks, and AI model status.
+Enhanced API Server with NetworkQuality-RS integration
 """
 
 import asyncio
 import json
-import logging
 import time
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List
-
-from flask import Flask, jsonify, request, Response, send_from_directory
+from flask import Flask, jsonify, request, render_template_string
 from flask_cors import CORS
-import threading
+import logging
+from typing import Optional, Dict, Any
+
+# Import the NetworkQuality routes
+from .networkquality_routes import create_networkquality_routes
 
 logger = logging.getLogger(__name__)
 
 class APIServer:
-    """Flask API server for the Network Intelligence Monitor"""
-    
-    def __init__(self, config, database, detector, collector=None):
+    def __init__(self, config, database, ai_detector=None, enhanced_collector=None):
         self.config = config
         self.database = database
-        self.detector = detector
-        self.collector = collector
+        self.ai_detector = ai_detector
+        self.enhanced_collector = enhanced_collector
         
-        # Initialize Flask app
+        # These will be set later by main.py
+        self.mimir_client = None
+        self.metrics_server = None
+        self.alert_manager = None
+        self.threshold_manager = None
+        self.nq_collector = None  # NetworkQuality collector
+        
         self.app = Flask(__name__)
         
-        # Enable CORS if configured
-        if config.get('cors_enabled', True):
-            CORS(self.app, resources={
-                r"/api/*": {
-                    "origins": "*",
-                    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-                    "allow_headers": ["Content-Type", "Authorization"]
-                }
-            })
+        if config.api.cors_enabled:
+            CORS(self.app)
         
-        # Setup routes
         self._setup_routes()
-        
-        # Threading
-        self.server_thread = None
-        self.running = False
     
     def _setup_routes(self):
-        """Setup API routes"""
+        """Setup all API routes including NetworkQuality routes"""
         
-        # Health check endpoints
-        @self.app.route('/health', methods=['GET'])
+        # Health check
+        @self.app.route('/health')
         def health_check():
-            """Basic health check"""
             return jsonify({
                 'status': 'healthy',
                 'timestamp': time.time(),
-                'service': 'network-intelligence-monitor'
+                'services': {
+                    'database': self.database is not None,
+                    'ai_detector': self.ai_detector is not None,
+                    'enhanced_collector': self.enhanced_collector is not None,
+                    'networkquality': self.nq_collector is not None,
+                    'mimir_client': self.mimir_client is not None,
+                    'alert_manager': self.alert_manager is not None
+                }
             })
         
-        @self.app.route('/api/health', methods=['GET'])
-        def api_health():
-            """Detailed health check"""
-            return asyncio.run(self._get_health_status())
-        
-        # Metrics endpoints
-        @self.app.route('/api/metrics/current', methods=['GET'])
-        def get_current_metrics():
-            """Get current metrics"""
-            return asyncio.run(self._get_current_metrics())
-        
-        @self.app.route('/api/metrics/recent', methods=['GET'])
-        def get_recent_metrics():
-            """Get recent metrics"""
-            target = request.args.get('target')
-            hours = int(request.args.get('hours', 24))
-            limit = int(request.args.get('limit', 1000))
-            
-            return asyncio.run(self._get_recent_metrics(target, hours, limit))
-        
-        @self.app.route('/api/metrics/targets', methods=['GET'])
-        def get_monitored_targets():
-            """Get list of monitored targets"""
+        # System status
+        @self.app.route('/api/status')
+        def system_status():
             return jsonify({
-                'targets': self.config.get('monitoring.targets', []),
-                'count': len(self.config.get('monitoring.targets', []))
-            })
-        
-        # Anomaly endpoints
-        @self.app.route('/api/anomalies/recent', methods=['GET'])
-        def get_recent_anomalies():
-            """Get recent anomalies"""
-            target = request.args.get('target')
-            hours = int(request.args.get('hours', 24))
-            limit = int(request.args.get('limit', 100))
-            
-            return asyncio.run(self._get_recent_anomalies(target, hours, limit))
-        
-        @self.app.route('/api/anomalies/summary', methods=['GET'])
-        def get_anomaly_summary():
-            """Get anomaly summary"""
-            hours = int(request.args.get('hours', 24))
-            return asyncio.run(self._get_anomaly_summary(hours))
-        
-        # AI Model endpoints
-        @self.app.route('/api/ai/status', methods=['GET'])
-        def get_ai_status():
-            """Get AI model status"""
-            return self._get_ai_status()
-        
-        @self.app.route('/api/ai/retrain', methods=['POST'])
-        def trigger_retrain():
-            """Trigger model retraining"""
-            return asyncio.run(self._trigger_retrain())
-        
-        @self.app.route('/api/ai/performance', methods=['GET'])
-        def get_ai_performance():
-            """Get AI model performance metrics"""
-            return asyncio.run(self._get_ai_performance())
-        
-        # Database endpoints
-        @self.app.route('/api/database/stats', methods=['GET'])
-        def get_database_stats():
-            """Get database statistics"""
-            return asyncio.run(self._get_database_stats())
-        
-        @self.app.route('/api/database/cleanup', methods=['POST'])
-        def trigger_cleanup():
-            """Trigger database cleanup"""
-            days = request.json.get('days', 30) if request.json else 30
-            return asyncio.run(self._trigger_cleanup(days))
-        
-        # Configuration endpoints
-        @self.app.route('/api/config', methods=['GET'])
-        def get_config():
-            """Get current configuration"""
-            return jsonify(self.config.to_dict())
-        
-        @self.app.route('/api/config', methods=['PUT'])
-        def update_config():
-            """Update configuration"""
-            return self._update_config(request.json)
-        
-        # Test endpoints
-        @self.app.route('/api/test/connectivity', methods=['POST'])
-        def test_connectivity():
-            """Test connectivity to targets"""
-            data = request.json or {}
-            targets = data.get('targets', self.config.get('monitoring.targets', []))
-            return asyncio.run(self._test_connectivity(targets))
-        
-        @self.app.route('/api/test/single', methods=['POST'])
-        def test_single_target():
-            """Test single target"""
-            data = request.json or {}
-            target = data.get('target')
-            if not target:
-                return jsonify({'error': 'Target required'}), 400
-            
-            return asyncio.run(self._test_single_target(target))
-        
-        # Dashboard data endpoints
-        @self.app.route('/api/dashboard/overview', methods=['GET'])
-        def get_dashboard_overview():
-            """Get dashboard overview data"""
-            return asyncio.run(self._get_dashboard_overview())
-        
-        @self.app.route('/api/dashboard/charts', methods=['GET'])
-        def get_chart_data():
-            """Get chart data for dashboard"""
-            chart_type = request.args.get('type', 'latency')
-            hours = int(request.args.get('hours', 24))
-            target = request.args.get('target')
-            
-            return asyncio.run(self._get_chart_data(chart_type, hours, target))
-        
-        # WebSocket endpoint for real-time data
-        @self.app.route('/api/ws/info', methods=['GET'])
-        def websocket_info():
-            """WebSocket connection information"""
-            return jsonify({
-                'websocket_url': f"ws://{request.host}/ws",
-                'protocols': ['metrics', 'anomalies', 'health'],
-                'update_interval': 30
-            })
-        
-        # Static files for dashboard
-        @self.app.route('/')
-        def serve_dashboard():
-            """Serve dashboard index"""
-            return send_from_directory('frontend/build', 'index.html')
-        
-        @self.app.route('/<path:path>')
-        def serve_static(path):
-            """Serve static dashboard files"""
-            return send_from_directory('frontend/build', path)
-        
-        # Error handlers
-        @self.app.errorhandler(404)
-        def not_found(error):
-            return jsonify({'error': 'Endpoint not found'}), 404
-        
-        @self.app.errorhandler(500)
-        def internal_error(error):
-            return jsonify({'error': 'Internal server error'}), 500
-        
-        @self.app.errorhandler(Exception)
-        def handle_exception(e):
-            logger.error(f"Unhandled API exception: {e}")
-            return jsonify({'error': 'An unexpected error occurred'}), 500
-    
-    async def _get_health_status(self):
-        """Get detailed health status"""
-        
-        try:
-            # Check database
-            db_stats = await self.database.get_database_stats()
-            db_healthy = db_stats.get('recent_metrics_count', 0) > 0
-            
-            # Check AI detector
-            ai_healthy = self.detector and hasattr(self.detector, 'is_trained') and self.detector.is_trained
-            
-            # Check collector
-            collector_healthy = self.collector is not None
-            
-            # Overall health
-            overall_healthy = db_healthy and ai_healthy
-            
-            health_data = {
-                'status': 'healthy' if overall_healthy else 'degraded',
-                'timestamp': time.time(),
-                'components': {
-                    'database': {
-                        'status': 'healthy' if db_healthy else 'unhealthy',
-                        'recent_metrics': db_stats.get('recent_metrics_count', 0),
-                        'size_mb': db_stats.get('database_size_mb', 0)
+                'status': 'success',
+                'data': {
+                    'uptime_seconds': time.time() - getattr(self, 'start_time', time.time()),
+                    'config': {
+                        'monitoring_enabled': self.config.monitoring.enabled,
+                        'ai_enabled': self.ai_detector is not None,
+                        'networkquality_enabled': self.config.networkquality.enabled if hasattr(self.config, 'networkquality') else False,
+                        'mimir_enabled': self.config.mimir.enabled if hasattr(self.config, 'mimir') else False,
+                        'alerts_enabled': self.config.alerts.enabled if hasattr(self.config, 'alerts') else False,
                     },
-                    'ai_detector': {
-                        'status': 'healthy' if ai_healthy else 'unhealthy',
-                        'trained': ai_healthy,
-                        'model_type': 'lstm_autoencoder' if ai_healthy else None
-                    },
-                    'collector': {
-                        'status': 'healthy' if collector_healthy else 'unavailable',
-                        'available': collector_healthy
+                    'targets': self.config.monitoring.targets if self.config.monitoring else [],
+                    'intervals': {
+                        'monitoring': self.config.monitoring.interval if self.config.monitoring else None,
+                        'networkquality': self.config.networkquality.testing.get('default_interval_seconds') if hasattr(self.config, 'networkquality') and hasattr(self.config.networkquality, 'testing') else None
                     }
                 },
-                'system': await self._get_system_health()
-            }
-            
-            return jsonify(health_data)
-            
-        except Exception as e:
-            logger.error(f"Error getting health status: {e}")
-            return jsonify({'error': str(e)}), 500
-    
-    async def _get_system_health(self):
-        """Get system health metrics"""
-        
-        try:
-            import psutil
-            
-            return {
-                'cpu_percent': psutil.cpu_percent(interval=1),
-                'memory_percent': psutil.virtual_memory().percent,
-                'disk_percent': psutil.disk_usage('/').percent,
-                'load_average': psutil.getloadavg() if hasattr(psutil, 'getloadavg') else [0, 0, 0],
-                'uptime_seconds': time.time() - psutil.boot_time()
-            }
-            
-        except ImportError:
-            return {'error': 'System monitoring not available'}
-        except Exception as e:
-            return {'error': str(e)}
-    
-    async def _get_current_metrics(self):
-        """Get current/latest metrics"""
-        
-        try:
-            if self.collector:
-                # Get real-time metrics
-                target = self.config.get('monitoring.targets', ['8.8.8.8'])[0]
-                metrics = await self.collector.collect_enhanced_metrics(target)
-                
-                if metrics:
-                    return jsonify({
-                        'status': 'success',
-                        'metrics': metrics.to_dict(),
-                        'source': 'real_time'
-                    })
-            
-            # Fallback to database
-            recent_metrics = await self.database.get_recent_metrics(limit=1)
-            if recent_metrics:
-                return jsonify({
-                    'status': 'success',
-                    'metrics': recent_metrics[0],
-                    'source': 'database'
-                })
-            else:
-                return jsonify({
-                    'status': 'no_data',
-                    'message': 'No metrics available'
-                })
-            
-        except Exception as e:
-            logger.error(f"Error getting current metrics: {e}")
-            return jsonify({'error': str(e)}), 500
-    
-    async def _get_recent_metrics(self, target: str = None, hours: int = 24, limit: int = 1000):
-        """Get recent metrics"""
-        
-        try:
-            metrics = await self.database.get_recent_metrics(target, hours, limit)
-            
-            return jsonify({
-                'status': 'success',
-                'metrics': metrics,
-                'count': len(metrics),
-                'target': target,
-                'hours': hours,
-                'limit': limit
+                'timestamp': time.time()
             })
-            
-        except Exception as e:
-            logger.error(f"Error getting recent metrics: {e}")
-            return jsonify({'error': str(e)}), 500
-    
-    async def _get_recent_anomalies(self, target: str = None, hours: int = 24, limit: int = 100):
-        """Get recent anomalies"""
         
+        # Enhanced metrics endpoints
+        @self.app.route('/api/metrics/latest')
+        def get_latest_metrics():
+            return asyncio.run(self._get_latest_metrics())
+        
+        @self.app.route('/api/metrics/history')
+        def get_metrics_history():
+            return asyncio.run(self._get_metrics_history())
+        
+        # Dashboard endpoint
+        @self.app.route('/')
+        def dashboard():
+            return render_template_string(self._get_dashboard_template())
+        
+        # NetworkQuality routes integration
+        if hasattr(self.config, 'networkquality') and self.config.networkquality.enabled:
+            # We'll register the NetworkQuality blueprint after it's created
+            pass
+    
+    def register_networkquality_routes(self, nq_collector):
+        """Register NetworkQuality routes after collector is available"""
+        self.nq_collector = nq_collector
+        nq_blueprint = create_networkquality_routes(self.database, nq_collector)
+        self.app.register_blueprint(nq_blueprint)
+        logger.info("NetworkQuality API routes registered")
+    
+    async def _get_latest_metrics(self):
+        """Get latest enhanced metrics"""
         try:
-            anomalies = await self.database.get_recent_anomalies(target, hours, limit)
+            if not self.database or not self.database.db:
+                return jsonify({'error': 'Database not available'}), 500
+            
+            query = """
+                SELECT * FROM enhanced_metrics 
+                ORDER BY timestamp DESC 
+                LIMIT 1
+            """
+            
+            cursor = await self.database.db.execute(query)
+            row = await cursor.fetchone()
+            
+            if not row:
+                return jsonify({'error': 'No metrics found'}), 404
+            
+            columns = [description[0] for description in cursor.description]
+            result = dict(zip(columns, row))
             
             return jsonify({
                 'status': 'success',
-                'anomalies': anomalies,
-                'count': len(anomalies),
-                'target': target,
-                'hours': hours
-            })
-            
-        except Exception as e:
-            logger.error(f"Error getting recent anomalies: {e}")
-            return jsonify({'error': str(e)}), 500
-    
-    async def _get_anomaly_summary(self, hours: int = 24):
-        """Get anomaly summary"""
-        
-        try:
-            anomalies = await self.database.get_recent_anomalies(hours=hours, limit=1000)
-            
-            summary = {
-                'total_anomalies': len(anomalies),
-                'critical_anomalies': len([a for a in anomalies if a.get('is_critical')]),
-                'by_severity': {},
-                'by_target': {},
-                'recent_trend': []
-            }
-            
-            # Group by severity and target
-            for anomaly in anomalies:
-                # Extract severity from recommendation or use default
-                if 'critical' in anomaly.get('recommendation', '').lower():
-                    severity = 'critical'
-                elif 'high' in anomaly.get('recommendation', '').lower():
-                    severity = 'high'
-                else:
-                    severity = 'medium'
-                
-                summary['by_severity'][severity] = summary['by_severity'].get(severity, 0) + 1
-                
-                target = anomaly.get('target_host', 'unknown')
-                summary['by_target'][target] = summary['by_target'].get(target, 0) + 1
-            
-            # Recent trend (last 24 hours in 4-hour buckets)
-            now = time.time()
-            for i in range(6):
-                bucket_start = now - (i + 1) * 4 * 3600
-                bucket_end = now - i * 4 * 3600
-                
-                bucket_anomalies = len([
-                    a for a in anomalies 
-                    if bucket_start <= a.get('timestamp', 0) < bucket_end
-                ])
-                
-                summary['recent_trend'].append({
-                    'time_bucket': bucket_start,
-                    'anomaly_count': bucket_anomalies
-                })
-            
-            summary['recent_trend'].reverse()
-            
-            return jsonify({
-                'status': 'success',
-                'summary': summary,
-                'hours': hours
-            })
-            
-        except Exception as e:
-            logger.error(f"Error getting anomaly summary: {e}")
-            return jsonify({'error': str(e)}), 500
-    
-    def _get_ai_status(self):
-        """Get AI model status"""
-        
-        try:
-            if not self.detector:
-                return jsonify({
-                    'status': 'unavailable',
-                    'message': 'AI detector not initialized'
-                })
-            
-            status = {
-                'status': 'healthy' if hasattr(self.detector, 'is_trained') and self.detector.is_trained else 'untrained',
-                'model_type': 'lstm_autoencoder',
-                'trained': hasattr(self.detector, 'is_trained') and self.detector.is_trained,
-                'model_info': {
-                    'sequence_length': getattr(self.detector, 'sequence_length', 20),
-                    'input_size': getattr(self.detector, 'input_size', 10),
-                    'hidden_size': getattr(self.detector, 'hidden_size', 64)
-                }
-            }
-            
-            # Add model file info if available
-            if hasattr(self.detector, 'model_dir'):
-                from pathlib import Path
-                model_path = Path(self.detector.model_dir) / 'lstm_autoencoder.pt'
-                if model_path.exists():
-                    status['model_file'] = {
-                        'path': str(model_path),
-                        'size_mb': model_path.stat().st_size / (1024**2),
-                        'modified': model_path.stat().st_mtime
-                    }
-            
-            return jsonify(status)
-            
-        except Exception as e:
-            logger.error(f"Error getting AI status: {e}")
-            return jsonify({'error': str(e)}), 500
-    
-    async def _trigger_retrain(self):
-        """Trigger model retraining"""
-        
-        try:
-            if not self.detector:
-                return jsonify({'error': 'AI detector not available'}), 503
-            
-            # Get training data
-            training_data = await self.database.get_metrics_for_training(hours=24)
-            
-            if len(training_data) < 50:
-                return jsonify({
-                    'error': 'Insufficient training data',
-                    'available_samples': len(training_data),
-                    'required_samples': 50
-                }), 400
-            
-            # Start training (this should be non-blocking in production)
-            start_time = time.time()
-            
-            if hasattr(self.detector, 'train_online'):
-                await self.detector.train_online(training_data)
-            else:
-                await self.detector.train_initial_model()
-            
-            training_time = time.time() - start_time
-            
-            return jsonify({
-                'status': 'success',
-                'message': 'Model retraining completed',
-                'training_samples': len(training_data),
-                'training_time_seconds': training_time
-            })
-            
-        except Exception as e:
-            logger.error(f"Error triggering retrain: {e}")
-            return jsonify({'error': str(e)}), 500
-    
-    async def _get_ai_performance(self):
-        """Get AI model performance metrics"""
-        
-        try:
-            # This would get performance data from database
-            # For now, return placeholder data
-            performance = {
-                'accuracy': 0.92,
-                'precision': 0.89,
-                'recall': 0.94,
-                'f1_score': 0.91,
-                'false_positive_rate': 0.08,
-                'last_training': time.time() - 3600,  # 1 hour ago
-                'total_predictions': 1250,
-                'anomalies_detected': 45
-            }
-            
-            return jsonify({
-                'status': 'success',
-                'performance': performance
-            })
-            
-        except Exception as e:
-            logger.error(f"Error getting AI performance: {e}")
-            return jsonify({'error': str(e)}), 500
-    
-    async def _get_database_stats(self):
-        """Get database statistics"""
-        
-        try:
-            stats = await self.database.get_database_stats()
-            
-            return jsonify({
-                'status': 'success',
-                'statistics': stats
-            })
-            
-        except Exception as e:
-            logger.error(f"Error getting database stats: {e}")
-            return jsonify({'error': str(e)}), 500
-    
-    async def _trigger_cleanup(self, days: int):
-        """Trigger database cleanup"""
-        
-        try:
-            cleanup_stats = await self.database.cleanup_old_data(days)
-            
-            return jsonify({
-                'status': 'success',
-                'message': f'Cleanup completed for data older than {days} days',
-                'cleanup_stats': cleanup_stats
-            })
-            
-        except Exception as e:
-            logger.error(f"Error triggering cleanup: {e}")
-            return jsonify({'error': str(e)}), 500
-    
-    def _update_config(self, new_config: Dict[str, Any]):
-        """Update configuration"""
-        
-        try:
-            if not new_config:
-                return jsonify({'error': 'No configuration provided'}), 400
-            
-            # Update configuration (simplified - in production, validate first)
-            for key, value in new_config.items():
-                self.config.set(key, value)
-            
-            return jsonify({
-                'status': 'success',
-                'message': 'Configuration updated'
-            })
-            
-        except Exception as e:
-            logger.error(f"Error updating config: {e}")
-            return jsonify({'error': str(e)}), 500
-    
-    async def _test_connectivity(self, targets: List[str]):
-        """Test connectivity to targets"""
-        
-        try:
-            if not self.collector:
-                return jsonify({'error': 'Collector not available'}), 503
-            
-            results = await self.collector.test_enhanced_connectivity(targets)
-            
-            return jsonify({
-                'status': 'success',
-                'test_results': results,
+                'data': result,
                 'timestamp': time.time()
             })
             
         except Exception as e:
-            logger.error(f"Error testing connectivity: {e}")
+            logger.error(f"Error fetching latest metrics: {e}")
             return jsonify({'error': str(e)}), 500
     
-    async def _test_single_target(self, target: str):
-        """Test single target"""
-        
+    async def _get_metrics_history(self):
+        """Get metrics history"""
         try:
-            if not self.collector:
-                return jsonify({'error': 'Collector not available'}), 503
+            if not self.database or not self.database.db:
+                return jsonify({'error': 'Database not available'}), 500
             
-            metrics = await self.collector.collect_enhanced_metrics(target)
+            hours = int(request.args.get('hours', 24))
+            limit = int(request.args.get('limit', 100))
+            target = request.args.get('target')
             
-            if metrics:
-                return jsonify({
-                    'status': 'success',
-                    'target': target,
-                    'metrics': metrics.to_dict(),
-                    'timestamp': time.time()
-                })
-            else:
-                return jsonify({
-                    'status': 'failed',
-                    'target': target,
-                    'message': 'Failed to collect metrics'
-                })
+            where_conditions = []
+            params = []
+            
+            start_time = time.time() - (hours * 3600)
+            where_conditions.append("timestamp >= ?")
+            params.append(start_time)
+            
+            if target:
+                where_conditions.append("target_host = ?")
+                params.append(target)
+            
+            where_clause = " AND ".join(where_conditions)
+            
+            query = f"""
+                SELECT * FROM enhanced_metrics 
+                WHERE {where_clause}
+                ORDER BY timestamp DESC 
+                LIMIT ?
+            """
+            params.append(limit)
+            
+            cursor = await self.database.db.execute(query, params)
+            rows = await cursor.fetchall()
+            
+            columns = [description[0] for description in cursor.description]
+            results = [dict(zip(columns, row)) for row in rows]
+            
+            return jsonify({
+                'status': 'success',
+                'data': results,
+                'count': len(results),
+                'filters': {
+                    'hours': hours,
+                    'limit': limit,
+                    'target': target
+                },
+                'timestamp': time.time()
+            })
             
         except Exception as e:
-            logger.error(f"Error testing single target: {e}")
+            logger.error(f"Error fetching metrics history: {e}")
             return jsonify({'error': str(e)}), 500
     
-    async def _get_dashboard_overview(self):
-        """Get dashboard overview data"""
+    def _get_dashboard_template(self):
+        """Enhanced dashboard template with NetworkQuality integration"""
+        return """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Network Intelligence Monitor</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0; padding: 20px; background: #f5f5f5; 
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px;
+            text-align: center;
+        }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { 
+            background: white; border-radius: 10px; padding: 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .card h3 { margin: 0 0 15px 0; color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .metric { display: flex; justify-content: space-between; margin: 10px 0; }
+        .metric-label { font-weight: 500; color: #666; }
+        .metric-value { font-weight: bold; color: #333; }
+        .status-healthy { color: #28a745; }
+        .status-warning { color: #ffc107; }
+        .status-danger { color: #dc3545; }
+        .button { 
+            background: #007bff; color: white; border: none; padding: 10px 20px; 
+            border-radius: 5px; cursor: pointer; margin: 5px; text-decoration: none;
+            display: inline-block;
+        }
+        .button:hover { background: #0056b3; }
+        .loading { text-align: center; color: #666; padding: 20px; }
+        .nq-quality { font-size: 1.2em; font-weight: bold; }
+        .quality-excellent { color: #28a745; }
+        .quality-good { color: #20c997; }
+        .quality-fair { color: #ffc107; }
+        .quality-poor { color: #fd7e14; }
+        .quality-error { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 Network Intelligence Monitor</h1>
+            <p>Enhanced monitoring with NetworkQuality-RS integration</p>
+        </div>
         
-        try:
-            # Get recent metrics and anomalies
-            recent_metrics = await self.database.get_recent_metrics(hours=1, limit=10)
-            recent_anomalies = await self.database.get_recent_anomalies(hours=24, limit=10)
+        <div class="cards">
+            <div class="card">
+                <h3>📊 System Status</h3>
+                <div id="system-status" class="loading">Loading...</div>
+            </div>
             
-            # Calculate overview stats
-            overview = {
-                'current_time': time.time(),
-                'monitoring_status': 'active' if recent_metrics else 'inactive',
-                'total_targets': len(self.config.get('monitoring.targets', [])),
-                'recent_metrics_count': len(recent_metrics),
-                'anomalies_24h': len(recent_anomalies),
-                'critical_anomalies': len([a for a in recent_anomalies if a.get('is_critical')]),
-                'system_health': await self._get_system_health(),
-                'ai_status': self._get_ai_status().get_json() if self.detector else None
+            <div class="card">
+                <h3>📈 Latest Enhanced Metrics</h3>
+                <div id="enhanced-metrics" class="loading">Loading...</div>
+            </div>
+            
+            <div class="card">
+                <h3>⚡ NetworkQuality Status</h3>
+                <div id="networkquality-status" class="loading">Loading...</div>
+            </div>
+            
+            <div class="card">
+                <h3>🎯 Latest NetworkQuality Metrics</h3>
+                <div id="networkquality-metrics" class="loading">Loading...</div>
+            </div>
+            
+            <div class="card">
+                <h3>📋 Recent Recommendations</h3>
+                <div id="recommendations" class="loading">Loading...</div>
+            </div>
+            
+            <div class="card">
+                <h3>🔧 Actions</h3>
+                <button class="button" onclick="runNetworkQualityTest()">Run NetworkQuality Test</button>
+                <button class="button" onclick="refreshData()">Refresh All Data</button>
+                <a href="/api/networkquality/metrics/history" class="button">View Full History</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchData(url) {
+            try {
+                const response = await fetch(url);
+                return await response.json();
+            } catch (error) {
+                console.error('Fetch error:', error);
+                return { error: error.message };
+            }
+        }
+        
+        function formatTimestamp(timestamp) {
+            return new Date(timestamp * 1000).toLocaleString();
+        }
+        
+        function formatMetric(label, value, unit = '') {
+            if (value === null || value === undefined) return '';
+            const formattedValue = typeof value === 'number' ? value.toFixed(2) : value;
+            return `<div class="metric"><span class="metric-label">${label}:</span><span class="metric-value">${formattedValue}${unit}</span></div>`;
+        }
+        
+        function getQualityClass(rating) {
+            return `quality-${rating}`;
+        }
+        
+        async function loadSystemStatus() {
+            const data = await fetchData('/api/status');
+            const container = document.getElementById('system-status');
+            
+            if (data.error) {
+                container.innerHTML = `<div class="status-danger">Error: ${data.error}</div>`;
+                return;
             }
             
-            # Add latest metrics summary
-            if recent_metrics:
-                latest = recent_metrics[0]
-                overview['latest_metrics'] = {
-                    'timestamp': latest.get('timestamp'),
-                    'target': latest.get('target_host'),
-                    'latency': latest.get('icmp_ping_time', 0),
-                    'packet_loss': latest.get('packet_loss', 0),
-                    'jitter': latest.get('jitter', 0)
+            const services = data.data.config;
+            container.innerHTML = `
+                <div class="metric"><span class="metric-label">Uptime:</span><span class="metric-value">${Math.round(data.data.uptime_seconds / 60)} minutes</span></div>
+                <div class="metric"><span class="metric-label">Enhanced Monitoring:</span><span class="metric-value ${services.monitoring_enabled ? 'status-healthy' : 'status-danger'}">${services.monitoring_enabled ? 'Enabled' : 'Disabled'}</span></div>
+                <div class="metric"><span class="metric-label">NetworkQuality:</span><span class="metric-value ${services.networkquality_enabled ? 'status-healthy' : 'status-danger'}">${services.networkquality_enabled ? 'Enabled' : 'Disabled'}</span></div>
+                <div class="metric"><span class="metric-label">AI Detection:</span><span class="metric-value ${services.ai_enabled ? 'status-healthy' : 'status-danger'}">${services.ai_enabled ? 'Enabled' : 'Disabled'}</span></div>
+                <div class="metric"><span class="metric-label">Targets:</span><span class="metric-value">${data.data.targets.join(', ')}</span></div>
+            `;
+        }
+        
+        async function loadEnhancedMetrics() {
+            const data = await fetchData('/api/metrics/latest');
+            const container = document.getElementById('enhanced-metrics');
+            
+            if (data.error) {
+                container.innerHTML = `<div class="status-danger">Error: ${data.error}</div>`;
+                return;
+            }
+            
+            const metrics = data.data;
+            container.innerHTML = `
+                <div class="metric"><span class="metric-label">Target:</span><span class="metric-value">${metrics.target_host}</span></div>
+                <div class="metric"><span class="metric-label">Last Update:</span><span class="metric-value">${formatTimestamp(metrics.timestamp)}</span></div>
+                ${formatMetric('Ping Time', metrics.icmp_ping_time, 'ms')}
+                ${formatMetric('TCP Handshake', metrics.tcp_handshake_time, 'ms')}
+                ${formatMetric('DNS Resolve', metrics.dns_resolve_time, 'ms')}
+                ${formatMetric('Packet Loss', metrics.packet_loss, '%')}
+                ${formatMetric('Jitter', metrics.jitter, 'ms')}
+                ${formatMetric('MOS Score', metrics.mos_score)}
+            `;
+        }
+        
+        async function loadNetworkQualityStatus() {
+            const data = await fetchData('/api/networkquality/status');
+            const container = document.getElementById('networkquality-status');
+            
+            if (data.error) {
+                container.innerHTML = `<div class="status-danger">Error: ${data.error}</div>`;
+                return;
+            }
+            
+            const status = data.data;
+            const healthClass = status.service_health === 'healthy' ? 'status-healthy' : 
+                               status.service_health === 'degraded' ? 'status-warning' : 'status-danger';
+            
+            container.innerHTML = `
+                <div class="metric"><span class="metric-label">Service Health:</span><span class="metric-value ${healthClass}">${status.service_health}</span></div>
+                <div class="metric"><span class="metric-label">Collector:</span><span class="metric-value ${status.collector_available ? 'status-healthy' : 'status-danger'}">${status.collector_available ? 'Available' : 'Unavailable'}</span></div>
+                <div class="metric"><span class="metric-label">Database:</span><span class="metric-value ${status.database_available ? 'status-healthy' : 'status-danger'}">${status.database_available ? 'Available' : 'Unavailable'}</span></div>
+                ${status.last_measurement ? `<div class="metric"><span class="metric-label">Last Measurement:</span><span class="metric-value">${formatTimestamp(status.last_measurement)}</span></div>` : ''}
+                ${status.last_measurement_ago_seconds ? `<div class="metric"><span class="metric-label">Time Since Last:</span><span class="metric-value">${Math.round(status.last_measurement_ago_seconds / 60)} minutes ago</span></div>` : ''}
+            `;
+        }
+        
+        async function loadNetworkQualityMetrics() {
+            const data = await fetchData('/api/networkquality/metrics/latest');
+            const container = document.getElementById('networkquality-metrics');
+            
+            if (data.error) {
+                container.innerHTML = `<div class="status-danger">Error: ${data.error}</div>`;
+                return;
+            }
+            
+            const metrics = data.data;
+            container.innerHTML = `
+                <div class="metric"><span class="metric-label">Target:</span><span class="metric-value">${metrics.target_host}</span></div>
+                <div class="metric"><span class="metric-label">Quality Rating:</span><span class="metric-value nq-quality ${getQualityClass(metrics.quality_rating)}">${metrics.quality_rating.toUpperCase()}</span></div>
+                ${formatMetric('RPM Average', metrics.rpm_average)}
+                ${formatMetric('Download RPM', metrics.rpm_download)}
+                ${formatMetric('Upload RPM', metrics.rpm_upload)}
+                ${formatMetric('Max Bufferbloat', metrics.max_bufferbloat_ms, 'ms')}
+                ${formatMetric('Bufferbloat Severity', metrics.bufferbloat_severity)}
+                ${formatMetric('Download Throughput', metrics.download_throughput_mbps, ' Mbps')}
+                ${formatMetric('Upload Throughput', metrics.upload_throughput_mbps, ' Mbps')}
+                ${formatMetric('Quality Score', metrics.overall_quality_score)}
+                <div class="metric"><span class="metric-label">Last Update:</span><span class="metric-value">${formatTimestamp(metrics.timestamp)}</span></div>
+            `;
+        }
+        
+        async function loadRecommendations() {
+            const data = await fetchData('/api/networkquality/recommendations?hours=6');
+            const container = document.getElementById('recommendations');
+            
+            if (data.error) {
+                container.innerHTML = `<div class="status-danger">Error: ${data.error}</div>`;
+                return;
+            }
+            
+            if (data.data.length === 0) {
+                container.innerHTML = '<div>No recent recommendations</div>';
+                return;
+            }
+            
+            const recentRecs = data.data.slice(0, 3);
+            container.innerHTML = recentRecs.map(rec => `
+                <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                    <div style="font-weight: bold; color: #666; font-size: 0.9em;">${formatTimestamp(rec.timestamp)} - ${rec.quality_rating.toUpperCase()}</div>
+                    <ul style="margin: 5px 0; padding-left: 20px;">
+                        ${rec.recommendations.map(r => `<li style="margin: 2px 0;">${r}</li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        }
+        
+        async function runNetworkQualityTest() {
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = 'Running Test...';
+            
+            try {
+                const response = await fetch('/api/networkquality/test/run', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ force: true })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    alert(`Test completed successfully!\\nDuration: ${result.duration_seconds}s\\nQuality: ${result.data.quality_rating}`);
+                    refreshData();
+                } else {
+                    alert(`Test failed: ${result.error}`);
                 }
-            
-            return jsonify({
-                'status': 'success',
-                'overview': overview
-            })
-            
-        except Exception as e:
-            logger.error(f"Error getting dashboard overview: {e}")
-            return jsonify({'error': str(e)}), 500
-    
-    async def _get_chart_data(self, chart_type: str, hours: int, target: str = None):
-        """Get chart data for dashboard"""
+            } catch (error) {
+                alert(`Test error: ${error.message}`);
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Run NetworkQuality Test';
+            }
+        }
         
-        try:
-            metrics = await self.database.get_recent_metrics(target, hours, 1000)
-            
-            if not metrics:
-                return jsonify({
-                    'status': 'no_data',
-                    'chart_type': chart_type,
-                    'message': 'No data available'
-                })
-            
-            # Process data based on chart type
-            chart_data = []
-            
-            for metric in metrics:
-                timestamp = metric.get('timestamp', 0)
-                
-                if chart_type == 'latency':
-                    value = metric.get('icmp_ping_time', 0)
-                elif chart_type == 'packet_loss':
-                    value = metric.get('packet_loss', 0)
-                elif chart_type == 'jitter':
-                    value = metric.get('jitter', 0)
-                elif chart_type == 'mos_score':
-                    value = metric.get('mos_score', 0)
-                else:
-                    value = 0
-                
-                chart_data.append({
-                    'timestamp': timestamp,
-                    'value': value,
-                    'target': metric.get('target_host', 'unknown')
-                })
-            
-            # Sort by timestamp
-            chart_data.sort(key=lambda x: x['timestamp'])
-            
-            return jsonify({
-                'status': 'success',
-                'chart_type': chart_type,
-                'data': chart_data,
-                'count': len(chart_data)
-            })
-            
-        except Exception as e:
-            logger.error(f"Error getting chart data: {e}")
-            return jsonify({'error': str(e)}), 500
+        async function refreshData() {
+            await Promise.all([
+                loadSystemStatus(),
+                loadEnhancedMetrics(),
+                loadNetworkQualityStatus(),
+                loadNetworkQualityMetrics(),
+                loadRecommendations()
+            ]);
+        }
+        
+        // Initial load
+        refreshData();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(refreshData, 30000);
+    </script>
+</body>
+</html>
+        """
     
-    def run(self, host: str = None, port: int = None, debug: bool = None):
+    def run(self):
         """Run the API server"""
-        
-        host = host or self.config.get('api.host', '0.0.0.0')
-        port = port or self.config.get('api.port', 5000)
-        debug = debug if debug is not None else self.config.get('api.debug', False)
-        
-        logger.info(f"Starting API server on {host}:{port}")
-        
-        try:
-            self.app.run(
-                host=host,
-                port=port,
-                debug=debug,
-                threaded=True,
-                use_reloader=False  # Disable reloader to avoid issues
-            )
-        except Exception as e:
-            logger.error(f"API server error: {e}")
-            raise
-    
-    def run_threaded(self, host: str = None, port: int = None, debug: bool = None):
-        """Run the API server in a separate thread"""
-        
-        if self.running:
-            logger.warning("API server already running")
-            return
-        
-        self.running = True
-        
-        def run_server():
-            self.run(host, port, debug)
-        
-        self.server_thread = threading.Thread(target=run_server, daemon=True)
-        self.server_thread.start()
-        
-        logger.info("API server started in background thread")
-    
-    def stop(self):
-        """Stop the API server"""
-        self.running = False
-        
-        # Note: Flask dev server doesn't have a clean shutdown method
-        # In production, use a proper WSGI server like Gunicorn
-        logger.info("API server stop requested")
+        self.start_time = time.time()
+        self.app.run(
+            host=self.config.api.host,
+            port=self.config.api.port,
+            debug=self.config.api.debug,
+            threaded=True
+        )
