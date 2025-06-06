@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # src/networkquality/bridge.py
 """
-Python bridge to the networkquality-rs binary.
-Parses JSON output from the command-line tool.
-Uses the 'rpm' subcommand as per cloudflare/networkquality-rs.
+Python bridge to the networkquality binary (Cloudflare's responsiveness tool).
+Parses JSON output from the rpm subcommand.
 """
 
 import asyncio
@@ -20,25 +19,32 @@ logger = logging.getLogger(__name__)
 @dataclass
 class NetworkQualityMeasurement:
     """
-    Represents the structured result from a networkquality-rs measurement.
-    Fields should align with the JSON output of the 'networkquality rpm --json' command.
+    Represents the structured result from a networkquality rpm measurement.
+    This tool measures against predefined endpoints (like Cloudflare).
     """
     timestamp: float
-    target_server: str # The server URL that was tested against
-    # Based on typical output from such tools, these are expected.
-    # Verify against actual JSON output of `networkquality rpm <server_url> --json`
-    rpm_download: Optional[float] = None # Often `dl_rpm` or `download_rpm` in JSON
-    rpm_upload: Optional[float] = None   # Often `ul_rpm` or `upload_rpm` in JSON
-    base_rtt_ms: Optional[float] = None  # Often `base_rtt_ms` or `rtt_ms`
-    loaded_rtt_download_ms: Optional[float] = None # Often `dl_loaded_rtt_ms`
-    loaded_rtt_upload_ms: Optional[float] = None   # Often `ul_loaded_rtt_ms`
-    download_throughput_mbps: Optional[float] = None # Often `dl_mbps` or `download_mbps`
-    upload_throughput_mbps: Optional[float] = None   # Often `ul_mbps` or `upload_mbps`
-    download_responsiveness_score: Optional[float] = None # Tool might provide a specific score
-    upload_responsiveness_score: Optional[float] = None   # Tool might provide a specific score
+    target_server: str  # Will be set to the endpoint used (e.g., "cloudflare")
+    
+    # RPM measurements
+    rpm_download: Optional[float] = None
+    rpm_upload: Optional[float] = None
+    
+    # RTT measurements
+    base_rtt_ms: Optional[float] = None
+    loaded_rtt_download_ms: Optional[float] = None
+    loaded_rtt_upload_ms: Optional[float] = None
+    
+    # Throughput measurements
+    download_throughput_mbps: Optional[float] = None
+    upload_throughput_mbps: Optional[float] = None
+    
+    # Responsiveness scores (if available)
+    download_responsiveness_score: Optional[float] = None
+    upload_responsiveness_score: Optional[float] = None
+    
     error: Optional[str] = None
 
-    # Derived metrics (can be calculated in the collector)
+    # Derived metrics (calculated in collector)
     rpm_average: Optional[float] = None
     download_bufferbloat_ms: Optional[float] = None
     upload_bufferbloat_ms: Optional[float] = None
@@ -51,79 +57,80 @@ class NetworkQualityMeasurement:
 
 class NetworkQualityBinaryBridge:
     """
-    Bridge to interact with the networkquality-rs command-line binary
-    using the 'rpm' subcommand.
+    Bridge to interact with the networkquality binary (Cloudflare responsiveness tool).
+    This tool measures against predefined endpoints, not custom servers.
     """
 
-    def __init__(self, client_config_dict: Dict[str, Any]): # Expects the 'client' part of networkquality config
+    def __init__(self, client_config_dict: Dict[str, Any]):
         """
         Initializes the bridge.
         Args:
-            client_config_dict: A dictionary containing client-specific configurations like
-                                'binary_path', 'test_duration', 'parallel_streams'.
+            client_config_dict: A dictionary containing client-specific configurations.
         """
         self.binary_path = Path(client_config_dict.get('binary_path', '/usr/local/bin/networkquality'))
-        self.default_duration = client_config_dict.get('test_duration', 10)
-        self.default_parallel_streams = client_config_dict.get('parallel_streams', 8)
+        self.default_duration_ms = client_config_dict.get('test_duration', 12000)  # milliseconds
+        self.default_max_connections = client_config_dict.get('max_loaded_connections', 8)
         self.logger = logger
 
         if not self.binary_path.exists():
-            # Attempt to resolve common paths if the configured path doesn't exist and is not absolute
+            # Attempt to resolve common paths
             if not self.binary_path.is_absolute():
                 common_paths = [
                     Path("/usr/local/bin/networkquality"),
                     Path("/usr/bin/networkquality"),
-                    Path("./networkquality") # Check local directory if running from project root during dev
+                    Path("./networkquality")
                 ]
                 for p in common_paths:
                     if p.exists():
                         self.binary_path = p
-                        self.logger.info(f"Resolved networkquality client binary to: {self.binary_path}")
+                        self.logger.info(f"Resolved networkquality binary to: {self.binary_path}")
                         break
-                else: # If still not found
+                else:
                     self.logger.warning(
-                        f"NetworkQuality client binary not found at '{client_config_dict.get('binary_path')}' or common locations. "
+                        f"NetworkQuality binary not found at '{client_config_dict.get('binary_path')}' or common locations. "
                         "Measurements will fail. Please install it or update the 'binary_path' in config."
                     )
-            else: # If absolute path was given and it doesn't exist
-                 self.logger.warning(
-                    f"NetworkQuality client binary not found at absolute path '{self.binary_path}'. Measurements will fail."
+            else:
+                self.logger.warning(
+                    f"NetworkQuality binary not found at absolute path '{self.binary_path}'. Measurements will fail."
                 )
 
-
-    async def measure(self, server_url: str,
-                      duration: Optional[int] = None,
-                      parallel_streams: Optional[int] = None) -> NetworkQualityMeasurement:
+    async def measure(self, server_url: str = None,
+                      duration_ms: Optional[int] = None,
+                      max_connections: Optional[int] = None) -> NetworkQualityMeasurement:
         """
         Runs the 'networkquality rpm' command to perform a measurement.
+        Note: server_url is ignored as this tool uses predefined endpoints.
 
         Args:
-            server_url: The URL of the networkquality-rs measurement server (positional argument).
-            duration: Duration of the test in seconds.
-            parallel_streams: Number of parallel streams to use.
+            server_url: Ignored - tool uses predefined endpoints
+            duration_ms: Duration of the test in milliseconds
+            max_connections: Maximum number of loaded connections
 
         Returns:
             A NetworkQualityMeasurement object.
         """
         if not self.binary_path.exists():
-            error_msg = f"NetworkQuality client binary not found at {self.binary_path}"
+            error_msg = f"NetworkQuality binary not found at {self.binary_path}"
             self.logger.error(error_msg)
-            return NetworkQualityMeasurement(timestamp=time.time(), target_server=server_url, error=error_msg)
+            return NetworkQualityMeasurement(
+                timestamp=time.time(), 
+                target_server="cloudflare", 
+                error=error_msg
+            )
 
-        test_duration = duration if duration is not None else self.default_duration
-        num_streams = parallel_streams if parallel_streams is not None else self.default_parallel_streams
+        test_duration_ms = duration_ms if duration_ms is not None else self.default_duration_ms
+        max_load = max_connections if max_connections is not None else self.default_max_connections
 
-        # Corrected command structure for 'networkquality rpm <server_url> [OPTIONS]'
+        # Build command for networkquality rpm
         cmd = [
             str(self.binary_path),
-            "rpm",                 # The subcommand
-            server_url,            # Server URL as a positional argument
-            "--duration", str(test_duration),
-            "--parallel-streams", str(num_streams),
-            "--json"               # Global option for JSON output
+            "rpm",
+            "--test-duration", str(test_duration_ms),
+            "--max-load", str(max_load),
+            # Add JSON output if supported (check with --help first)
+            # "--json"  # Uncomment if the tool supports JSON output
         ]
-        # Optional: Add verbosity flags like -v or -q if needed, from config
-        # Example: if client_config_dict.get('verbose'): cmd.append('-v')
 
         self.logger.debug(f"Executing NetworkQuality command: {' '.join(cmd)}")
         timestamp = time.time()
@@ -138,88 +145,150 @@ class NetworkQualityBinaryBridge:
 
             if proc.returncode != 0:
                 error_message = stderr.decode().strip() if stderr else "Unknown error from binary"
-                self.logger.error(f"NetworkQuality measurement failed for {server_url} (RC: {proc.returncode}): {error_message}")
-                return NetworkQualityMeasurement(timestamp=timestamp, target_server=server_url, error=error_message)
+                self.logger.error(f"NetworkQuality measurement failed (RC: {proc.returncode}): {error_message}")
+                return NetworkQualityMeasurement(
+                    timestamp=timestamp, 
+                    target_server="cloudflare", 
+                    error=error_message
+                )
 
             raw_result_str = stdout.decode()
             if not raw_result_str.strip():
                 error_message = stderr.decode().strip() if stderr else "Empty output from binary"
-                self.logger.error(f"NetworkQuality measurement for {server_url} produced no output. Stderr: {error_message}")
-                return NetworkQualityMeasurement(timestamp=timestamp, target_server=server_url, error=f"Empty output. Stderr: {error_message}")
+                self.logger.error(f"NetworkQuality measurement produced no output. Stderr: {error_message}")
+                return NetworkQualityMeasurement(
+                    timestamp=timestamp, 
+                    target_server="cloudflare", 
+                    error=f"Empty output. Stderr: {error_message}"
+                )
 
-            raw_result = json.loads(raw_result_str)
-            self.logger.debug(f"Raw NetworkQuality 'rpm' result for {server_url}: {raw_result}")
-
-            # CRITICAL: Field names here MUST match the JSON output of `networkquality rpm ... --json`
-            # Common keys from networkquality-rs output for 'rpm' might be:
-            #   "up_bytes_per_sec", "down_bytes_per_sec" (convert to mbps)
-            #   "up_rpm", "down_rpm"
-            #   "rtt_ms" (base RTT)
-            #   "up_loaded_rtt_ms", "down_loaded_rtt_ms"
-            #   "interface_name" (useful if the tool reports it)
-            #   "error" (if the tool itself reports a specific error in JSON)
-            #   Refer to the `Measurement` struct in networkquality-rs `src/measurement.rs` if possible
-            #   or directly inspect the JSON output.
-
-            # Example mapping:
-            dl_mbps = (raw_result.get("down_bytes_per_sec", 0) * 8) / 1_000_000 if raw_result.get("down_bytes_per_sec") is not None else None
-            ul_mbps = (raw_result.get("up_bytes_per_sec", 0) * 8) / 1_000_000 if raw_result.get("up_bytes_per_sec") is not None else None
-
-            return NetworkQualityMeasurement(
-                timestamp=timestamp,
-                target_server=server_url, # server_url is the target tested
-                rpm_download=raw_result.get("down_rpm"),
-                rpm_upload=raw_result.get("up_rpm"),
-                base_rtt_ms=raw_result.get("rtt_ms"), # Check if this is the base RTT
-                loaded_rtt_download_ms=raw_result.get("down_loaded_rtt_ms"),
-                loaded_rtt_upload_ms=raw_result.get("up_loaded_rtt_ms"),
-                download_throughput_mbps=dl_mbps,
-                upload_throughput_mbps=ul_mbps,
-                # The 'rpm' command should directly give RPMs. Scores might be part of a different subcommand or not present.
-                # If the JSON also contains specific responsiveness scores, map them here.
-                # download_responsiveness_score=raw_result.get("some_dl_score_key"),
-                # upload_responsiveness_score=raw_result.get("some_ul_score_key"),
-                error=raw_result.get("error") # If the JSON itself can contain an error field
-            )
+            # Try to parse as JSON first
+            try:
+                raw_result = json.loads(raw_result_str)
+                self.logger.debug(f"Raw NetworkQuality JSON result: {raw_result}")
+                return self._parse_json_output(raw_result, timestamp)
+            except json.JSONDecodeError:
+                # If not JSON, parse text output
+                self.logger.debug(f"Raw NetworkQuality text result: {raw_result_str}")
+                return self._parse_text_output(raw_result_str, timestamp)
 
         except FileNotFoundError:
-            error_msg = f"NetworkQuality client binary not found at {self.binary_path}"
+            error_msg = f"NetworkQuality binary not found at {self.binary_path}"
             self.logger.error(error_msg)
-            return NetworkQualityMeasurement(timestamp=time.time(), target_server=server_url, error=error_msg)
-        except json.JSONDecodeError as e:
-            error_msg = f"Failed to parse JSON output from NetworkQuality binary: {e}. Output: {stdout.decode() if 'stdout' in locals() else 'N/A'}"
-            self.logger.error(error_msg)
-            return NetworkQualityMeasurement(timestamp=time.time(), target_server=server_url, error=error_msg)
+            return NetworkQualityMeasurement(
+                timestamp=time.time(), 
+                target_server="cloudflare", 
+                error=error_msg
+            )
         except Exception as e:
             error_msg = f"An unexpected error occurred during NetworkQuality measurement: {e}"
             self.logger.exception(error_msg)
-            return NetworkQualityMeasurement(timestamp=time.time(), target_server=server_url, error=error_msg)
+            return NetworkQualityMeasurement(
+                timestamp=time.time(), 
+                target_server="cloudflare", 
+                error=error_msg
+            )
+
+    def _parse_json_output(self, raw_result: Dict[str, Any], timestamp: float) -> NetworkQualityMeasurement:
+        """Parse JSON output from the tool"""
+        
+        # Convert throughput from bytes/sec to Mbps if needed
+        dl_mbps = None
+        ul_mbps = None
+        
+        if "download_throughput_bps" in raw_result:
+            dl_mbps = raw_result["download_throughput_bps"] / 1_000_000
+        elif "download_throughput_mbps" in raw_result:
+            dl_mbps = raw_result["download_throughput_mbps"]
+        
+        if "upload_throughput_bps" in raw_result:
+            ul_mbps = raw_result["upload_throughput_bps"] / 1_000_000
+        elif "upload_throughput_mbps" in raw_result:
+            ul_mbps = raw_result["upload_throughput_mbps"]
+
+        return NetworkQualityMeasurement(
+            timestamp=timestamp,
+            target_server="cloudflare",
+            rpm_download=raw_result.get("download_rpm"),
+            rpm_upload=raw_result.get("upload_rpm"),
+            base_rtt_ms=raw_result.get("base_rtt_ms"),
+            loaded_rtt_download_ms=raw_result.get("download_loaded_rtt_ms"),
+            loaded_rtt_upload_ms=raw_result.get("upload_loaded_rtt_ms"),
+            download_throughput_mbps=dl_mbps,
+            upload_throughput_mbps=ul_mbps,
+            download_responsiveness_score=raw_result.get("download_responsiveness_score"),
+            upload_responsiveness_score=raw_result.get("upload_responsiveness_score"),
+            error=raw_result.get("error")
+        )
+
+    def _parse_text_output(self, output: str, timestamp: float) -> NetworkQualityMeasurement:
+        """Parse text output from the tool"""
+        
+        # This is a fallback parser for text output
+        # You'll need to adjust this based on the actual text format
+        lines = output.strip().split('\n')
+        
+        measurement = NetworkQualityMeasurement(
+            timestamp=timestamp,
+            target_server="cloudflare"
+        )
+        
+        # Look for specific patterns in the output
+        for line in lines:
+            line = line.strip().lower()
+            
+            # Look for RPM values
+            if "download rpm" in line or "dl rpm" in line:
+                try:
+                    rpm_value = float([word for word in line.split() if word.replace('.', '').isdigit()][0])
+                    measurement.rpm_download = rpm_value
+                except (IndexError, ValueError):
+                    pass
+            
+            elif "upload rpm" in line or "ul rpm" in line:
+                try:
+                    rpm_value = float([word for word in line.split() if word.replace('.', '').isdigit()][0])
+                    measurement.rpm_upload = rpm_value
+                except (IndexError, ValueError):
+                    pass
+            
+            # Look for throughput values
+            elif "download" in line and ("mbps" in line or "mb/s" in line):
+                try:
+                    mbps_value = float([word for word in line.split() if word.replace('.', '').isdigit()][0])
+                    measurement.download_throughput_mbps = mbps_value
+                except (IndexError, ValueError):
+                    pass
+            
+            elif "upload" in line and ("mbps" in line or "mb/s" in line):
+                try:
+                    mbps_value = float([word for word in line.split() if word.replace('.', '').isdigit()][0])
+                    measurement.upload_throughput_mbps = mbps_value
+                except (IndexError, ValueError):
+                    pass
+        
+        return measurement
 
 async def main():
     logging.basicConfig(level=logging.DEBUG)
-    # This config should come from the main Config object's networkquality.client section
+    
     client_config_dict = {
-        "binary_path": "/usr/local/bin/networkquality", # ADJUST THIS PATH
-        "test_duration": 5,
-        "parallel_streams": 4
+        "binary_path": "/usr/local/bin/networkquality",
+        "test_duration": 12000,  # 12 seconds in milliseconds
+        "max_loaded_connections": 8
     }
     bridge = NetworkQualityBinaryBridge(client_config_dict)
 
-    # Replace with your actual self-hosted server URL
-    server_url = "http://localhost:9090" # Ensure your networkquality-server is running here
-
-    logger.info(f"Attempting to measure against {server_url} using 'rpm' subcommand...")
+    logger.info("Attempting to measure responsiveness using networkquality rpm...")
     try:
-        result = await bridge.measure(server_url)
+        result = await bridge.measure()
         logger.info(f"Measurement Result: {result.to_dict()}")
         if result.error:
             logger.error(f"Measurement error: {result.error}")
     except Exception as e:
-        logger.error(f"Direct test execution failed: {e}")
+        logger.error(f"Test execution failed: {e}")
 
 if __name__ == "__main__":
-    # asyncio.run(main())
     print("NetworkQualityBinaryBridge defined. To test, uncomment asyncio.run(main()) and ensure "
-          "the networkquality binary (client) and a networkquality-server are available, "
-          "and paths/URLs in main() are correct.")
-
+          "the networkquality binary is available at the configured path.")
+    # asyncio.run(main())

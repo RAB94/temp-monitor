@@ -56,18 +56,13 @@ monitoring:
 networkquality:
   client:
     binary_path: /usr/local/bin/networkquality
-    parallel_streams: 8
-    test_duration: 10
+    test_duration: 12000  # Duration in milliseconds (12 seconds)
+    max_loaded_connections: 8  # Replaces parallel_streams
   enabled: true
   server:
-    additional_args: []
-    auto_start: true
-    binary_path: /usr/local/bin/networkquality
-    bind_address: 192.168.25.104
-    log_level: info
-    port: 7500
-    type: self_hosted
-    url: http://127.0.0.1:7500
+    type: external  # Changed from self_hosted
+    url: null  # No server needed
+    auto_start: false  # Cannot auto-start a server
   testing:
     adaptive_intervals:
       error: 300
@@ -91,4 +86,4 @@ networkquality:
       excellent: 800
       fair: 300
       good: 600
-      poor: 100
+      poor: 100  
