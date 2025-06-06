@@ -296,24 +296,10 @@ class Config:
                 else: 
                      if not Path(self.networkquality.client.binary_path).exists(): 
                         logger.warning(f"networkquality client binary not found at {self.networkquality.client.binary_path}")
-
-
-            if self.networkquality.server.type == 'self_hosted':
-                nq_server_bin = Path(self.networkquality.server.binary_path)
-                if not nq_server_bin.is_absolute() and not nq_server_bin.exists():
-                    common_paths_server = [Path("/usr/local/bin/networkquality-server"), Path("/usr/bin/networkquality-server"), Path("./networkquality-server")]
-                    for p in common_paths_server:
-                        if p.exists():
-                            self.networkquality.server.binary_path = str(p.resolve())
-                            logger.info(f"Resolved networkquality server binary to: {self.networkquality.server.binary_path}")
-                            break
-                    else: 
-                        if not Path(self.networkquality.server.binary_path).exists(): 
-                            logger.warning(f"networkquality-server binary not found at {self.networkquality.server.binary_path} for self-hosting.")
-            elif self.networkquality.server.type == 'external' and not self.networkquality.server.url:
-                 logger.error("networkquality server type is 'external' but no URL is provided ('networkquality.server.url').")
-                 self.networkquality.enabled = False 
-
+            
+            # REMOVED FAULTY VALIDATION LOGIC. The networkquality tool does not need a server URL
+            # as it defaults to Cloudflare. This fixes the startup error.
+            
         logger.info("Configuration validation completed.")
 
 

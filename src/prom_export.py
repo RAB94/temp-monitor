@@ -12,6 +12,7 @@ Features:
 - Edge device optimized memory usage
 """
 
+ 
 import time
 import logging
 import threading
@@ -25,6 +26,10 @@ from prometheus_client.core import CounterMetricFamily, GaugeMetricFamily, Histo
 from flask import Flask, Response
 import json
 
+# Import the new metrics definition
+from src.networkquality.prometheus_metrics import NetworkQualityPrometheusMetrics
+
+
 logger = logging.getLogger(__name__)
 
 class NetworkIntelligenceMetrics:
@@ -34,10 +39,8 @@ class NetworkIntelligenceMetrics:
         self.registry = registry or CollectorRegistry()
         self._setup_metrics()
         
-        # Metric update lock for thread safety
         self._lock = threading.Lock()
         
-        # Metric history for histogram calculations
         self._latency_history = []
         self._jitter_history = []
         self._max_history_size = 1000
@@ -88,7 +91,7 @@ class NetworkIntelligenceMetrics:
             ['target', 'calculation_method'],
             registry=self.registry
         )
-        
+
         self.r_factor = Gauge(
             'network_r_factor',
             'R-factor for voice quality (0-100)',
@@ -532,12 +535,14 @@ class PrometheusMetricsServer:
         self.port = port
         self.host = host
         self.app = Flask(__name__)
-        self.metrics = NetworkIntelligenceMetrics()
         
-        # Setup routes
+        # FIX: The server now holds instances of both metric sets
+        self.registry = CollectorRegistry()
+        self.metrics = NetworkIntelligenceMetrics(registry=self.registry)
+        self.nq_metrics = NetworkQualityPrometheusMetrics(registry=self.registry) # New
+        
         self._setup_routes()
         
-        # Threading for server
         self.server_thread = None
         self.running = False
     
@@ -548,7 +553,8 @@ class PrometheusMetricsServer:
         def metrics_endpoint():
             """Prometheus metrics endpoint"""
             try:
-                metrics_text = self.metrics.get_metrics_text()
+                # Use the shared registry to generate all metrics
+                metrics_text = generate_latest(self.registry).decode('utf-8')
                 return Response(metrics_text, mimetype=CONTENT_TYPE_LATEST)
             except Exception as e:
                 logger.error(f"Error generating metrics: {e}")
@@ -559,59 +565,48 @@ class PrometheusMetricsServer:
         def health_endpoint():
             """Health check endpoint"""
             return {'status': 'healthy', 'timestamp': time.time()}
-        
-        @self.app.route('/info')
-        def info_endpoint():
-            """Information endpoint"""
-            return {
-                'service': 'network-intelligence-monitor',
-                'version': '1.0.0',
-                'metrics_endpoint': '/metrics',
-                'timestamp': time.time()
-            }
     
     def start(self):
         """Start the metrics server"""
-        
         if self.running:
             logger.warning("Metrics server already running")
             return
-        
         self.running = True
         
         def run_server():
             try:
+                # Disable reloader to prevent errors in threads
                 self.app.run(
-                    host=self.host,
-                    port=self.port,
-                    debug=False,
-                    use_reloader=False,
-                    threaded=True
+                    host=self.host, port=self.port, debug=False, use_reloader=False, threaded=True
                 )
             except Exception as e:
                 logger.error(f"Metrics server error: {e}")
         
         self.server_thread = threading.Thread(target=run_server, daemon=True)
         self.server_thread.start()
-        
         logger.info(f"Prometheus metrics server started on {self.host}:{self.port}")
     
     def stop(self):
-        """Stop the metrics server"""
         self.running = False
         logger.info("Prometheus metrics server stopped")
-    
+
     def update_metrics(self, enhanced_metrics):
-        """Update metrics from enhanced network metrics"""
         self.metrics.update_from_enhanced_metrics(enhanced_metrics)
     
+    # New method to update NetworkQuality metrics
+    def update_nq_metrics(self, nq_metrics_data):
+        if hasattr(nq_metrics_data, 'to_dict'):
+            data = nq_metrics_data.to_dict()
+        else:
+            data = nq_metrics_data
+        self.nq_metrics.update_metrics(data)
+
     def update_anomaly_metrics(self, anomaly_result, target: str):
-        """Update anomaly detection metrics"""
         self.metrics.update_anomaly_metrics(anomaly_result, target)
     
     def update_interface_metrics(self, interface_stats: Dict[str, Any]):
-        """Update interface metrics"""
         self.metrics.update_interface_metrics(interface_stats)
+
 
 class MetricsAggregator:
     """Aggregate and batch metrics updates for efficiency"""
@@ -620,129 +615,111 @@ class MetricsAggregator:
         self.metrics_server = metrics_server
         self.batch_size = batch_size
         
-        # Batching
         self.metrics_batch = []
         self.anomaly_batch = []
         self.interface_batch = {}
-        
-        # Threading
+        self.nq_metrics_batch = [] # New batch for network quality metrics
+
         self._lock = threading.Lock()
         self._flush_thread = None
         self._running = False
-        self.flush_interval = 30  # seconds
+        self.flush_interval = 30
     
     def start(self):
-        """Start the metrics aggregator"""
-        
         self._running = True
-        
         def flush_loop():
             while self._running:
                 time.sleep(self.flush_interval)
                 self.flush_batches()
-        
         self._flush_thread = threading.Thread(target=flush_loop, daemon=True)
         self._flush_thread.start()
-        
         logger.info("Metrics aggregator started")
     
     def stop(self):
-        """Stop the metrics aggregator"""
-        
         self._running = False
-        self.flush_batches()  # Final flush
-        
+        self.flush_batches()
         if self._flush_thread and self._flush_thread.is_alive():
             self._flush_thread.join(timeout=5)
-        
         logger.info("Metrics aggregator stopped")
     
     def add_enhanced_metrics(self, metrics):
-        """Add enhanced metrics to batch"""
-        
         with self._lock:
             self.metrics_batch.append(metrics)
-            
             if len(self.metrics_batch) >= self.batch_size:
                 self._flush_metrics_batch()
-    
+
+
+    def add_networkquality_metrics(self, nq_metrics):
+        """Add NetworkQuality metrics to Prometheus export"""
+        try:
+            # Import at runtime to avoid circular imports
+            from src.networkquality.prometheus_metrics import NetworkQualityPrometheusMetrics
+            
+            # Always try to get/create instance - singleton will handle duplicates
+            if not hasattr(self, 'nq_metrics'):
+                # Pass None for registry to use existing metrics if they exist
+                self.nq_metrics = NetworkQualityPrometheusMetrics(registry=None)
+            
+            # Update metrics
+            if self.nq_metrics:
+                data = nq_metrics.to_dict() if hasattr(nq_metrics, 'to_dict') else nq_metrics
+                self.nq_metrics.update_metrics(data)
+                logger.debug(f"Updated NetworkQuality metrics for {data.get('target_host', 'unknown')}")
+            
+        except Exception as e:
+            logger.error(f"Error updating NetworkQuality metrics: {e}")
+            # Don't raise - just log and continue
+
     def add_anomaly_metrics(self, anomaly_result, target: str):
-        """Add anomaly metrics to batch"""
-        
         with self._lock:
             self.anomaly_batch.append((anomaly_result, target))
-            
             if len(self.anomaly_batch) >= self.batch_size:
                 self._flush_anomaly_batch()
     
-    def add_interface_metrics(self, interface_name: str, stats: Dict[str, Any]):
-        """Add interface metrics to batch"""
-        
-        with self._lock:
-            if interface_name not in self.interface_batch:
-                self.interface_batch[interface_name] = {}
-            
-            # Accumulate stats
-            for key, value in stats.items():
-                if key in self.interface_batch[interface_name]:
-                    self.interface_batch[interface_name][key] += value
-                else:
-                    self.interface_batch[interface_name][key] = value
-    
     def flush_batches(self):
-        """Flush all batched metrics"""
-        
         with self._lock:
             self._flush_metrics_batch()
             self._flush_anomaly_batch()
-            self._flush_interface_batch()
-    
+            self._flush_nq_metrics_batch() # Flush the new batch
+
     def _flush_metrics_batch(self):
-        """Flush enhanced metrics batch"""
-        
-        if not self.metrics_batch:
-            return
-        
+        if not self.metrics_batch: return
         try:
-            # Process most recent metrics for each target
-            target_metrics = {}
-            for metrics in self.metrics_batch:
-                target_metrics[metrics.target_host] = metrics
-            
-            # Update Prometheus metrics
+            target_metrics = {m.target_host: m for m in self.metrics_batch}
             for metrics in target_metrics.values():
                 self.metrics_server.update_metrics(metrics)
-            
             logger.debug(f"Flushed {len(target_metrics)} enhanced metrics")
-            
         except Exception as e:
             logger.error(f"Error flushing metrics batch: {e}")
         finally:
             self.metrics_batch.clear()
-    
-    def _flush_anomaly_batch(self):
-        """Flush anomaly metrics batch"""
-        
-        if not self.anomaly_batch:
-            return
-        
-        try:
-            # Process most recent anomaly for each target
-            target_anomalies = {}
-            for anomaly_result, target in self.anomaly_batch:
-                target_anomalies[target] = anomaly_result
             
-            # Update Prometheus metrics
+    # FIX: Add the flush logic for the new batch
+    def _flush_nq_metrics_batch(self):
+        """Flush the NetworkQuality metrics batch."""
+        if not self.nq_metrics_batch: return
+        try:
+            # The NQ test has a single "target" (cloudflare), so just process the latest one
+            latest_nq_metric = self.nq_metrics_batch[-1]
+            self.metrics_server.update_nq_metrics(latest_nq_metric)
+            logger.debug(f"Flushed {len(self.nq_metrics_batch)} NetworkQuality metrics")
+        except Exception as e:
+            logger.error(f"Error flushing NetworkQuality metrics batch: {e}")
+        finally:
+            self.nq_metrics_batch.clear()
+
+    def _flush_anomaly_batch(self):
+        if not self.anomaly_batch: return
+        try:
+            target_anomalies = {target: result for result, target in self.anomaly_batch}
             for target, anomaly_result in target_anomalies.items():
                 self.metrics_server.update_anomaly_metrics(anomaly_result, target)
-            
             logger.debug(f"Flushed {len(target_anomalies)} anomaly metrics")
-            
         except Exception as e:
             logger.error(f"Error flushing anomaly batch: {e}")
         finally:
-            self.anomaly_batch.clear()
-    
+            self.anomaly_batch.clear()   
+
     def _flush_interface_batch(self):
         """Flush interface metrics batch"""
         

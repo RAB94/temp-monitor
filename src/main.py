@@ -38,7 +38,6 @@ from src.websocket_server import WebSocketManager, WebSocketIntegration
 from src.api.server import APIServer
 # New imports for networkquality-rs
 from src.networkquality.collector import NetworkQualityCollector, ResponsivenessMetrics
-from src.networkquality.server import NetworkQualityServerManager
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +59,6 @@ class EnhancedNetworkIntelligenceMonitor:
         self.edge_optimizer: Optional[EdgeOptimizer] = None
 
         # NetworkQuality-RS components
-        self.nq_server_manager: Optional[NetworkQualityServerManager] = None
         self.nq_collector: Optional[NetworkQualityCollector] = None
 
         # Monitoring components
@@ -98,7 +96,7 @@ class EnhancedNetworkIntelligenceMonitor:
         logger.info("Initializing Enhanced Network Intelligence Monitor...")
         try:
             await self._load_configuration()
-            await self._detect_environment() # Call to the method that was missing
+            await self._detect_environment() 
             await self._initialize_database()
             await self._initialize_enhanced_collector()
             await self._initialize_ai_system()
@@ -121,13 +119,13 @@ class EnhancedNetworkIntelligenceMonitor:
     async def _load_configuration(self):
         self.config = Config(self.config_path)
         logger.info(f"Configuration loaded from: {self.config_path}")
-        if self.config and self.config.networkquality: # Check if config and networkquality section exist
+        if self.config and self.config.networkquality: 
             logger.info(f"NetworkQuality-RS enabled: {self.config.networkquality.enabled}")
         else:
             logger.warning("NetworkQuality configuration section not found or config not loaded.")
 
 
-    async def _detect_environment(self): # Added method definition
+    async def _detect_environment(self): 
         """Detect deployment environment and apply optimizations if necessary."""
         if not self.config:
             logger.error("Configuration not loaded, cannot detect environment.")
@@ -144,40 +142,25 @@ class EnhancedNetworkIntelligenceMonitor:
         logger.info(f"  Is edge device: {environment_info.get('is_edge_device', False)}")
         logger.info(f"  Constraints: {environment_info.get('constraints', [])}")
 
-        # Example of applying optimizations based on detection
         if environment_info.get('is_edge_device') and self.config.deployment and not self.config.deployment.edge_optimization:
             logger.info("Auto-enabling edge optimizations based on environment detection.")
             self.config.deployment.edge_optimization = True
-            if hasattr(self.config.deployment, 'quantize_models'): # Ensure attribute exists
+            if hasattr(self.config.deployment, 'quantize_models'): 
                 self.config.deployment.quantize_models = True
-            if self.config.monitoring: # Ensure attribute exists
+            if self.config.monitoring: 
                 self.config.monitoring.interval = optimal_config_params.get('monitoring_interval', 60)
-        # Further logic to adjust self.config based on environment_info can be added here.
 
 
     async def _initialize_networkquality_rs(self):
-        """Initializes NetworkQuality-RS server manager and collector."""
+        """Initializes NetworkQuality-RS collector."""
         if not self.config or not self.config.networkquality or not self.config.networkquality.enabled:
             logger.info("NetworkQuality-RS monitoring is disabled in configuration.")
             return
 
-        logger.info("Initializing NetworkQuality-RS components...")
-
-        if self.config.networkquality.server.type == 'self_hosted' and \
-           self.config.networkquality.server.auto_start:
-            self.nq_server_manager = NetworkQualityServerManager(self.config.networkquality)
-            started = await self.nq_server_manager.start()
-            if not started:
-                logger.error("Failed to start self-hosted NetworkQuality server. RPM tests might fail.")
-            else:
-                logger.info("Self-hosted NetworkQuality server manager started.")
-        else:
-            logger.info("NetworkQuality server is configured as external or auto_start is false. Not managing server process.")
-
+        logger.info("Initializing NetworkQuality-RS collector...")
+        
         self.nq_collector = NetworkQualityCollector(self.config.networkquality, self.database)
         logger.info("NetworkQuality-RS collector initialized.")
-        if self.nq_collector and not self.nq_collector.server_url and self.config.networkquality.enabled:
-             logger.warning("NetworkQuality-RS is enabled, but no server URL is configured for the collector. RPM tests may not run.")
 
 
     async def _initialize_database(self):
@@ -242,10 +225,10 @@ class EnhancedNetworkIntelligenceMonitor:
         if self.config and self.config.ai:
             ai_config = {
                 'model_dir': self.config.ai.model_dir,
-                'sequence_length': self.config.ai.sequence_length,  # Direct attribute access
-                'input_size': self.config.ai.input_size,            # Direct attribute access
-                'hidden_size': self.config.ai.hidden_size,          # Direct attribute access
-                'num_layers': self.config.ai.num_layers,            # Direct attribute access
+                'sequence_length': self.config.ai.sequence_length,  
+                'input_size': self.config.ai.input_size,            
+                'hidden_size': self.config.ai.hidden_size,          
+                'num_layers': self.config.ai.num_layers,            
                 'initial_epochs': self.config.ai.initial_epochs,
                 'enable_quantization': self.config.ai.enable_quantization,
                 'deployment_type': 'edge' if self.config.deployment and self.config.deployment.edge_optimization else 'standard'
@@ -254,7 +237,7 @@ class EnhancedNetworkIntelligenceMonitor:
             await self.ai_detector.initialize()
             try:
                 self.ai_detector.load_models()
-                if self.ai_logger:  # Check if logger exists
+                if self.ai_logger:  
                     self.ai_logger.log_model_loaded('enhanced_lstm', self.config.ai.model_dir)
                 logger.info("Loaded existing AI models")
             except FileNotFoundError:
@@ -290,10 +273,8 @@ class EnhancedNetworkIntelligenceMonitor:
 
     async def _initialize_alerting_system(self):
         if self.config and self.config.alerts and self.config.alerts.enabled:
-            # Convert dataclass to dictionary
             alert_config = asdict(self.config.alerts)
             
-            # The alert manager expects a specific structure, so we need to wrap it properly
             alert_config = {
                 'correlation': {
                     'correlation_window_seconds': 300,
@@ -327,7 +308,7 @@ class EnhancedNetworkIntelligenceMonitor:
                         }
                     ]
                 },
-                'retention_hours': 168  # 1 week
+                'retention_hours': 168
             }
             
             self.alert_manager = create_alert_manager(alert_config)
@@ -348,27 +329,63 @@ class EnhancedNetworkIntelligenceMonitor:
         if self.config and self.config.metrics:
             metrics_conf = self.config.metrics
             self.metrics_server = PrometheusMetricsServer(port=metrics_conf.port, host=metrics_conf.host)
-            # Ensure start is called in a non-blocking way if it's blocking
-            # For Flask, self.metrics_server.start() might be blocking.
-            # If so, it should be run in a separate thread or using asyncio.to_thread in an async context.
-            # For simplicity here, assuming it's non-blocking or managed by its own thread.
+            
             try:
-                self.metrics_server.start() # Review this start call
+                self.metrics_server.start()
             except Exception as e:
                 logger.error(f"Failed to start metrics server: {e}")
                 return
 
-
+            # Create the aggregator
             self.metrics_aggregator = MetricsAggregator(self.metrics_server, batch_size=metrics_conf.batch_size)
+            
+            # Initialize NetworkQuality metrics support if enabled
+            if self.config.networkquality and self.config.networkquality.enabled:
+                # Import and add the method directly to MetricsAggregator
+                def add_networkquality_metrics(self, nq_metrics_data):
+                    """Add NetworkQuality metrics to Prometheus export"""
+                    try:
+                        # Lazy initialization with proper singleton pattern
+                        if not hasattr(self, 'nq_metrics'):
+                            from src.networkquality.prometheus_metrics import NetworkQualityPrometheusMetrics
+                            
+                            # Always use the main registry
+                            registry = self.metrics_server.metrics.registry
+                            
+                            try:
+                                self.nq_metrics = NetworkQualityPrometheusMetrics(registry=registry)
+                                logger.info("NetworkQuality Prometheus metrics initialized with main registry")
+                            except ValueError as ve:
+                                logger.error(f"Cannot initialize NetworkQuality metrics: {ve}")
+                                self.nq_metrics = None
+                                return
+                        
+                        # Update metrics if handler exists
+                        if self.nq_metrics:
+                            data = nq_metrics_data.to_dict() if hasattr(nq_metrics_data, 'to_dict') else nq_metrics_data
+                            self.nq_metrics.update_metrics(data)
+                            logger.debug(f"Updated NetworkQuality metrics for {data.get('target_host', 'unknown')}")
+                        
+                    except Exception as e:
+                        logger.error(f"Error in add_networkquality_metrics: {e}")
+                
+                # Bind the method to the aggregator instance
+                import types
+                self.metrics_aggregator.add_networkquality_metrics = types.MethodType(
+                    add_networkquality_metrics, 
+                    self.metrics_aggregator
+                )
+                
+                logger.info("NetworkQuality metrics support added to aggregator")
+            
+            # Start the aggregator
             self.metrics_aggregator.start()
             logger.info(f"Prometheus metrics server configured on port {metrics_conf.port}")
         else:
             logger.warning("Metrics configuration not found, skipping metrics export.")
 
-
     async def _initialize_api_server(self):
         if self.config:
-            # Create API server with only the expected parameters
             self.api_server = APIServer(
                 self.config, 
                 self.database, 
@@ -376,7 +393,6 @@ class EnhancedNetworkIntelligenceMonitor:
                 self.enhanced_collector
             )
             
-            # Add additional components as attributes after creation
             self.api_server.mimir_client = self.mimir_client
             self.api_server.metrics_server = self.metrics_server
             self.api_server.alert_manager = self.alert_manager
@@ -390,13 +406,13 @@ class EnhancedNetworkIntelligenceMonitor:
         """Initializes the WebSocket server if enabled in the configuration."""
         if self.config and self.config.api and self.config.api.websocket_enabled:
             websocket_host = self.config.api.host
-            websocket_port = self.config.api.websocket_port  # Use port from config
+            websocket_port = self.config.api.websocket_port  
             
             logger.info(f"WebSocket config: host={websocket_host}, port={websocket_port}")
             
             self.websocket_manager = WebSocketManager(
                 host=websocket_host,
-                port=websocket_port  # This should use the config port, not hardcoded 8001
+                port=websocket_port
             )
             try:
                 await self.websocket_manager.start_server()
@@ -418,7 +434,7 @@ class EnhancedNetworkIntelligenceMonitor:
     async def _apply_edge_optimizations(self):
         if self.config and self.config.deployment and self.config.deployment.edge_optimization:
             edge_config = self.config.deployment.to_dict() if hasattr(self.config.deployment, 'to_dict') else \
-                           self.config.get('deployment') # fallback
+                           self.config.get('deployment') 
             self.edge_optimizer = create_edge_optimizer(edge_config)
             if self.ai_detector and self.ai_detector.model and self.edge_optimizer:
                 self.ai_detector.model = self.edge_optimizer.optimize_for_edge(model=self.ai_detector.model)
@@ -431,19 +447,7 @@ class EnhancedNetworkIntelligenceMonitor:
         if not self.config:
             logger.warning("Config not loaded, skipping integration verification.")
             return
-        # ... (existing verification logic) ...
-        if self.config.networkquality and self.config.networkquality.enabled:
-            logger.info("Verifying NetworkQuality-RS setup...")
-            if self.nq_collector and self.nq_collector.server_url:
-                logger.info(f"✓ NetworkQuality-RS collector configured for server: {self.nq_collector.server_url}")
-            elif self.config.networkquality.enabled: # Check again if enabled but collector has no URL
-                 logger.warning("✗ NetworkQuality-RS is enabled, but collector server URL not found.")
-
-            if self.nq_server_manager and self.config.networkquality.server.type == 'self_hosted':
-                if self.nq_server_manager.is_running():
-                    logger.info("✓ Self-hosted NetworkQuality server is running.")
-                elif self.config.networkquality.server.auto_start:
-                    logger.warning("✗ Self-hosted NetworkQuality server was configured to auto-start but is not running.")
+        
         logger.info("Integration verification setup completed.")
 
 
@@ -482,18 +486,15 @@ class EnhancedNetworkIntelligenceMonitor:
             self.api_task,
             self.baseline_update_task
         ]
-        # Cancel tasks
+        
         for task in tasks_to_cancel:
             if task and not task.done():
                 task.cancel()
-        # Wait for tasks to complete cancellation
+        
         await asyncio.gather(*[t for t in tasks_to_cancel if t], return_exceptions=True)
 
-
-        if self.nq_server_manager:
-            await self.nq_server_manager.stop()
-        if self.metrics_aggregator: self.metrics_aggregator.stop() # Typically synchronous
-        if self.metrics_server: self.metrics_server.stop() # Flask dev server might not have a clean async stop
+        if self.metrics_aggregator: self.metrics_aggregator.stop()
+        if self.metrics_server: self.metrics_server.stop()
         if self.websocket_manager: await self.websocket_manager.stop_server()
         if self.enhanced_collector: await self.enhanced_collector.close()
         if self.mimir_client: await self.mimir_client.close()
@@ -518,7 +519,6 @@ class EnhancedNetworkIntelligenceMonitor:
             try:
                 loop.add_signal_handler(sig, lambda s=sig: asyncio.create_task(self._initiate_shutdown(s)))
             except NotImplementedError:
-                 # For Windows, signal handling is different or not fully supported for asyncio loop
                  logger.warning(f"Signal handling for {sig.name} not fully supported on this platform.")
                  signal.signal(sig, self._blocking_shutdown_handler)
 
@@ -526,8 +526,7 @@ class EnhancedNetworkIntelligenceMonitor:
     def _blocking_shutdown_handler(self, sig, frame):
         """Fallback shutdown handler for platforms where loop.add_signal_handler is not available."""
         logger.info(f"Received signal {signal.Signals(sig).name} (blocking handler), initiating shutdown...")
-        # This will set the event, and the main start() method's await self.shutdown_event.wait() will unblock.
-        if self.shutdown_event: # Check if event exists
+        if self.shutdown_event: 
             self.shutdown_event.set()
 
 
@@ -544,7 +543,6 @@ class EnhancedNetworkIntelligenceMonitor:
             if self.config.metrics:
                 logger.info(f"Metrics Export (for Alloy): http://{self.config.metrics.host}:{self.config.metrics.port}/metrics")
             if self.websocket_manager and self.config.api and self.config.api.websocket_enabled:
-                # Use the actual port the WebSocket manager is running on
                 actual_port = self.websocket_manager.port
                 logger.info(f"WebSocket Server: ws://{self.config.api.host}:{actual_port}/ws")
             if self.config.monitoring:
@@ -552,7 +550,7 @@ class EnhancedNetworkIntelligenceMonitor:
             if self.config.networkquality:
                 logger.info(f"NetworkQuality-RS Monitoring: {'Enabled' if self.config.networkquality.enabled else 'Disabled'}")
                 if self.config.networkquality.enabled and self.nq_collector:
-                    logger.info(f"NetworkQuality-RS Server: {self.nq_collector.server_url or 'Not specified'}")
+                    logger.info(f"NetworkQuality-RS Server: (uses default Cloudflare endpoints)")
         logger.info("=====================================================")
 
     async def _main_monitoring_loop(self):
@@ -564,7 +562,7 @@ class EnhancedNetworkIntelligenceMonitor:
                 continue
             try:
                 for target in self.config.monitoring.targets:
-                    if not self.running: break # Check running flag frequently
+                    if not self.running: break
                     metrics = await self.enhanced_collector.collect_enhanced_metrics(target)
                     if metrics and self.database:
                         await self.database.store_metrics(metrics.to_dict())
@@ -582,67 +580,8 @@ class EnhancedNetworkIntelligenceMonitor:
         logger.info("Main (enhanced_collector) monitoring loop stopped")
 
 
-    async def _networkquality_monitoring_loop(self):
-        if not self.config or not self.config.networkquality or not self.config.networkquality.enabled or not self.nq_collector:
-            logger.info("NetworkQuality-RS monitoring loop not starting (disabled or collector not initialized).")
-            return
-
-        logger.info("NetworkQuality-RS monitoring loop started.")
-        testing_config = self.config.networkquality.testing
-        adaptive_intervals = testing_config.get('adaptive_intervals', {})
-        default_interval = testing_config.get('default_interval_seconds', 300)
-
-        while self.running:
-            try:
-                target_nq_server = self.nq_collector.server_url
-                if not target_nq_server:
-                    logger.warning("NQRS server URL not available. Skipping cycle.")
-                    await asyncio.sleep(default_interval)
-                    continue
-
-                logger.debug(f"Requesting NQRS measurement: {target_nq_server}")
-                nq_metrics = await self.nq_collector.collect_network_quality()
-
-                if nq_metrics:
-                    self.performance_stats['total_nq_measurements'] += 1
-                    if nq_metrics.error:
-                        logger.warning(f"NQRS measurement for {nq_metrics.target_host} error: {nq_metrics.error}")
-                    else:
-                        logger.info(f"NQRS metrics for {nq_metrics.target_host}: RPM {nq_metrics.rpm_average:.2f}, Rating {nq_metrics.quality_rating}")
-                        if self.database:
-                            await self._store_nq_metrics(nq_metrics)
-                        # ... (Prometheus and alerting logic from previous version) ...
-                        if self.alert_manager and (nq_metrics.quality_rating in ["poor", "error"] or \
-                            (nq_metrics.rpm_average is not None and nq_metrics.rpm_average < self.config.networkquality.thresholds['rpm']['fair'])):
-                             await self.alert_manager.create_alert(
-                                title=f"Network Responsiveness Issue: {nq_metrics.target_host}",
-                                description=f"Quality: {nq_metrics.quality_rating}, RPM: {nq_metrics.rpm_average:.0f if nq_metrics.rpm_average is not None else 'N/A'}, Bufferbloat: {nq_metrics.max_bufferbloat_ms:.0f if nq_metrics.max_bufferbloat_ms is not None else 'N/A'}ms. Recs: {' '.join(nq_metrics.recommendations or [])}",
-                                severity=AlertSeverity.HIGH if nq_metrics.quality_rating == "poor" else AlertSeverity.CRITICAL,
-                                source="networkquality_rs",
-                                metric_name="rpm_average",
-                                current_value=nq_metrics.rpm_average if nq_metrics.rpm_average is not None else -1,
-                                threshold=float(self.config.networkquality.thresholds['rpm']['fair']), # Ensure float
-                                target=str(nq_metrics.target_host)
-                            )
-
-
-                    current_rating = nq_metrics.quality_rating if not nq_metrics.error else "error"
-                    sleep_interval = adaptive_intervals.get(current_rating, default_interval)
-                else:
-                    logger.warning("NQRS collector returned no metrics.")
-                    sleep_interval = adaptive_intervals.get("error", default_interval)
-
-                if not self.running: break
-                await asyncio.sleep(sleep_interval)
-            except asyncio.CancelledError:
-                logger.info("NetworkQuality-RS monitoring loop cancelled.")
-                break
-            except Exception as e:
-                logger.exception(f"Error in NQRS monitoring loop: {e}")
-                await asyncio.sleep(adaptive_intervals.get('error', 300))
-        logger.info("NetworkQuality-RS monitoring loop stopped.")
-
     async def _store_nq_metrics(self, metrics: ResponsivenessMetrics):
+        """Store NetworkQuality metrics in the database"""
         if not self.database or not self.database.db:
             logger.warning("Database not available for storing NQRS metrics.")
             return
@@ -670,6 +609,76 @@ class EnhancedNetworkIntelligenceMonitor:
         except Exception as e:
             logger.error(f"Failed to store NQRS metrics for {metrics.target_host}: {e}", exc_info=True)
 
+    async def _networkquality_monitoring_loop(self):
+        if not self.config or not self.config.networkquality or not self.config.networkquality.enabled or not self.nq_collector:
+            logger.info("NetworkQuality-RS monitoring loop not starting (disabled or collector not initialized).")
+            return
+
+        logger.info("NetworkQuality-RS monitoring loop started.")
+        testing_config = self.config.networkquality.testing
+        adaptive_intervals = testing_config.get('adaptive_intervals', {})
+        default_interval = testing_config.get('default_interval_seconds', 300)
+
+        while self.running:
+            try:
+                logger.debug("Requesting NQRS measurement...")
+                nq_metrics = await self.nq_collector.collect_network_quality()
+
+                if nq_metrics:
+                    self.performance_stats['total_nq_measurements'] += 1
+                    
+                    if nq_metrics.error:
+                        logger.warning(f"NQRS measurement for {nq_metrics.target_host} resulted in an error: {nq_metrics.error}")
+                    else:
+                        rpm_avg_str = f"{nq_metrics.rpm_average:.2f}" if nq_metrics.rpm_average is not None else "N/A"
+                        logger.info(f"NQRS metrics for {nq_metrics.target_host}: RPM {rpm_avg_str}, Rating {nq_metrics.quality_rating}")
+                        
+                        # FIX: The collector already stores metrics, so this line is removed.
+                        if self.database:
+                            await self._store_nq_metrics(nq_metrics) 
+                       
+                        if self.metrics_aggregator:
+                            self.metrics_aggregator.add_networkquality_metrics(nq_metrics)
+                            logger.debug("Sent NetworkQuality metrics to Prometheus")
+
+                        if self.alert_manager and (nq_metrics.quality_rating in ["poor", "error"] or \
+                           (nq_metrics.rpm_average is not None and nq_metrics.rpm_average < self.config.networkquality.thresholds['rpm']['fair'])):
+                            
+                            rpm_str = f"{nq_metrics.rpm_average:.0f}" if nq_metrics.rpm_average is not None else "N/A"
+                            bufferbloat_str = f"{nq_metrics.max_bufferbloat_ms:.0f}" if nq_metrics.max_bufferbloat_ms is not None else "N/A"
+                            recs_str = ' '.join(nq_metrics.recommendations or [])
+
+                            alert_description = (
+                                f"Quality: {nq_metrics.quality_rating}, RPM: {rpm_str}, "
+                                f"Bufferbloat: {bufferbloat_str}ms. Recs: {recs_str}"
+                            )
+
+                            await self.alert_manager.create_alert(
+                                title=f"Network Responsiveness Issue: {nq_metrics.target_host}",
+                                description=alert_description,
+                                severity=AlertSeverity.HIGH if nq_metrics.quality_rating == "poor" else AlertSeverity.CRITICAL,
+                                source="networkquality_rs",
+                                metric_name="rpm_average",
+                                current_value=nq_metrics.rpm_average if nq_metrics.rpm_average is not None else -1,
+                                threshold=float(self.config.networkquality.thresholds['rpm']['fair']), 
+                                target=str(nq_metrics.target_host)
+                            )
+
+                    current_rating = nq_metrics.quality_rating if not nq_metrics.error else "error"
+                    sleep_interval = adaptive_intervals.get(current_rating, default_interval)
+                else:
+                    logger.warning("NQRS collector returned no metrics.")
+                    sleep_interval = adaptive_intervals.get("error", default_interval)
+
+                if not self.running: break
+                await asyncio.sleep(sleep_interval)
+            except asyncio.CancelledError:
+                logger.info("NetworkQuality-RS monitoring loop cancelled.")
+                break
+            except Exception as e:
+                logger.exception(f"Error in NQRS monitoring loop: {e}")
+                await asyncio.sleep(adaptive_intervals.get('error', 300))
+        logger.info("NetworkQuality-RS monitoring loop stopped.")
 
     async def _run_api_server(self):
         if not self.api_server:
@@ -677,7 +686,6 @@ class EnhancedNetworkIntelligenceMonitor:
             return
         try:
             loop = asyncio.get_event_loop()
-            # Assuming self.api_server.run() is a blocking call (typical for Flask dev server)
             await loop.run_in_executor(None, self.api_server.run)
         except asyncio.CancelledError:
             logger.info("API server task cancelled.")
@@ -692,7 +700,6 @@ class EnhancedNetworkIntelligenceMonitor:
          logger.info("Baseline update loop started.")
          while self.running:
             try:
-                # ... (existing baseline update logic, ensure it's async or run in executor if blocking) ...
                 await asyncio.sleep(21600)
             except asyncio.CancelledError:
                 logger.info("Baseline update loop cancelled.")
@@ -718,7 +725,6 @@ class EnhancedNetworkIntelligenceMonitor:
         logger.info("================================")
 
     def _calculate_system_health(self) -> float:
-        # Placeholder
         return 95.0
 
 
@@ -740,17 +746,13 @@ async def main():
     except Exception as e:
         logger.critical(f"Unhandled exception in main: {e}", exc_info=True)
     finally:
-        if monitor.running: # Check if it was ever started
-            logger.info("Main function ensuring monitor stop is called upon exit.")
-            # If shutdown_event was already set, stop() would have been called.
-            # If shutdown_event was not set (e.g. direct exception in start),
-            # we ensure stop is called.
+        if monitor.running: 
             if not monitor.shutdown_event.is_set():
-                 monitor.shutdown_event.set() # Ensure loops know to stop
-                 await monitor.stop() # Call stop if not already called via shutdown
-        elif monitor.shutdown_event.is_set(): # If shutdown was initiated but start might not have fully completed
+                 monitor.shutdown_event.set() 
+                 await monitor.stop() 
+        elif monitor.shutdown_event.is_set():
             logger.info("Monitor shutdown was initiated, ensuring cleanup.")
-            await monitor.stop() # Ensure cleanup happens
+            await monitor.stop()
         logger.info("Application shutdown sequence complete.")
 
 if __name__ == "__main__":

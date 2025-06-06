@@ -156,9 +156,46 @@ class NetworkQualityCollector:
 
     def _get_threshold(self, category: str, level: str) -> float:
         """Safely get a threshold value."""
-        return self.thresholds_config.get(category, self.default_thresholds.get(category, {})).get(level, 0)
+        # Log what we're looking for
+        logger.debug(f"Getting threshold for {category}.{level}")
+        logger.debug(f"Config thresholds: {self.thresholds_config}")
+        logger.debug(f"Default thresholds: {self.default_thresholds}")
+        
+        value = None
+        source = "not found"
+        
+        # First try config thresholds
+        if category in self.thresholds_config:
+            logger.debug(f"Found category {category} in config: {self.thresholds_config[category]}")
+            if level in self.thresholds_config[category]:
+                value = self.thresholds_config[category][level]
+                source = "config"
+                logger.debug(f"Found {category}.{level} = {value} in config")
+        
+        # Fall back to defaults if not found
+        if value is None and category in self.default_thresholds:
+            logger.debug(f"Checking defaults for {category}.{level}")
+            if level in self.default_thresholds[category]:
+                value = self.default_thresholds[category][level]
+                source = "defaults"
+                logger.debug(f"Found {category}.{level} = {value} in defaults")
+        
+        # Convert to float
+        if value is not None:
+            try:
+                result = float(value)
+                logger.debug(f"Threshold {category}.{level} = {result} (from {source})")
+                return result
+            except (ValueError, TypeError) as e:
+                logger.error(f"Error converting threshold {category}.{level} = {value} to float: {e}")
+                return 0.0
+        else:
+            logger.warning(f"Threshold not found for {category}.{level}, returning 0")
+            return 0.0
 
     def _process_raw_measurement(self, raw: NetworkQualityMeasurement, duration_ms: float) -> ResponsivenessMetrics:
+        """Process raw measurement and calculate derived metrics"""
+        
         dl_rpm = raw.rpm_download
         ul_rpm = raw.rpm_upload
         base_rtt = raw.base_rtt_ms
@@ -187,42 +224,88 @@ class NetworkQualityCollector:
 
         bufferbloat_severity = "unknown"
         if max_bufferbloat is not None:
-            if max_bufferbloat >= self._get_threshold('bufferbloat_ms', 'severe'):
+            severe_threshold = float(self._get_threshold('bufferbloat_ms', 'severe'))
+            moderate_threshold = float(self._get_threshold('bufferbloat_ms', 'moderate'))
+            mild_threshold = float(self._get_threshold('bufferbloat_ms', 'mild'))
+            
+            if max_bufferbloat >= severe_threshold:
                 bufferbloat_severity = "severe"
-            elif max_bufferbloat >= self._get_threshold('bufferbloat_ms', 'moderate'):
+            elif max_bufferbloat >= moderate_threshold:
                 bufferbloat_severity = "moderate"
-            elif max_bufferbloat >= self._get_threshold('bufferbloat_ms', 'mild'):
+            elif max_bufferbloat >= mild_threshold:
                 bufferbloat_severity = "mild"
             else:
                 bufferbloat_severity = "none"
 
+        # Calculate quality score
         quality_score = 0.0
         if rpm_average is not None:
             quality_score += min(rpm_average * 0.4, 400)
         if max_bufferbloat is not None:
-            if max_bufferbloat > self._get_threshold('bufferbloat_ms', 'severe'):
+            severe_threshold = float(self._get_threshold('bufferbloat_ms', 'severe'))
+            moderate_threshold = float(self._get_threshold('bufferbloat_ms', 'moderate'))
+            mild_threshold = float(self._get_threshold('bufferbloat_ms', 'mild'))
+            
+            if max_bufferbloat > severe_threshold:
                 quality_score -= 300
-            elif max_bufferbloat > self._get_threshold('bufferbloat_ms', 'moderate'):
+            elif max_bufferbloat > moderate_threshold:
                 quality_score -= 150
-            elif max_bufferbloat > self._get_threshold('bufferbloat_ms', 'mild'):
+            elif max_bufferbloat > mild_threshold:
                 quality_score -= 75
         if raw.download_throughput_mbps is not None and raw.upload_throughput_mbps is not None:
             quality_score += min((raw.download_throughput_mbps + raw.upload_throughput_mbps) * 2, 300)
 
         quality_score = max(0.0, min(1000.0, quality_score))
 
+        # FIX: Correct quality rating based on RPM thresholds with proper numeric comparison
         quality_rating = "unknown"
-        if quality_score >= self._get_threshold('quality_score', 'excellent'):
-            quality_rating = "excellent"
-        elif quality_score >= self._get_threshold('quality_score', 'good'):
-            quality_rating = "good"
-        elif quality_score >= self._get_threshold('quality_score', 'fair'):
-            quality_rating = "fair"
+        if rpm_average is not None:
+            # Get thresholds and ensure they are floats
+            excellent_threshold = float(self._get_threshold('rpm', 'excellent'))
+            good_threshold = float(self._get_threshold('rpm', 'good'))
+            fair_threshold = float(self._get_threshold('rpm', 'fair'))
+            poor_threshold = float(self._get_threshold('rpm', 'poor'))
+            
+            # Log for debugging
+            logger.debug(f"RPM average: {rpm_average}, thresholds: excellent={excellent_threshold}, "
+                         f"good={good_threshold}, fair={fair_threshold}, poor={poor_threshold}")
+            
+            # Determine rating (check from highest to lowest)
+            if rpm_average >= excellent_threshold:
+                quality_rating = "excellent"
+            elif rpm_average >= good_threshold:
+                quality_rating = "good"
+            elif rpm_average >= fair_threshold:
+                quality_rating = "fair"
+            elif rpm_average >= poor_threshold:
+                quality_rating = "poor"
+            else:
+                quality_rating = "poor"  # Below all thresholds
+            
+            logger.debug(f"Quality rating for RPM {rpm_average}: {quality_rating}")
+            
+            # Downgrade rating if severe bufferbloat
+            if bufferbloat_severity == "severe" and quality_rating in ["excellent", "good"]:
+                logger.debug(f"Downgrading quality rating from {quality_rating} to fair due to severe bufferbloat")
+                quality_rating = "fair"
         else:
-            quality_rating = "poor"
+            # Fallback to quality score if no RPM
+            excellent_score = float(self._get_threshold('quality_score', 'excellent'))
+            good_score = float(self._get_threshold('quality_score', 'good'))
+            fair_score = float(self._get_threshold('quality_score', 'fair'))
+            poor_score = float(self._get_threshold('quality_score', 'poor'))
+            
+            if quality_score >= excellent_score:
+                quality_rating = "excellent"
+            elif quality_score >= good_score:
+                quality_rating = "good"
+            elif quality_score >= fair_score:
+                quality_rating = "fair"
+            else:
+                quality_rating = "poor"
 
         congestion_detected = bufferbloat_severity in ["moderate", "severe"] or \
-                              (rpm_average is not None and rpm_average < self._get_threshold('rpm', 'fair'))
+                              (rpm_average is not None and rpm_average < float(self._get_threshold('rpm', 'fair')))
 
         metrics = ResponsivenessMetrics(
             timestamp=raw.timestamp,
@@ -247,6 +330,14 @@ class NetworkQualityCollector:
             measurement_duration_ms=duration_ms,
             error=raw.error
         )
+        
+        # Log final calculation
+        rpm_str = f"{rpm_average:.1f}" if rpm_average is not None else "0"
+        bb_str = f"{max_bufferbloat:.1f}" if max_bufferbloat is not None else "0"
+        logger.info(f"Processed NQ metrics: RPM avg={rpm_str}, "
+                    f"bufferbloat={bb_str}ms ({bufferbloat_severity}), "
+                    f"quality_score={quality_score:.1f}, rating={quality_rating}")       
+
         metrics.recommendations = self._generate_recommendations(metrics)
         return metrics
 

@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class WebSocketTestClient:
     """Test client for WebSocket server"""
     
-    def __init__(self, host="localhost", port=8001):
+    def __init__(self, host="localhost", port=11450):
         self.host = host
         self.port = port
         self.websocket = None

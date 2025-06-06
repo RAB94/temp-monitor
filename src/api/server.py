@@ -241,38 +241,38 @@ class APIServer:
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌐 Network Intelligence Monitor</h1>
+            <h1>倹 Network Intelligence Monitor</h1>
             <p>Enhanced monitoring with NetworkQuality-RS integration</p>
         </div>
         
         <div class="cards">
             <div class="card">
-                <h3>📊 System Status</h3>
+                <h3>投 System Status</h3>
                 <div id="system-status" class="loading">Loading...</div>
             </div>
             
             <div class="card">
-                <h3>📈 Latest Enhanced Metrics</h3>
+                <h3>嶋 Latest Enhanced Metrics</h3>
                 <div id="enhanced-metrics" class="loading">Loading...</div>
             </div>
             
             <div class="card">
-                <h3>⚡ NetworkQuality Status</h3>
+                <h3>笞｡ NetworkQuality Status</h3>
                 <div id="networkquality-status" class="loading">Loading...</div>
             </div>
             
             <div class="card">
-                <h3>🎯 Latest NetworkQuality Metrics</h3>
+                <h3>識 Latest NetworkQuality Metrics</h3>
                 <div id="networkquality-metrics" class="loading">Loading...</div>
             </div>
             
             <div class="card">
-                <h3>📋 Recent Recommendations</h3>
+                <h3>搭 Recent Recommendations</h3>
                 <div id="recommendations" class="loading">Loading...</div>
             </div>
             
             <div class="card">
-                <h3>🔧 Actions</h3>
+                <h3>肌 Actions</h3>
                 <button class="button" onclick="runNetworkQualityTest()">Run NetworkQuality Test</button>
                 <button class="button" onclick="refreshData()">Refresh All Data</button>
                 <a href="/api/networkquality/metrics/history" class="button">View Full History</a>
@@ -467,11 +467,17 @@ class APIServer:
         """
     
     def run(self):
-        """Run the API server"""
+        """Run the API server, ensuring the reloader is disabled."""
         self.start_time = time.time()
+        
+        # When running inside a thread via run_in_executor, the reloader must be disabled
+        # to avoid the "signal only works in main thread" error.
+        use_reloader = False
+        
         self.app.run(
             host=self.config.api.host,
             port=self.config.api.port,
             debug=self.config.api.debug,
+            use_reloader=use_reloader, # Explicitly disable the reloader
             threaded=True
         )

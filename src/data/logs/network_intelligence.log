@@ -917,3 +917,1849 @@ ValueError: signal only works in main thread of the main interpreter
 2025-06-06 12:35:47,386 - __main__ - INFO - Enhanced Network Intelligence Monitor stopped
 2025-06-06 12:35:47,386 - __main__ - INFO - Monitor shutdown was initiated, ensuring cleanup.
 2025-06-06 12:35:47,386 - __main__ - INFO - Application shutdown sequence complete.
+2025-06-06 12:47:24,974 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 12:47:24,974 - src.utils.logger - INFO - Log level: 20
+2025-06-06 12:47:24,974 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 12:47:24,974 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 12:47:24,976 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 12:47:24,976 - src.config - INFO - Configuration validation completed.
+2025-06-06 12:47:24,976 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 12:47:24,976 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 12:47:24,976 - __main__ - INFO - Detecting environment...
+2025-06-06 12:47:24,977 - __main__ - INFO -   Platform: linux
+2025-06-06 12:47:24,977 - __main__ - INFO -   Is container: True
+2025-06-06 12:47:24,978 - __main__ - INFO -   Is cloud: False
+2025-06-06 12:47:24,978 - __main__ - INFO -   Is edge device: False
+2025-06-06 12:47:24,978 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 12:47:24,979 - src.utils.database - INFO - Database tables created
+2025-06-06 12:47:24,979 - src.utils.database - INFO - Database indexes created
+2025-06-06 12:47:24,979 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 12:47:24,979 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 12:47:24,979 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 12:47:24,979 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 12:47:24,979 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 12:47:25,476 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 12:47:25,476 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 12:47:25,476 - __main__ - INFO - Loaded existing AI models
+2025-06-06 12:47:25,476 - __main__ - INFO - AI detection system initialized
+2025-06-06 12:47:25,476 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 12:47:25,476 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 12:47:25,476 - src.alerts - INFO - Alert management system started
+2025-06-06 12:47:25,476 - __main__ - INFO - Alerting system initialized
+2025-06-06 12:47:25,477 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 12:47:25,477 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 12:47:25,478 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 12:47:25,478 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 12:47:25,478 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 12:47:25,479 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 12:47:25,480 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 12:47:25,483 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 12:47:25,483 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 12:47:25,483 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 12:47:25,484 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 12:47:25,484 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 12:47:25,484 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 12:47:25,484 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 12:47:25,484 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 12:47:25,484 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 12:47:25,484 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 12:47:25,484 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 12:47:25,484 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 12:47:25,484 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 12:47:25,484 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 12:47:25,484 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 12:47:25,484 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 12:47:25,484 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 12:47:25,484 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 12:47:25,484 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 12:47:25,484 - __main__ - INFO - =====================================================
+2025-06-06 12:47:25,484 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 12:47:25,484 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 12:47:25,484 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 12:47:45,682 - __main__ - ERROR - Error in NQRS monitoring loop: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 580, in _networkquality_monitoring_loop
+    logger.info(f"NQRS metrics for {nq_metrics.target_host}: RPM {nq_metrics.rpm_average:.2f}, Rating {nq_metrics.quality_rating}")
+                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2025-06-06 12:49:23,135 - websockets.server - INFO - connection open
+2025-06-06 12:49:23,135 - websockets.server - ERROR - connection handler failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 376, in conn_handler
+    await self.handler(connection)
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: WebSocketManager.handle_client() missing 1 required positional argument: 'path'
+2025-06-06 12:52:45,683 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 12:53:05,879 - __main__ - ERROR - Error in NQRS monitoring loop: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 580, in _networkquality_monitoring_loop
+    logger.info(f"NQRS metrics for {nq_metrics.target_host}: RPM {nq_metrics.rpm_average:.2f}, Rating {nq_metrics.quality_rating}")
+                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2025-06-06 12:53:19,372 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-06 12:53:19,372 - __main__ - INFO - Stopping Enhanced Network Intelligence Monitor...
+2025-06-06 12:53:19,372 - __main__ - INFO - Main monitoring loop cancelled.
+2025-06-06 12:53:19,372 - __main__ - INFO - Main (enhanced_collector) monitoring loop stopped
+2025-06-06 12:53:19,372 - __main__ - INFO - API server task cancelled.
+2025-06-06 12:53:24,373 - src.prom_export - INFO - Metrics aggregator stopped
+2025-06-06 12:53:24,373 - src.prom_export - INFO - Prometheus metrics server stopped
+2025-06-06 12:53:24,373 - src.websocket_server - INFO - Stopping WebSocket server...
+2025-06-06 12:53:24,373 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-06 12:53:24,373 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-06 12:53:24,373 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-06 12:53:24,374 - websockets.server - INFO - server closing
+2025-06-06 12:53:24,374 - websockets.server - INFO - server closed
+2025-06-06 12:53:24,374 - src.websocket_server - INFO - WebSocket server stopped
+2025-06-06 12:53:24,375 - src.utils.database - INFO - Database connection closed
+2025-06-06 12:53:24,375 - __main__ - INFO - AI models saved
+2025-06-06 12:53:24,375 - __main__ - INFO - === Final Performance Report ===
+2025-06-06 12:53:24,375 - __main__ - INFO - System Uptime: 0.10 hours
+2025-06-06 12:53:24,375 - __main__ - INFO - Total Standard Measurements: 18
+2025-06-06 12:53:24,375 - __main__ - INFO - Total NetworkQuality-RS Measurements: 2
+2025-06-06 12:53:24,375 - __main__ - INFO - Anomalies Detected: 0
+2025-06-06 12:53:24,375 - __main__ - INFO - Alerts Sent: 0
+2025-06-06 12:53:24,375 - __main__ - INFO - Model Trainings: 0
+2025-06-06 12:53:24,375 - __main__ - INFO - Baseline Updates: 0
+2025-06-06 12:53:24,375 - __main__ - INFO - Average Collection Time: 0.00s
+2025-06-06 12:53:24,375 - __main__ - INFO - Final Health Score: 100.0
+2025-06-06 12:53:24,375 - __main__ - INFO - ================================
+2025-06-06 12:53:24,375 - __main__ - INFO - Enhanced Network Intelligence Monitor stopped
+2025-06-06 12:53:24,375 - __main__ - INFO - Monitor shutdown was initiated, ensuring cleanup.
+2025-06-06 12:53:24,375 - __main__ - INFO - Application shutdown sequence complete.
+2025-06-06 12:55:30,883 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 12:55:30,883 - src.utils.logger - INFO - Log level: 20
+2025-06-06 12:55:30,883 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 12:55:30,883 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 12:55:30,886 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 12:55:30,886 - src.config - INFO - Configuration validation completed.
+2025-06-06 12:55:30,886 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 12:55:30,886 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 12:55:30,886 - __main__ - INFO - Detecting environment...
+2025-06-06 12:55:30,887 - __main__ - INFO -   Platform: linux
+2025-06-06 12:55:30,887 - __main__ - INFO -   Is container: True
+2025-06-06 12:55:30,887 - __main__ - INFO -   Is cloud: False
+2025-06-06 12:55:30,887 - __main__ - INFO -   Is edge device: False
+2025-06-06 12:55:30,887 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 12:55:30,888 - src.utils.database - INFO - Database tables created
+2025-06-06 12:55:30,888 - src.utils.database - INFO - Database indexes created
+2025-06-06 12:55:30,889 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 12:55:30,889 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 12:55:30,889 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 12:55:30,889 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 12:55:30,889 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 12:55:31,376 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 12:55:31,376 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 12:55:31,376 - __main__ - INFO - Loaded existing AI models
+2025-06-06 12:55:31,376 - __main__ - INFO - AI detection system initialized
+2025-06-06 12:55:31,376 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 12:55:31,376 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 12:55:31,376 - src.alerts - INFO - Alert management system started
+2025-06-06 12:55:31,376 - __main__ - INFO - Alerting system initialized
+2025-06-06 12:55:31,376 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 12:55:31,376 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 12:55:31,377 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 12:55:31,378 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 12:55:31,378 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 12:55:31,379 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 12:55:31,379 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 12:55:31,382 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 12:55:31,382 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 12:55:31,382 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 12:55:31,382 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 12:55:31,382 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 12:55:31,382 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 12:55:31,382 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 12:55:31,383 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 12:55:31,383 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 12:55:31,383 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 12:55:31,383 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 12:55:31,383 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 12:55:31,383 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 12:55:31,383 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 12:55:31,383 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 12:55:31,383 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 12:55:31,383 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 12:55:31,383 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 12:55:31,383 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 12:55:31,383 - __main__ - INFO - =====================================================
+2025-06-06 12:55:31,383 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 12:55:31,383 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 12:55:31,383 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 12:55:54,522 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 12:55:54,522 - __main__ - ERROR - Error in NQRS monitoring loop: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 578, in _networkquality_monitoring_loop
+    description=f"Quality: {nq_metrics.quality_rating}, RPM: {nq_metrics.rpm_average:.0f if nq_metrics.rpm_average is not None else 'N/A'}, Bufferbloat: {nq_metrics.max_bufferbloat_ms:.0f if nq_metrics.max_bufferbloat_ms is not None else 'N/A'}ms. Recs: {' '.join(nq_metrics.recommendations or [])}",
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2025-06-06 13:00:54,524 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 13:01:14,094 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 13:01:14,094 - __main__ - ERROR - Error in NQRS monitoring loop: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 578, in _networkquality_monitoring_loop
+    description=f"Quality: {nq_metrics.quality_rating}, RPM: {nq_metrics.rpm_average:.0f if nq_metrics.rpm_average is not None else 'N/A'}, Bufferbloat: {nq_metrics.max_bufferbloat_ms:.0f if nq_metrics.max_bufferbloat_ms is not None else 'N/A'}ms. Recs: {' '.join(nq_metrics.recommendations or [])}",
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2025-06-06 13:06:14,095 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 13:06:34,258 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 13:06:34,259 - __main__ - ERROR - Error in NQRS monitoring loop: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 578, in _networkquality_monitoring_loop
+    description=f"Quality: {nq_metrics.quality_rating}, RPM: {nq_metrics.rpm_average:.0f if nq_metrics.rpm_average is not None else 'N/A'}, Bufferbloat: {nq_metrics.max_bufferbloat_ms:.0f if nq_metrics.max_bufferbloat_ms is not None else 'N/A'}ms. Recs: {' '.join(nq_metrics.recommendations or [])}",
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2025-06-06 13:11:34,260 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 13:11:54,431 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 13:11:54,432 - __main__ - ERROR - Error in NQRS monitoring loop: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 578, in _networkquality_monitoring_loop
+    description=f"Quality: {nq_metrics.quality_rating}, RPM: {nq_metrics.rpm_average:.0f if nq_metrics.rpm_average is not None else 'N/A'}, Bufferbloat: {nq_metrics.max_bufferbloat_ms:.0f if nq_metrics.max_bufferbloat_ms is not None else 'N/A'}ms. Recs: {' '.join(nq_metrics.recommendations or [])}",
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2025-06-06 13:16:54,433 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 13:17:16,611 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 13:17:16,611 - __main__ - ERROR - Error in NQRS monitoring loop: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 578, in _networkquality_monitoring_loop
+    description=f"Quality: {nq_metrics.quality_rating}, RPM: {nq_metrics.rpm_average:.0f if nq_metrics.rpm_average is not None else 'N/A'}, Bufferbloat: {nq_metrics.max_bufferbloat_ms:.0f if nq_metrics.max_bufferbloat_ms is not None else 'N/A'}ms. Recs: {' '.join(nq_metrics.recommendations or [])}",
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2025-06-06 13:22:16,612 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 13:22:37,785 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 13:22:37,786 - __main__ - ERROR - Error in NQRS monitoring loop: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 578, in _networkquality_monitoring_loop
+    description=f"Quality: {nq_metrics.quality_rating}, RPM: {nq_metrics.rpm_average:.0f if nq_metrics.rpm_average is not None else 'N/A'}, Bufferbloat: {nq_metrics.max_bufferbloat_ms:.0f if nq_metrics.max_bufferbloat_ms is not None else 'N/A'}ms. Recs: {' '.join(nq_metrics.recommendations or [])}",
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2025-06-06 13:27:46,244 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 13:28:06,407 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 13:28:06,407 - __main__ - ERROR - Error in NQRS monitoring loop: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 578, in _networkquality_monitoring_loop
+    description=f"Quality: {nq_metrics.quality_rating}, RPM: {nq_metrics.rpm_average:.0f if nq_metrics.rpm_average is not None else 'N/A'}, Bufferbloat: {nq_metrics.max_bufferbloat_ms:.0f if nq_metrics.max_bufferbloat_ms is not None else 'N/A'}ms. Recs: {' '.join(nq_metrics.recommendations or [])}",
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2025-06-06 13:33:06,409 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 13:33:29,559 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 13:33:29,559 - __main__ - ERROR - Error in NQRS monitoring loop: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 578, in _networkquality_monitoring_loop
+    description=f"Quality: {nq_metrics.quality_rating}, RPM: {nq_metrics.rpm_average:.0f if nq_metrics.rpm_average is not None else 'N/A'}, Bufferbloat: {nq_metrics.max_bufferbloat_ms:.0f if nq_metrics.max_bufferbloat_ms is not None else 'N/A'}ms. Recs: {' '.join(nq_metrics.recommendations or [])}",
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2025-06-06 13:38:29,560 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 13:38:49,727 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 13:38:49,727 - __main__ - ERROR - Error in NQRS monitoring loop: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 578, in _networkquality_monitoring_loop
+    description=f"Quality: {nq_metrics.quality_rating}, RPM: {nq_metrics.rpm_average:.0f if nq_metrics.rpm_average is not None else 'N/A'}, Bufferbloat: {nq_metrics.max_bufferbloat_ms:.0f if nq_metrics.max_bufferbloat_ms is not None else 'N/A'}ms. Recs: {' '.join(nq_metrics.recommendations or [])}",
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2025-06-06 13:43:50,042 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 13:44:36,918 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 13:44:36,918 - src.utils.logger - INFO - Log level: 20
+2025-06-06 13:44:36,919 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 13:44:36,919 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 13:44:36,921 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 13:44:36,921 - src.config - INFO - Configuration validation completed.
+2025-06-06 13:44:36,921 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 13:44:36,921 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 13:44:36,921 - __main__ - INFO - Detecting environment...
+2025-06-06 13:44:36,923 - __main__ - INFO -   Platform: linux
+2025-06-06 13:44:36,923 - __main__ - INFO -   Is container: True
+2025-06-06 13:44:36,923 - __main__ - INFO -   Is cloud: False
+2025-06-06 13:44:36,923 - __main__ - INFO -   Is edge device: False
+2025-06-06 13:44:36,923 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 13:44:36,925 - src.utils.database - INFO - Database tables created
+2025-06-06 13:44:36,925 - src.utils.database - INFO - Database indexes created
+2025-06-06 13:44:36,925 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 13:44:36,925 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 13:44:36,925 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 13:44:36,925 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 13:44:36,925 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 13:44:37,410 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 13:44:37,410 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 13:44:37,410 - __main__ - INFO - Loaded existing AI models
+2025-06-06 13:44:37,410 - __main__ - INFO - AI detection system initialized
+2025-06-06 13:44:37,410 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 13:44:37,410 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 13:44:37,410 - src.alerts - INFO - Alert management system started
+2025-06-06 13:44:37,410 - __main__ - INFO - Alerting system initialized
+2025-06-06 13:44:37,411 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 13:44:37,411 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 13:44:37,412 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 13:44:37,412 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 13:44:37,412 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 13:44:37,414 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 13:44:37,414 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 13:44:37,417 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 13:44:37,417 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 13:44:37,417 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 13:44:37,417 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 13:44:37,417 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 13:44:37,417 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 13:44:37,417 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 13:44:37,417 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 13:44:37,417 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 13:44:37,417 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 13:44:37,418 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 13:44:37,418 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 13:44:37,418 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 13:44:37,418 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 13:44:37,418 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 13:44:37,418 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 13:44:37,418 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 13:44:37,418 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 13:44:37,418 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 13:44:37,418 - __main__ - INFO - =====================================================
+2025-06-06 13:44:37,418 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 13:44:37,418 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 13:44:37,418 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 13:44:59,516 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 13:44:59,516 - src.alerts - INFO - Created alert 3e324c579e5907ba: Network Responsiveness Issue: cloudflare (severity: high)
+2025-06-06 13:49:59,517 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 13:50:21,664 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 13:58:09,842 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 13:58:09,842 - src.utils.logger - INFO - Log level: 20
+2025-06-06 13:58:09,842 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 13:58:09,842 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 13:58:09,845 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 13:58:09,845 - src.config - INFO - Configuration validation completed.
+2025-06-06 13:58:09,845 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 13:58:09,845 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 13:58:09,845 - __main__ - INFO - Detecting environment...
+2025-06-06 13:58:09,846 - __main__ - INFO -   Platform: linux
+2025-06-06 13:58:09,846 - __main__ - INFO -   Is container: True
+2025-06-06 13:58:09,846 - __main__ - INFO -   Is cloud: False
+2025-06-06 13:58:09,846 - __main__ - INFO -   Is edge device: False
+2025-06-06 13:58:09,846 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 13:58:09,848 - src.utils.database - INFO - Database tables created
+2025-06-06 13:58:09,848 - src.utils.database - INFO - Database indexes created
+2025-06-06 13:58:09,848 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 13:58:09,848 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 13:58:09,848 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 13:58:09,848 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 13:58:09,849 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 13:58:10,344 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 13:58:10,344 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 13:58:10,344 - __main__ - INFO - Loaded existing AI models
+2025-06-06 13:58:10,344 - __main__ - INFO - AI detection system initialized
+2025-06-06 13:58:10,344 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 13:58:10,345 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 13:58:10,345 - src.alerts - INFO - Alert management system started
+2025-06-06 13:58:10,345 - __main__ - INFO - Alerting system initialized
+2025-06-06 13:58:10,345 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 13:58:10,345 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 13:58:10,346 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 13:58:10,346 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 13:58:10,346 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 13:58:10,346 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 13:58:10,348 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 13:58:10,348 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 13:58:10,351 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 13:58:10,351 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 13:58:10,351 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 13:58:10,351 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 13:58:10,351 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 13:58:10,351 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 13:58:10,351 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 13:58:10,351 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 13:58:10,351 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 13:58:10,351 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 13:58:10,351 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 13:58:10,352 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 13:58:10,352 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 13:58:10,352 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 13:58:10,352 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 13:58:10,352 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 13:58:10,352 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 13:58:10,352 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 13:58:10,352 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 13:58:10,352 - __main__ - INFO - =====================================================
+2025-06-06 13:58:10,352 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 13:58:10,352 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 13:58:10,352 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 13:58:30,106 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 13:58:30,106 - __main__ - ERROR - Error in NQRS monitoring loop: 'EnhancedNetworkIntelligenceMonitor' object has no attribute '_store_nq_metrics'
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 573, in _networkquality_monitoring_loop
+    await self._store_nq_metrics(nq_metrics)
+          ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EnhancedNetworkIntelligenceMonitor' object has no attribute '_store_nq_metrics'
+2025-06-06 14:02:01,677 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 14:02:01,677 - src.utils.logger - INFO - Log level: 20
+2025-06-06 14:02:01,677 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 14:02:01,677 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 14:02:01,680 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 14:02:01,680 - src.config - INFO - Configuration validation completed.
+2025-06-06 14:02:01,680 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 14:02:01,680 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 14:02:01,680 - __main__ - INFO - Detecting environment...
+2025-06-06 14:02:01,681 - __main__ - INFO -   Platform: linux
+2025-06-06 14:02:01,681 - __main__ - INFO -   Is container: True
+2025-06-06 14:02:01,681 - __main__ - INFO -   Is cloud: False
+2025-06-06 14:02:01,681 - __main__ - INFO -   Is edge device: False
+2025-06-06 14:02:01,681 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 14:02:01,683 - src.utils.database - INFO - Database tables created
+2025-06-06 14:02:01,683 - src.utils.database - INFO - Database indexes created
+2025-06-06 14:02:01,683 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:02:01,684 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 14:02:01,684 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:02:01,684 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 14:02:01,684 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 14:02:02,175 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 14:02:02,175 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 14:02:02,175 - __main__ - INFO - Loaded existing AI models
+2025-06-06 14:02:02,175 - __main__ - INFO - AI detection system initialized
+2025-06-06 14:02:02,175 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 14:02:02,176 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 14:02:02,176 - src.alerts - INFO - Alert management system started
+2025-06-06 14:02:02,176 - __main__ - INFO - Alerting system initialized
+2025-06-06 14:02:02,176 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 14:02:02,176 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 14:02:02,177 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 14:02:02,178 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 14:02:02,178 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 14:02:02,178 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 14:02:02,179 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 14:02:02,179 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 14:02:02,182 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 14:02:02,182 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 14:02:02,182 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 14:02:02,182 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 14:02:02,182 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 14:02:02,183 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 14:02:02,183 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 14:02:02,183 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 14:02:02,183 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 14:02:02,183 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 14:02:02,183 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 14:02:02,183 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 14:02:02,183 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 14:02:02,183 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 14:02:02,183 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 14:02:02,183 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 14:02:02,184 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 14:02:02,184 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 14:02:02,184 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 14:02:02,184 - __main__ - INFO - =====================================================
+2025-06-06 14:02:02,184 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 14:02:02,184 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 14:02:02,184 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 14:02:25,315 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 14:02:25,315 - src.alerts - INFO - Created alert 3e324c579e5907ba: Network Responsiveness Issue: cloudflare (severity: high)
+2025-06-06 14:07:25,316 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 14:08:09,681 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 14:08:09,681 - src.utils.logger - INFO - Log level: 20
+2025-06-06 14:08:09,681 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 14:08:09,681 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 14:08:09,683 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 14:08:09,683 - src.config - INFO - Configuration validation completed.
+2025-06-06 14:08:09,683 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 14:08:09,683 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 14:08:09,683 - __main__ - INFO - Detecting environment...
+2025-06-06 14:08:09,684 - __main__ - INFO -   Platform: linux
+2025-06-06 14:08:09,684 - __main__ - INFO -   Is container: True
+2025-06-06 14:08:09,685 - __main__ - INFO -   Is cloud: False
+2025-06-06 14:08:09,685 - __main__ - INFO -   Is edge device: False
+2025-06-06 14:08:09,685 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 14:08:09,687 - src.utils.database - INFO - Database tables created
+2025-06-06 14:08:09,687 - src.utils.database - INFO - Database indexes created
+2025-06-06 14:08:09,687 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:08:09,687 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 14:08:09,687 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:08:09,687 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 14:08:09,687 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 14:08:10,181 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 14:08:10,181 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 14:08:10,181 - __main__ - INFO - Loaded existing AI models
+2025-06-06 14:08:10,181 - __main__ - INFO - AI detection system initialized
+2025-06-06 14:08:10,181 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 14:08:10,181 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 14:08:10,182 - src.alerts - INFO - Alert management system started
+2025-06-06 14:08:10,182 - __main__ - INFO - Alerting system initialized
+2025-06-06 14:08:10,182 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 14:08:10,182 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 14:08:10,183 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 14:08:10,183 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 14:08:10,184 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 14:08:10,184 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 14:08:10,186 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 14:08:10,186 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 14:08:10,188 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 14:08:10,188 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 14:08:10,188 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 14:08:10,188 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 14:08:10,188 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 14:08:10,188 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 14:08:10,188 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 14:08:10,188 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 14:08:10,188 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 14:08:10,188 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 14:08:10,188 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 14:08:10,189 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 14:08:10,189 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 14:08:10,189 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 14:08:10,189 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 14:08:10,189 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 14:08:10,189 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 14:08:10,189 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 14:08:10,189 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 14:08:10,189 - __main__ - INFO - =====================================================
+2025-06-06 14:08:10,189 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 14:08:10,189 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 14:08:10,189 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 14:08:30,351 - __main__ - INFO - NQRS metrics for cloudflare: RPM N/A, Rating poor
+2025-06-06 14:08:30,351 - src.alerts - INFO - Created alert 3e324c579e5907ba: Network Responsiveness Issue: cloudflare (severity: high)
+2025-06-06 14:08:54,938 - websockets.server - INFO - connection rejected (500 Internal Server Error)
+2025-06-06 14:08:54,942 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 149, in handshake
+    response = await response
+               ^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/websocket_server.py", line 97, in process_request
+    upgrade_header = request_headers.get('Upgrade', '').lower()
+                     ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Request' object has no attribute 'get'
+2025-06-06 14:08:55,084 - websockets.server - INFO - connection rejected (500 Internal Server Error)
+2025-06-06 14:08:55,086 - websockets.server - ERROR - opening handshake failed
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/websockets/asyncio/server.py", line 149, in handshake
+    response = await response
+               ^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/websocket_server.py", line 97, in process_request
+    upgrade_header = request_headers.get('Upgrade', '').lower()
+                     ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Request' object has no attribute 'get'
+2025-06-06 14:13:30,352 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 14:14:11,170 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 14:14:11,170 - src.utils.logger - INFO - Log level: 20
+2025-06-06 14:14:11,170 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 14:14:11,170 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 14:14:11,173 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 14:14:11,173 - src.config - INFO - Configuration validation completed.
+2025-06-06 14:14:11,173 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 14:14:11,173 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 14:14:11,173 - __main__ - INFO - Detecting environment...
+2025-06-06 14:14:11,174 - __main__ - INFO -   Platform: linux
+2025-06-06 14:14:11,174 - __main__ - INFO -   Is container: True
+2025-06-06 14:14:11,174 - __main__ - INFO -   Is cloud: False
+2025-06-06 14:14:11,174 - __main__ - INFO -   Is edge device: False
+2025-06-06 14:14:11,174 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 14:14:11,176 - src.utils.database - INFO - Database tables created
+2025-06-06 14:14:11,176 - src.utils.database - INFO - Database indexes created
+2025-06-06 14:14:11,176 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:14:11,177 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 14:14:11,177 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:14:11,177 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 14:14:11,177 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 14:14:11,663 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 14:14:11,663 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 14:14:11,663 - __main__ - INFO - Loaded existing AI models
+2025-06-06 14:14:11,663 - __main__ - INFO - AI detection system initialized
+2025-06-06 14:14:11,663 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 14:14:11,663 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 14:14:11,663 - src.alerts - INFO - Alert management system started
+2025-06-06 14:14:11,663 - __main__ - INFO - Alerting system initialized
+2025-06-06 14:14:11,663 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 14:14:11,663 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 14:14:11,664 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 14:14:11,665 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 14:14:11,665 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 14:14:11,665 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 14:14:11,666 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 14:14:11,666 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 14:14:11,669 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 14:14:11,669 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 14:14:11,670 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 14:14:11,670 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 14:14:11,670 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 14:14:11,670 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 14:14:11,670 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 14:14:11,670 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 14:14:11,670 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 14:14:11,670 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 14:14:11,670 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 14:14:11,670 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 14:14:11,670 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 14:14:11,670 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 14:14:11,670 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 14:14:11,670 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 14:14:11,670 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 14:14:11,670 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 14:14:11,670 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 14:14:11,670 - __main__ - INFO - =====================================================
+2025-06-06 14:14:11,671 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 14:14:11,671 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 14:14:11,671 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 14:14:31,763 - __main__ - INFO - NQRS metrics for cloudflare: RPM 1101.50, Rating poor
+2025-06-06 14:14:31,764 - src.alerts - INFO - Created alert 3e324c579e5907ba: Network Responsiveness Issue: cloudflare (severity: high)
+2025-06-06 14:19:07,071 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 14:19:07,071 - src.utils.logger - INFO - Log level: 20
+2025-06-06 14:19:07,071 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 14:19:07,071 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 14:19:07,074 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 14:19:07,074 - src.config - INFO - Configuration validation completed.
+2025-06-06 14:19:07,074 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 14:19:07,074 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 14:19:07,074 - __main__ - INFO - Detecting environment...
+2025-06-06 14:19:07,075 - __main__ - INFO -   Platform: linux
+2025-06-06 14:19:07,075 - __main__ - INFO -   Is container: True
+2025-06-06 14:19:07,075 - __main__ - INFO -   Is cloud: False
+2025-06-06 14:19:07,075 - __main__ - INFO -   Is edge device: False
+2025-06-06 14:19:07,075 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 14:19:07,077 - src.utils.database - INFO - Database tables created
+2025-06-06 14:19:07,078 - src.utils.database - INFO - Database indexes created
+2025-06-06 14:19:07,078 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:19:07,078 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 14:19:07,078 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:19:07,078 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 14:19:07,078 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 14:19:07,572 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 14:19:07,573 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 14:19:07,573 - __main__ - INFO - Loaded existing AI models
+2025-06-06 14:19:07,573 - __main__ - INFO - AI detection system initialized
+2025-06-06 14:19:07,573 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 14:19:07,573 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 14:19:07,573 - src.alerts - INFO - Alert management system started
+2025-06-06 14:19:07,573 - __main__ - INFO - Alerting system initialized
+2025-06-06 14:19:07,573 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 14:19:07,573 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 14:19:07,574 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 14:19:07,574 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 14:19:07,575 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 14:19:07,575 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 14:19:07,576 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 14:19:07,576 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 14:19:07,579 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 14:19:07,579 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 14:19:07,579 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 14:19:07,579 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 14:19:07,579 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 14:19:07,579 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 14:19:07,580 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 14:19:07,580 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 14:19:07,580 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 14:19:07,580 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 14:19:07,580 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 14:19:07,580 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 14:19:07,580 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 14:19:07,580 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 14:19:07,580 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 14:19:07,580 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 14:19:07,580 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 14:19:07,580 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 14:19:07,580 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 14:19:07,580 - __main__ - INFO - =====================================================
+2025-06-06 14:19:07,580 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 14:19:07,580 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 14:19:07,580 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 14:19:28,793 - __main__ - INFO - NQRS metrics for cloudflare: RPM 1016.50, Rating poor
+2025-06-06 14:19:28,793 - src.alerts - INFO - Created alert 3e324c579e5907ba: Network Responsiveness Issue: cloudflare (severity: high)
+2025-06-06 14:26:08,922 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 14:26:08,922 - src.utils.logger - INFO - Log level: 20
+2025-06-06 14:26:08,922 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 14:26:08,922 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 14:26:08,925 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 14:26:08,925 - src.config - INFO - Configuration validation completed.
+2025-06-06 14:26:08,925 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 14:26:08,925 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 14:26:08,925 - __main__ - INFO - Detecting environment...
+2025-06-06 14:26:08,926 - __main__ - INFO -   Platform: linux
+2025-06-06 14:26:08,926 - __main__ - INFO -   Is container: True
+2025-06-06 14:26:08,926 - __main__ - INFO -   Is cloud: False
+2025-06-06 14:26:08,926 - __main__ - INFO -   Is edge device: False
+2025-06-06 14:26:08,926 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 14:26:08,928 - src.utils.database - INFO - Database tables created
+2025-06-06 14:26:08,928 - src.utils.database - INFO - Database indexes created
+2025-06-06 14:26:08,928 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:26:08,928 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 14:26:08,928 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:26:08,928 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 14:26:08,928 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 14:26:09,423 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 14:26:09,423 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 14:26:09,423 - __main__ - INFO - Loaded existing AI models
+2025-06-06 14:26:09,423 - __main__ - INFO - AI detection system initialized
+2025-06-06 14:26:09,423 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 14:26:09,423 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 14:26:09,423 - src.alerts - INFO - Alert management system started
+2025-06-06 14:26:09,423 - __main__ - INFO - Alerting system initialized
+2025-06-06 14:26:09,423 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 14:26:09,423 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 14:26:09,424 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 14:26:09,425 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 14:26:09,425 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 14:26:09,425 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 14:26:09,426 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 14:26:09,426 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 14:26:09,429 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 14:26:09,429 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 14:26:09,429 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 14:26:09,429 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 14:26:09,429 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 14:26:09,430 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 14:26:09,430 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 14:26:09,430 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 14:26:09,430 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 14:26:09,430 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 14:26:09,430 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 14:26:09,430 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 14:26:09,430 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 14:26:09,430 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 14:26:09,430 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 14:26:09,430 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 14:26:09,430 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 14:26:09,430 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 14:26:09,430 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 14:26:09,430 - __main__ - INFO - =====================================================
+2025-06-06 14:26:09,430 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 14:26:09,431 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 14:26:09,431 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 14:26:29,584 - __main__ - INFO - NQRS metrics for cloudflare: RPM 1060.50, Rating fair
+2025-06-06 14:29:56,422 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 14:29:56,423 - src.utils.logger - INFO - Log level: 20
+2025-06-06 14:29:56,423 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 14:29:56,423 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 14:29:56,425 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 14:29:56,425 - src.config - INFO - Configuration validation completed.
+2025-06-06 14:29:56,425 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 14:29:56,425 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 14:29:56,425 - __main__ - INFO - Detecting environment...
+2025-06-06 14:29:56,426 - __main__ - INFO -   Platform: linux
+2025-06-06 14:29:56,426 - __main__ - INFO -   Is container: True
+2025-06-06 14:29:56,427 - __main__ - INFO -   Is cloud: False
+2025-06-06 14:29:56,427 - __main__ - INFO -   Is edge device: False
+2025-06-06 14:29:56,427 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 14:29:56,428 - src.utils.database - INFO - Database tables created
+2025-06-06 14:29:56,428 - src.utils.database - INFO - Database indexes created
+2025-06-06 14:29:56,428 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:29:56,428 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 14:29:56,428 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:29:56,428 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 14:29:56,428 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 14:29:56,917 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 14:29:56,917 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 14:29:56,917 - __main__ - INFO - Loaded existing AI models
+2025-06-06 14:29:56,917 - __main__ - INFO - AI detection system initialized
+2025-06-06 14:29:56,917 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 14:29:56,917 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 14:29:56,917 - src.alerts - INFO - Alert management system started
+2025-06-06 14:29:56,917 - __main__ - INFO - Alerting system initialized
+2025-06-06 14:29:56,917 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 14:29:56,917 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 14:29:56,918 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 14:29:56,919 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 14:29:56,919 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 14:29:56,919 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 14:29:56,920 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 14:29:56,920 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 14:29:56,923 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 14:29:56,924 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 14:29:56,924 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 14:29:56,924 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 14:29:56,924 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 14:29:56,924 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 14:29:56,924 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 14:29:56,924 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 14:29:56,924 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 14:29:56,924 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 14:29:56,924 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 14:29:56,924 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 14:29:56,924 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 14:29:56,924 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 14:29:56,924 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 14:29:56,924 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 14:29:56,924 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 14:29:56,924 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 14:29:56,924 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 14:29:56,924 - __main__ - INFO - =====================================================
+2025-06-06 14:29:56,924 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 14:29:56,924 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 14:29:56,925 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 14:30:19,065 - __main__ - INFO - NQRS metrics for cloudflare: RPM 913.50, Rating poor
+2025-06-06 14:30:19,065 - src.alerts - INFO - Created alert 3e324c579e5907ba: Network Responsiveness Issue: cloudflare (severity: high)
+2025-06-06 14:34:31,251 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 14:34:31,251 - src.utils.logger - INFO - Log level: 20
+2025-06-06 14:34:31,251 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 14:34:31,251 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 14:34:31,253 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 14:34:31,253 - src.config - INFO - Configuration validation completed.
+2025-06-06 14:34:31,253 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 14:34:31,253 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 14:34:31,254 - __main__ - INFO - Detecting environment...
+2025-06-06 14:34:31,255 - __main__ - INFO -   Platform: linux
+2025-06-06 14:34:31,255 - __main__ - INFO -   Is container: True
+2025-06-06 14:34:31,255 - __main__ - INFO -   Is cloud: False
+2025-06-06 14:34:31,255 - __main__ - INFO -   Is edge device: False
+2025-06-06 14:34:31,255 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 14:34:31,256 - src.utils.database - INFO - Database tables created
+2025-06-06 14:34:31,256 - src.utils.database - INFO - Database indexes created
+2025-06-06 14:34:31,256 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:34:31,256 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 14:34:31,256 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:34:31,257 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 14:34:31,257 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 14:34:31,744 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 14:34:31,744 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 14:34:31,744 - __main__ - INFO - Loaded existing AI models
+2025-06-06 14:34:31,744 - __main__ - INFO - AI detection system initialized
+2025-06-06 14:34:31,744 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 14:34:31,744 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 14:34:31,745 - src.alerts - INFO - Alert management system started
+2025-06-06 14:34:31,745 - __main__ - INFO - Alerting system initialized
+2025-06-06 14:34:31,745 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 14:34:31,745 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 14:34:31,746 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 14:34:31,746 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 14:34:31,746 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 14:34:31,746 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 14:34:31,747 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 14:34:31,747 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 14:34:31,751 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 14:34:31,751 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 14:34:31,751 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 14:34:31,751 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 14:34:31,751 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 14:34:31,751 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 14:34:31,751 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 14:34:31,751 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 14:34:31,751 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 14:34:31,751 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 14:34:31,751 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 14:34:31,752 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 14:34:31,752 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 14:34:31,752 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 14:34:31,752 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 14:34:31,752 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 14:34:31,752 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 14:34:31,752 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 14:34:31,752 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 14:34:31,752 - __main__ - INFO - =====================================================
+2025-06-06 14:34:31,752 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 14:34:31,752 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 14:34:31,752 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 14:34:54,913 - __main__ - INFO - NQRS metrics for cloudflare: RPM 551.50, Rating poor
+2025-06-06 14:34:54,913 - src.alerts - INFO - Created alert 3e324c579e5907ba: Network Responsiveness Issue: cloudflare (severity: high)
+2025-06-06 14:39:54,913 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 14:40:18,042 - __main__ - INFO - NQRS metrics for cloudflare: RPM 907.00, Rating poor
+2025-06-06 14:51:16,001 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 14:51:16,001 - src.utils.logger - INFO - Log level: 20
+2025-06-06 14:51:16,001 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 14:51:16,001 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 14:51:16,003 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 14:51:16,003 - src.config - INFO - Configuration validation completed.
+2025-06-06 14:51:16,003 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 14:51:16,003 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 14:51:16,003 - __main__ - INFO - Detecting environment...
+2025-06-06 14:51:16,005 - __main__ - INFO -   Platform: linux
+2025-06-06 14:51:16,005 - __main__ - INFO -   Is container: True
+2025-06-06 14:51:16,005 - __main__ - INFO -   Is cloud: False
+2025-06-06 14:51:16,005 - __main__ - INFO -   Is edge device: False
+2025-06-06 14:51:16,005 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 14:51:16,006 - src.utils.database - INFO - Database tables created
+2025-06-06 14:51:16,006 - src.utils.database - INFO - Database indexes created
+2025-06-06 14:51:16,006 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:51:16,007 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 14:51:16,007 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 14:51:16,007 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 14:51:16,007 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 14:51:16,496 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 14:51:16,496 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 14:51:16,496 - __main__ - INFO - Loaded existing AI models
+2025-06-06 14:51:16,496 - __main__ - INFO - AI detection system initialized
+2025-06-06 14:51:16,496 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 14:51:16,496 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 14:51:16,497 - src.alerts - INFO - Alert management system started
+2025-06-06 14:51:16,497 - __main__ - INFO - Alerting system initialized
+2025-06-06 14:51:16,497 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 14:51:16,497 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 14:51:16,497 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 14:51:16,498 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 14:51:16,498 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 14:51:16,498 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 14:51:16,498 - __main__ - ERROR - Failed to initialize enhanced monitor: cannot import name 'integrate_networkquality_metrics' from 'src.networkquality.prometheus_metrics' (/opt/network-monitor-ml/src/networkquality/prometheus_metrics.py)
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 106, in initialize
+    await self._initialize_metrics_export()
+  File "/opt/network-monitor-ml/src/main.py", line 347, in _initialize_metrics_export
+    from src.networkquality.prometheus_metrics import integrate_networkquality_metrics
+ImportError: cannot import name 'integrate_networkquality_metrics' from 'src.networkquality.prometheus_metrics' (/opt/network-monitor-ml/src/networkquality/prometheus_metrics.py)
+2025-06-06 14:51:16,499 - __main__ - CRITICAL - Unhandled exception in main: cannot import name 'integrate_networkquality_metrics' from 'src.networkquality.prometheus_metrics' (/opt/network-monitor-ml/src/networkquality/prometheus_metrics.py)
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 682, in main
+    if await monitor.initialize():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/main.py", line 106, in initialize
+    await self._initialize_metrics_export()
+  File "/opt/network-monitor-ml/src/main.py", line 347, in _initialize_metrics_export
+    from src.networkquality.prometheus_metrics import integrate_networkquality_metrics
+ImportError: cannot import name 'integrate_networkquality_metrics' from 'src.networkquality.prometheus_metrics' (/opt/network-monitor-ml/src/networkquality/prometheus_metrics.py)
+2025-06-06 14:51:16,499 - __main__ - INFO - Application shutdown sequence complete.
+2025-06-06 14:51:16,499 - asyncio - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x73e2db36a0c0>
+2025-06-06 17:13:56,680 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 17:13:56,680 - src.utils.logger - INFO - Log level: 20
+2025-06-06 17:13:56,680 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 17:13:56,680 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 17:13:56,682 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 17:13:56,683 - src.config - INFO - Configuration validation completed.
+2025-06-06 17:13:56,683 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 17:13:56,683 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 17:13:56,683 - __main__ - INFO - Detecting environment...
+2025-06-06 17:13:56,684 - __main__ - INFO -   Platform: linux
+2025-06-06 17:13:56,684 - __main__ - INFO -   Is container: True
+2025-06-06 17:13:56,684 - __main__ - INFO -   Is cloud: False
+2025-06-06 17:13:56,684 - __main__ - INFO -   Is edge device: False
+2025-06-06 17:13:56,684 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 17:13:56,685 - src.utils.database - INFO - Database tables created
+2025-06-06 17:13:56,685 - src.utils.database - INFO - Database indexes created
+2025-06-06 17:13:56,685 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:13:56,685 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 17:13:56,685 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:13:56,685 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 17:13:56,685 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 17:13:57,170 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 17:13:57,170 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 17:13:57,170 - __main__ - INFO - Loaded existing AI models
+2025-06-06 17:13:57,170 - __main__ - INFO - AI detection system initialized
+2025-06-06 17:13:57,170 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 17:13:57,170 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 17:13:57,170 - src.alerts - INFO - Alert management system started
+2025-06-06 17:13:57,170 - __main__ - INFO - Alerting system initialized
+2025-06-06 17:13:57,170 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 17:13:57,170 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 17:13:57,171 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 17:13:57,172 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 17:13:57,172 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 17:13:57,172 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 17:13:57,172 - __main__ - ERROR - Failed to initialize enhanced monitor: cannot import name 'integrate_networkquality_metrics' from 'src.networkquality.prometheus_metrics' (/opt/network-monitor-ml/src/networkquality/prometheus_metrics.py)
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 106, in initialize
+    await self._initialize_metrics_export()
+  File "/opt/network-monitor-ml/src/main.py", line 347, in _initialize_metrics_export
+    from src.networkquality.prometheus_metrics import integrate_networkquality_metrics
+ImportError: cannot import name 'integrate_networkquality_metrics' from 'src.networkquality.prometheus_metrics' (/opt/network-monitor-ml/src/networkquality/prometheus_metrics.py)
+2025-06-06 17:13:57,172 - __main__ - CRITICAL - Unhandled exception in main: cannot import name 'integrate_networkquality_metrics' from 'src.networkquality.prometheus_metrics' (/opt/network-monitor-ml/src/networkquality/prometheus_metrics.py)
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 682, in main
+    if await monitor.initialize():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/main.py", line 106, in initialize
+    await self._initialize_metrics_export()
+  File "/opt/network-monitor-ml/src/main.py", line 347, in _initialize_metrics_export
+    from src.networkquality.prometheus_metrics import integrate_networkquality_metrics
+ImportError: cannot import name 'integrate_networkquality_metrics' from 'src.networkquality.prometheus_metrics' (/opt/network-monitor-ml/src/networkquality/prometheus_metrics.py)
+2025-06-06 17:13:57,173 - __main__ - INFO - Application shutdown sequence complete.
+2025-06-06 17:13:57,173 - asyncio - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x7543379c0650>
+2025-06-06 17:18:37,943 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 17:18:37,943 - src.utils.logger - INFO - Log level: 20
+2025-06-06 17:18:37,943 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 17:18:37,943 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 17:18:37,945 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 17:18:37,945 - src.config - INFO - Configuration validation completed.
+2025-06-06 17:18:37,946 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 17:18:37,946 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 17:18:37,946 - __main__ - INFO - Detecting environment...
+2025-06-06 17:18:37,947 - __main__ - INFO -   Platform: linux
+2025-06-06 17:18:37,947 - __main__ - INFO -   Is container: True
+2025-06-06 17:18:37,947 - __main__ - INFO -   Is cloud: False
+2025-06-06 17:18:37,947 - __main__ - INFO -   Is edge device: False
+2025-06-06 17:18:37,947 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 17:18:37,948 - src.utils.database - INFO - Database tables created
+2025-06-06 17:18:37,948 - src.utils.database - INFO - Database indexes created
+2025-06-06 17:18:37,948 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:18:37,948 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 17:18:37,948 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:18:37,948 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 17:18:37,949 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 17:18:38,436 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 17:18:38,436 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 17:18:38,437 - __main__ - INFO - Loaded existing AI models
+2025-06-06 17:18:38,437 - __main__ - INFO - AI detection system initialized
+2025-06-06 17:18:38,437 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 17:18:38,437 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 17:18:38,437 - src.alerts - INFO - Alert management system started
+2025-06-06 17:18:38,437 - __main__ - INFO - Alerting system initialized
+2025-06-06 17:18:38,437 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 17:18:38,437 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 17:18:38,438 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 17:18:38,438 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 17:18:38,438 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 17:18:38,438 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 17:18:38,440 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 17:18:38,440 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 17:18:38,443 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 17:18:38,443 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 17:18:38,443 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 17:18:38,443 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 17:18:38,443 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 17:18:38,443 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 17:18:38,443 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 17:18:38,443 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 17:18:38,443 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 17:18:38,443 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 17:18:38,443 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 17:18:38,443 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 17:18:38,443 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 17:18:38,443 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 17:18:38,443 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 17:18:38,443 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 17:18:38,443 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 17:18:38,443 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 17:18:38,443 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 17:18:38,443 - __main__ - INFO - =====================================================
+2025-06-06 17:18:38,444 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 17:18:38,444 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 17:18:38,444 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 17:18:54,344 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-06 17:18:54,344 - __main__ - INFO - Stopping Enhanced Network Intelligence Monitor...
+2025-06-06 17:18:54,344 - __main__ - INFO - API server task cancelled.
+2025-06-06 17:18:54,344 - __main__ - INFO - NetworkQuality-RS monitoring loop cancelled.
+2025-06-06 17:18:54,344 - __main__ - INFO - NetworkQuality-RS monitoring loop stopped.
+2025-06-06 17:18:54,344 - __main__ - INFO - Main monitoring loop cancelled.
+2025-06-06 17:18:54,344 - __main__ - INFO - Main (enhanced_collector) monitoring loop stopped
+2025-06-06 17:18:59,344 - src.prom_export - INFO - Metrics aggregator stopped
+2025-06-06 17:18:59,345 - src.prom_export - INFO - Prometheus metrics server stopped
+2025-06-06 17:18:59,345 - src.websocket_server - INFO - Stopping WebSocket server...
+2025-06-06 17:18:59,345 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-06 17:18:59,345 - websockets.server - INFO - server closing
+2025-06-06 17:18:59,345 - websockets.server - INFO - server closed
+2025-06-06 17:18:59,345 - src.websocket_server - INFO - WebSocket server stopped
+2025-06-06 17:18:59,346 - src.utils.database - INFO - Database connection closed
+2025-06-06 17:18:59,346 - __main__ - INFO - AI models saved
+2025-06-06 17:18:59,346 - __main__ - INFO - === Final Performance Report ===
+2025-06-06 17:18:59,346 - __main__ - INFO - System Uptime: 0.01 hours
+2025-06-06 17:18:59,346 - __main__ - INFO - Total Standard Measurements: 0
+2025-06-06 17:18:59,346 - __main__ - INFO - Total NetworkQuality-RS Measurements: 0
+2025-06-06 17:18:59,346 - __main__ - INFO - Anomalies Detected: 0
+2025-06-06 17:18:59,346 - __main__ - INFO - Alerts Sent: 0
+2025-06-06 17:18:59,346 - __main__ - INFO - Model Trainings: 0
+2025-06-06 17:18:59,346 - __main__ - INFO - Baseline Updates: 0
+2025-06-06 17:18:59,346 - __main__ - INFO - Average Collection Time: 0.00s
+2025-06-06 17:18:59,346 - __main__ - INFO - Final Health Score: 100.0
+2025-06-06 17:18:59,346 - __main__ - INFO - ================================
+2025-06-06 17:18:59,346 - __main__ - INFO - Enhanced Network Intelligence Monitor stopped
+2025-06-06 17:18:59,346 - __main__ - INFO - Monitor shutdown was initiated, ensuring cleanup.
+2025-06-06 17:18:59,346 - __main__ - INFO - Application shutdown sequence complete.
+2025-06-06 17:19:45,649 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 17:19:45,649 - src.utils.logger - INFO - Log level: 20
+2025-06-06 17:19:45,649 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 17:19:45,649 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 17:19:45,652 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 17:19:45,652 - src.config - INFO - Configuration validation completed.
+2025-06-06 17:19:45,652 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 17:19:45,652 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 17:19:45,652 - __main__ - INFO - Detecting environment...
+2025-06-06 17:19:45,653 - __main__ - INFO -   Platform: linux
+2025-06-06 17:19:45,653 - __main__ - INFO -   Is container: True
+2025-06-06 17:19:45,653 - __main__ - INFO -   Is cloud: False
+2025-06-06 17:19:45,653 - __main__ - INFO -   Is edge device: False
+2025-06-06 17:19:45,653 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 17:19:45,654 - src.utils.database - INFO - Database tables created
+2025-06-06 17:19:45,655 - src.utils.database - INFO - Database indexes created
+2025-06-06 17:19:45,655 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:19:45,655 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 17:19:45,655 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:19:45,655 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 17:19:45,655 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 17:19:46,147 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 17:19:46,147 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 17:19:46,147 - __main__ - INFO - Loaded existing AI models
+2025-06-06 17:19:46,147 - __main__ - INFO - AI detection system initialized
+2025-06-06 17:19:46,147 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 17:19:46,147 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 17:19:46,148 - src.alerts - INFO - Alert management system started
+2025-06-06 17:19:46,148 - __main__ - INFO - Alerting system initialized
+2025-06-06 17:19:46,148 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 17:19:46,148 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 17:19:46,148 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 17:19:46,149 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 17:19:46,149 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 17:19:46,150 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 17:19:46,151 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 17:19:46,152 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 17:19:46,154 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 17:19:46,154 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 17:19:46,154 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 17:19:46,154 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 17:19:46,154 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 17:19:46,154 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 17:19:46,154 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 17:19:46,154 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 17:19:46,154 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 17:19:46,154 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 17:19:46,154 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 17:19:46,155 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 17:19:46,155 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 17:19:46,155 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 17:19:46,155 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 17:19:46,155 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 17:19:46,155 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 17:19:46,155 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 17:19:46,155 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 17:19:46,155 - __main__ - INFO - =====================================================
+2025-06-06 17:19:46,155 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 17:19:46,155 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 17:19:46,155 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 17:20:07,333 - src.networkquality.bridge - ERROR - An unexpected error occurred during NetworkQuality measurement
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/networkquality/bridge.py", line 112, in measure
+    return self._parse_json_output(raw_result_str, timestamp)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/networkquality/bridge.py", line 126, in _parse_json_output
+    unloaded_latency_ms = raw_result.get("unloaded_latency_ms")
+                          ^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-06-06 17:20:07,334 - src.networkquality.collector - WARNING - NQRS measurement error: 'str' object has no attribute 'get'
+2025-06-06 17:20:07,334 - __main__ - WARNING - NQRS measurement for cloudflare resulted in an error: 'str' object has no attribute 'get'
+2025-06-06 17:21:57,403 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 17:21:57,403 - src.utils.logger - INFO - Log level: 20
+2025-06-06 17:21:57,403 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 17:21:57,403 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 17:21:57,406 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 17:21:57,406 - src.config - INFO - Configuration validation completed.
+2025-06-06 17:21:57,406 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 17:21:57,406 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 17:21:57,406 - __main__ - INFO - Detecting environment...
+2025-06-06 17:21:57,407 - __main__ - INFO -   Platform: linux
+2025-06-06 17:21:57,407 - __main__ - INFO -   Is container: True
+2025-06-06 17:21:57,407 - __main__ - INFO -   Is cloud: False
+2025-06-06 17:21:57,407 - __main__ - INFO -   Is edge device: False
+2025-06-06 17:21:57,407 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 17:21:57,409 - src.utils.database - INFO - Database tables created
+2025-06-06 17:21:57,409 - src.utils.database - INFO - Database indexes created
+2025-06-06 17:21:57,409 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:21:57,409 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 17:21:57,409 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:21:57,409 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 17:21:57,409 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 17:21:57,898 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 17:21:57,898 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 17:21:57,898 - __main__ - INFO - Loaded existing AI models
+2025-06-06 17:21:57,898 - __main__ - INFO - AI detection system initialized
+2025-06-06 17:21:57,898 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 17:21:57,898 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 17:21:57,898 - src.alerts - INFO - Alert management system started
+2025-06-06 17:21:57,898 - __main__ - INFO - Alerting system initialized
+2025-06-06 17:21:57,898 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 17:21:57,898 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 17:21:57,899 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 17:21:57,899 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 17:21:57,900 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 17:21:57,900 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 17:21:57,901 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 17:21:57,901 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 17:21:57,904 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 17:21:57,904 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 17:21:57,904 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 17:21:57,904 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 17:21:57,904 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 17:21:57,904 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 17:21:57,904 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 17:21:57,904 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 17:21:57,905 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 17:21:57,905 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 17:21:57,905 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 17:21:57,905 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 17:21:57,905 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 17:21:57,905 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 17:21:57,905 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 17:21:57,905 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 17:21:57,905 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 17:21:57,905 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 17:21:57,905 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 17:21:57,905 - __main__ - INFO - =====================================================
+2025-06-06 17:21:57,905 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 17:21:57,905 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 17:21:57,905 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 17:22:17,980 - src.networkquality.bridge - ERROR - An unexpected error occurred during NetworkQuality measurement
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/networkquality/bridge.py", line 112, in measure
+    return self._parse_json_output(raw_result_str, timestamp)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/networkquality/bridge.py", line 127, in _parse_json_output
+    unloaded_latency_ms = raw_result.get("unloaded_latency_ms")
+                          ^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-06-06 17:22:17,981 - src.networkquality.collector - WARNING - NQRS measurement error: 'str' object has no attribute 'get'
+2025-06-06 17:22:17,981 - __main__ - WARNING - NQRS measurement for cloudflare resulted in an error: 'str' object has no attribute 'get'
+2025-06-06 17:27:17,983 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 17:27:50,137 - src.networkquality.bridge - ERROR - An unexpected error occurred during NetworkQuality measurement
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/networkquality/bridge.py", line 112, in measure
+    return self._parse_json_output(raw_result_str, timestamp)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/networkquality/bridge.py", line 127, in _parse_json_output
+    unloaded_latency_ms = raw_result.get("unloaded_latency_ms")
+                          ^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-06-06 17:27:50,137 - src.networkquality.collector - WARNING - NQRS measurement error: 'str' object has no attribute 'get'
+2025-06-06 17:27:50,138 - __main__ - WARNING - NQRS measurement for cloudflare resulted in an error: 'str' object has no attribute 'get'
+2025-06-06 17:27:54,356 - __main__ - INFO - Received signal SIGINT, initiating graceful shutdown...
+2025-06-06 17:27:54,356 - __main__ - INFO - Stopping Enhanced Network Intelligence Monitor...
+2025-06-06 17:27:54,356 - __main__ - INFO - NetworkQuality-RS monitoring loop cancelled.
+2025-06-06 17:27:54,356 - __main__ - INFO - NetworkQuality-RS monitoring loop stopped.
+2025-06-06 17:27:54,356 - __main__ - INFO - API server task cancelled.
+2025-06-06 17:27:54,356 - __main__ - INFO - Main monitoring loop cancelled.
+2025-06-06 17:27:54,356 - __main__ - INFO - Main (enhanced_collector) monitoring loop stopped
+2025-06-06 17:27:57,905 - src.prom_export - INFO - Metrics aggregator stopped
+2025-06-06 17:27:57,905 - src.prom_export - INFO - Prometheus metrics server stopped
+2025-06-06 17:27:57,905 - src.websocket_server - INFO - Stopping WebSocket server...
+2025-06-06 17:27:57,905 - websockets.server - INFO - server closing
+2025-06-06 17:27:57,905 - websockets.server - INFO - server closed
+2025-06-06 17:27:57,905 - src.websocket_server - INFO - WebSocket server stopped
+2025-06-06 17:27:57,908 - src.utils.database - INFO - Database connection closed
+2025-06-06 17:27:57,908 - __main__ - INFO - AI models saved
+2025-06-06 17:27:57,908 - __main__ - INFO - === Final Performance Report ===
+2025-06-06 17:27:57,908 - __main__ - INFO - System Uptime: 0.10 hours
+2025-06-06 17:27:57,908 - __main__ - INFO - Total Standard Measurements: 20
+2025-06-06 17:27:57,908 - __main__ - INFO - Total NetworkQuality-RS Measurements: 2
+2025-06-06 17:27:57,908 - __main__ - INFO - Anomalies Detected: 0
+2025-06-06 17:27:57,908 - __main__ - INFO - Alerts Sent: 0
+2025-06-06 17:27:57,908 - __main__ - INFO - Model Trainings: 0
+2025-06-06 17:27:57,908 - __main__ - INFO - Baseline Updates: 0
+2025-06-06 17:27:57,908 - __main__ - INFO - Average Collection Time: 0.00s
+2025-06-06 17:27:57,908 - __main__ - INFO - Final Health Score: 100.0
+2025-06-06 17:27:57,908 - __main__ - INFO - ================================
+2025-06-06 17:27:57,908 - __main__ - INFO - Enhanced Network Intelligence Monitor stopped
+2025-06-06 17:27:57,908 - __main__ - INFO - Monitor shutdown was initiated, ensuring cleanup.
+2025-06-06 17:27:57,908 - __main__ - INFO - Application shutdown sequence complete.
+2025-06-06 17:30:43,516 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 17:30:43,516 - src.utils.logger - INFO - Log level: 20
+2025-06-06 17:30:43,516 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 17:30:43,516 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 17:30:43,518 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 17:30:43,518 - src.config - INFO - Configuration validation completed.
+2025-06-06 17:30:43,518 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 17:30:43,518 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 17:30:43,518 - __main__ - INFO - Detecting environment...
+2025-06-06 17:30:43,520 - __main__ - INFO -   Platform: linux
+2025-06-06 17:30:43,520 - __main__ - INFO -   Is container: True
+2025-06-06 17:30:43,520 - __main__ - INFO -   Is cloud: False
+2025-06-06 17:30:43,520 - __main__ - INFO -   Is edge device: False
+2025-06-06 17:30:43,520 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 17:30:43,521 - src.utils.database - INFO - Database tables created
+2025-06-06 17:30:43,521 - src.utils.database - INFO - Database indexes created
+2025-06-06 17:30:43,521 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:30:43,521 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 17:30:43,521 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:30:43,521 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 17:30:43,521 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 17:30:44,013 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 17:30:44,013 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 17:30:44,013 - __main__ - INFO - Loaded existing AI models
+2025-06-06 17:30:44,013 - __main__ - INFO - AI detection system initialized
+2025-06-06 17:30:44,013 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 17:30:44,013 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 17:30:44,013 - src.alerts - INFO - Alert management system started
+2025-06-06 17:30:44,013 - __main__ - INFO - Alerting system initialized
+2025-06-06 17:30:44,013 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 17:30:44,013 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 17:30:44,014 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 17:30:44,015 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 17:30:44,015 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 17:30:44,015 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 17:30:44,016 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 17:30:44,016 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 17:30:44,019 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 17:30:44,019 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 17:30:44,020 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 17:30:44,020 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 17:30:44,020 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 17:30:44,020 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 17:30:44,020 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 17:30:44,020 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 17:30:44,020 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 17:30:44,020 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 17:30:44,020 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 17:30:44,020 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 17:30:44,020 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 17:30:44,020 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 17:30:44,020 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 17:30:44,020 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 17:30:44,020 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 17:30:44,020 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 17:30:44,020 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 17:30:44,021 - __main__ - INFO - =====================================================
+2025-06-06 17:30:44,021 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 17:30:44,021 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 17:30:44,021 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 17:31:04,158 - src.networkquality.bridge - ERROR - An unexpected error occurred during NetworkQuality measurement
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/networkquality/bridge.py", line 112, in measure
+    return self._parse_json_output(raw_result, timestamp)
+                                  ^^^^^^^^^^
+NameError: name 'raw_result' is not defined. Did you mean: 'raw_result_str'?
+2025-06-06 17:31:04,160 - src.networkquality.collector - WARNING - NQRS measurement error: name 'raw_result' is not defined
+2025-06-06 17:31:04,160 - __main__ - WARNING - NQRS measurement for cloudflare resulted in an error: name 'raw_result' is not defined
+2025-06-06 17:37:44,932 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 17:37:44,932 - src.utils.logger - INFO - Log level: 20
+2025-06-06 17:37:44,932 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 17:37:44,932 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 17:37:44,935 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 17:37:44,935 - src.config - INFO - Configuration validation completed.
+2025-06-06 17:37:44,935 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 17:37:44,935 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 17:37:44,935 - __main__ - INFO - Detecting environment...
+2025-06-06 17:37:44,936 - __main__ - INFO -   Platform: linux
+2025-06-06 17:37:44,936 - __main__ - INFO -   Is container: True
+2025-06-06 17:37:44,936 - __main__ - INFO -   Is cloud: False
+2025-06-06 17:37:44,936 - __main__ - INFO -   Is edge device: False
+2025-06-06 17:37:44,936 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 17:37:44,937 - src.utils.database - INFO - Database tables created
+2025-06-06 17:37:44,937 - src.utils.database - INFO - Database indexes created
+2025-06-06 17:37:44,937 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:37:44,938 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 17:37:44,938 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:37:44,938 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 17:37:44,938 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 17:37:45,427 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 17:37:45,427 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 17:37:45,427 - __main__ - INFO - Loaded existing AI models
+2025-06-06 17:37:45,428 - __main__ - INFO - AI detection system initialized
+2025-06-06 17:37:45,428 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 17:37:45,428 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 17:37:45,428 - src.alerts - INFO - Alert management system started
+2025-06-06 17:37:45,428 - __main__ - INFO - Alerting system initialized
+2025-06-06 17:37:45,428 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 17:37:45,428 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 17:37:45,429 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 17:37:45,429 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 17:37:45,429 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 17:37:45,429 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 17:37:45,431 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 17:37:45,431 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 17:37:45,434 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 17:37:45,434 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 17:37:45,434 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 17:37:45,434 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 17:37:45,434 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 17:37:45,434 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 17:37:45,434 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 17:37:45,434 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 17:37:45,434 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 17:37:45,434 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 17:37:45,434 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 17:37:45,435 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 17:37:45,435 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 17:37:45,435 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 17:37:45,435 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 17:37:45,435 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 17:37:45,435 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 17:37:45,435 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 17:37:45,435 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 17:37:45,435 - __main__ - INFO - =====================================================
+2025-06-06 17:37:45,435 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 17:37:45,435 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 17:37:45,435 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 17:38:08,642 - src.networkquality.bridge - ERROR - An unexpected error occurred during NetworkQuality measurement
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/networkquality/bridge.py", line 119, in measure
+    return self._parse_json_output(raw_result_dict, timestamp)  # Use the new variable name
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/networkquality/bridge.py", line 162, in _parse_json_output
+    self.logger.info(f"Parsed metrics - Download: {download_rpm} RPM, {dl_mbps:.2f if dl_mbps else 0} Mbps | Upload: {upload_rpm} RPM, {ul_mbps:.2f if ul_mbps else 0} Mbps")
+                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Invalid format specifier '.2f if dl_mbps else 0' for object of type 'float'
+2025-06-06 17:38:08,643 - src.networkquality.collector - WARNING - NQRS measurement error: Invalid format specifier '.2f if dl_mbps else 0' for object of type 'float'
+2025-06-06 17:38:08,643 - __main__ - WARNING - NQRS measurement for cloudflare resulted in an error: Invalid format specifier '.2f if dl_mbps else 0' for object of type 'float'
+2025-06-06 17:43:39,758 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 17:43:39,759 - src.utils.logger - INFO - Log level: 20
+2025-06-06 17:43:39,759 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 17:43:39,759 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 17:43:39,761 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 17:43:39,761 - src.config - INFO - Configuration validation completed.
+2025-06-06 17:43:39,761 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 17:43:39,761 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 17:43:39,761 - __main__ - INFO - Detecting environment...
+2025-06-06 17:43:39,762 - __main__ - INFO -   Platform: linux
+2025-06-06 17:43:39,762 - __main__ - INFO -   Is container: True
+2025-06-06 17:43:39,762 - __main__ - INFO -   Is cloud: False
+2025-06-06 17:43:39,762 - __main__ - INFO -   Is edge device: False
+2025-06-06 17:43:39,762 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 17:43:39,764 - src.utils.database - INFO - Database tables created
+2025-06-06 17:43:39,764 - src.utils.database - INFO - Database indexes created
+2025-06-06 17:43:39,764 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:43:39,764 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 17:43:39,764 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:43:39,764 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 17:43:39,764 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 17:43:40,260 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 17:43:40,260 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 17:43:40,260 - __main__ - INFO - Loaded existing AI models
+2025-06-06 17:43:40,260 - __main__ - INFO - AI detection system initialized
+2025-06-06 17:43:40,260 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 17:43:40,260 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 17:43:40,260 - src.alerts - INFO - Alert management system started
+2025-06-06 17:43:40,260 - __main__ - INFO - Alerting system initialized
+2025-06-06 17:43:40,260 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 17:43:40,260 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 17:43:40,261 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 17:43:40,262 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 17:43:40,262 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 17:43:40,262 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 17:43:40,263 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 17:43:40,263 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 17:43:40,266 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 17:43:40,266 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 17:43:40,266 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 17:43:40,266 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 17:43:40,266 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 17:43:40,266 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 17:43:40,266 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 17:43:40,266 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 17:43:40,266 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 17:43:40,266 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 17:43:40,267 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 17:43:40,267 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 17:43:40,267 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 17:43:40,267 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 17:43:40,267 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 17:43:40,267 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 17:43:40,267 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 17:43:40,267 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 17:43:40,267 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 17:43:40,267 - __main__ - INFO - =====================================================
+2025-06-06 17:43:40,268 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 17:43:40,268 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 17:43:40,268 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 17:44:00,447 - src.networkquality.bridge - ERROR - An unexpected error occurred during NetworkQuality measurement
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/networkquality/bridge.py", line 119, in measure
+    return self._parse_json_output(raw_result_dict, timestamp)  # Use the new variable name
+           ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NetworkQualityBinaryBridge' object has no attribute '_parse_json_output'
+2025-06-06 17:44:00,448 - src.networkquality.collector - WARNING - NQRS measurement error: 'NetworkQualityBinaryBridge' object has no attribute '_parse_json_output'
+2025-06-06 17:44:00,448 - __main__ - WARNING - NQRS measurement for cloudflare resulted in an error: 'NetworkQualityBinaryBridge' object has no attribute '_parse_json_output'
+2025-06-06 17:45:23,649 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 17:45:23,649 - src.utils.logger - INFO - Log level: 20
+2025-06-06 17:45:23,649 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 17:45:23,649 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 17:45:23,652 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 17:45:23,652 - src.config - INFO - Configuration validation completed.
+2025-06-06 17:45:23,652 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 17:45:23,652 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 17:45:23,652 - __main__ - INFO - Detecting environment...
+2025-06-06 17:45:23,653 - __main__ - INFO -   Platform: linux
+2025-06-06 17:45:23,653 - __main__ - INFO -   Is container: True
+2025-06-06 17:45:23,653 - __main__ - INFO -   Is cloud: False
+2025-06-06 17:45:23,653 - __main__ - INFO -   Is edge device: False
+2025-06-06 17:45:23,653 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 17:45:23,654 - src.utils.database - INFO - Database tables created
+2025-06-06 17:45:23,655 - src.utils.database - INFO - Database indexes created
+2025-06-06 17:45:23,655 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:45:23,655 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 17:45:23,655 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:45:23,655 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 17:45:23,655 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 17:45:24,141 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 17:45:24,141 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 17:45:24,141 - __main__ - INFO - Loaded existing AI models
+2025-06-06 17:45:24,141 - __main__ - INFO - AI detection system initialized
+2025-06-06 17:45:24,141 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 17:45:24,141 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 17:45:24,141 - src.alerts - INFO - Alert management system started
+2025-06-06 17:45:24,141 - __main__ - INFO - Alerting system initialized
+2025-06-06 17:45:24,141 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 17:45:24,141 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 17:45:24,142 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 17:45:24,143 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 17:45:24,143 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 17:45:24,143 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 17:45:24,144 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 17:45:24,145 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 17:45:24,147 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 17:45:24,148 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 17:45:24,148 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 17:45:24,148 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 17:45:24,148 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 17:45:24,148 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 17:45:24,148 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 17:45:24,148 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 17:45:24,148 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 17:45:24,148 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 17:45:24,148 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 17:45:24,148 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 17:45:24,148 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 17:45:24,148 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 17:45:24,148 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 17:45:24,148 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 17:45:24,149 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 17:45:24,149 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 17:45:24,149 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 17:45:24,149 - __main__ - INFO - =====================================================
+2025-06-06 17:45:24,149 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 17:45:24,149 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 17:45:24,149 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 17:45:44,449 - src.networkquality.bridge - INFO - Parsed metrics - Download: 1154 RPM, 1498.89 Mbps | Upload: 746 RPM, 1543.50 Mbps
+2025-06-06 17:45:44,449 - __main__ - INFO - NQRS metrics for cloudflare: RPM 950.00, Rating poor
+2025-06-06 17:45:44,449 - __main__ - ERROR - Error in NQRS monitoring loop: 'EnhancedNetworkIntelligenceMonitor' object has no attribute '_store_nq_metrics'
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/main.py", line 567, in _networkquality_monitoring_loop
+    await self._store_nq_metrics(nq_metrics)
+         ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EnhancedNetworkIntelligenceMonitor' object has no attribute '_store_nq_metrics'
+2025-06-06 17:55:31,998 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 17:55:31,998 - src.utils.logger - INFO - Log level: 20
+2025-06-06 17:55:31,998 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 17:55:31,998 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 17:55:32,001 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 17:55:32,001 - src.config - INFO - Configuration validation completed.
+2025-06-06 17:55:32,001 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 17:55:32,001 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 17:55:32,001 - __main__ - INFO - Detecting environment...
+2025-06-06 17:55:32,002 - __main__ - INFO -   Platform: linux
+2025-06-06 17:55:32,002 - __main__ - INFO -   Is container: True
+2025-06-06 17:55:32,002 - __main__ - INFO -   Is cloud: False
+2025-06-06 17:55:32,002 - __main__ - INFO -   Is edge device: False
+2025-06-06 17:55:32,002 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 17:55:32,003 - src.utils.database - INFO - Database tables created
+2025-06-06 17:55:32,004 - src.utils.database - INFO - Database indexes created
+2025-06-06 17:55:32,004 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:55:32,004 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 17:55:32,004 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 17:55:32,004 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 17:55:32,004 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 17:55:32,487 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 17:55:32,487 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 17:55:32,487 - __main__ - INFO - Loaded existing AI models
+2025-06-06 17:55:32,487 - __main__ - INFO - AI detection system initialized
+2025-06-06 17:55:32,487 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 17:55:32,487 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 17:55:32,487 - src.alerts - INFO - Alert management system started
+2025-06-06 17:55:32,487 - __main__ - INFO - Alerting system initialized
+2025-06-06 17:55:32,487 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 17:55:32,487 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 17:55:32,488 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 17:55:32,489 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 17:55:32,489 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 17:55:32,489 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 17:55:32,490 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 17:55:32,490 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 17:55:32,493 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 17:55:32,493 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 17:55:32,493 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 17:55:32,493 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 17:55:32,494 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 17:55:32,494 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 17:55:32,494 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 17:55:32,494 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 17:55:32,494 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 17:55:32,494 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 17:55:32,494 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 17:55:32,494 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 17:55:32,494 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 17:55:32,494 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 17:55:32,494 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 17:55:32,494 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 17:55:32,494 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 17:55:32,494 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 17:55:32,494 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 17:55:32,494 - __main__ - INFO - =====================================================
+2025-06-06 17:55:32,494 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 17:55:32,494 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 17:55:32,494 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 17:55:55,122 - src.networkquality.bridge - INFO - Parsed metrics - Download: 952 RPM, 1485.23 Mbps | Upload: 725 RPM, 1526.73 Mbps
+2025-06-06 17:55:55,123 - __main__ - INFO - NQRS metrics for cloudflare: RPM 838.50, Rating poor
+2025-06-06 17:55:55,123 - src.prom_export - ERROR - Error adding NetworkQuality metrics to aggregator: Duplicated timeseries in CollectorRegistry: {'networkquality_rpm_download'}
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/prom_export.py", line 658, in add_networkquality_metrics
+    self.nq_metrics = NetworkQualityPrometheusMetrics(
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/networkquality/prometheus_metrics.py", line 20, in __init__
+    self.rpm_download = Gauge('networkquality_rpm_download', 'NetworkQuality download RPM', ['target_host'], registry=registry)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/prometheus_client/metrics.py", line 376, in __init__
+    super().__init__(
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/prometheus_client/metrics.py", line 132, in __init__
+    registry.register(self)
+  File "/opt/network-monitor-ml/venv/lib/python3.12/site-packages/prometheus_client/registry.py", line 43, in register
+    raise ValueError(
+ValueError: Duplicated timeseries in CollectorRegistry: {'networkquality_rpm_download'}
+2025-06-06 17:55:55,123 - src.alerts - INFO - Created alert 3e324c579e5907ba: Network Responsiveness Issue: cloudflare (severity: high)
+2025-06-06 18:03:16,531 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 18:03:16,531 - src.utils.logger - INFO - Log level: 20
+2025-06-06 18:03:16,531 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 18:03:16,531 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 18:03:16,534 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 18:03:16,534 - src.config - INFO - Configuration validation completed.
+2025-06-06 18:03:16,534 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 18:03:16,534 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 18:03:16,534 - __main__ - INFO - Detecting environment...
+2025-06-06 18:03:16,535 - __main__ - INFO -   Platform: linux
+2025-06-06 18:03:16,535 - __main__ - INFO -   Is container: True
+2025-06-06 18:03:16,535 - __main__ - INFO -   Is cloud: False
+2025-06-06 18:03:16,535 - __main__ - INFO -   Is edge device: False
+2025-06-06 18:03:16,535 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 18:03:16,536 - src.utils.database - INFO - Database tables created
+2025-06-06 18:03:16,537 - src.utils.database - INFO - Database indexes created
+2025-06-06 18:03:16,537 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 18:03:16,537 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 18:03:16,537 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 18:03:16,537 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 18:03:16,537 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 18:03:17,035 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 18:03:17,035 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 18:03:17,035 - __main__ - INFO - Loaded existing AI models
+2025-06-06 18:03:17,035 - __main__ - INFO - AI detection system initialized
+2025-06-06 18:03:17,035 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 18:03:17,035 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 18:03:17,036 - src.alerts - INFO - Alert management system started
+2025-06-06 18:03:17,036 - __main__ - INFO - Alerting system initialized
+2025-06-06 18:03:17,036 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 18:03:17,036 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 18:03:17,036 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 18:03:17,037 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 18:03:17,037 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 18:03:17,037 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 18:03:17,038 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 18:03:17,038 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 18:03:17,042 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 18:03:17,042 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 18:03:17,042 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 18:03:17,042 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 18:03:17,042 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 18:03:17,042 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 18:03:17,042 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 18:03:17,042 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 18:03:17,043 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 18:03:17,043 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 18:03:17,043 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 18:03:17,043 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 18:03:17,043 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 18:03:17,043 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 18:03:17,043 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 18:03:17,043 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 18:03:17,043 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 18:03:17,043 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 18:03:17,043 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 18:03:17,043 - __main__ - INFO - =====================================================
+2025-06-06 18:03:17,043 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 18:03:17,043 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 18:03:17,043 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 18:03:40,239 - src.networkquality.bridge - INFO - Parsed metrics - Download: 982 RPM, 1504.58 Mbps | Upload: 759 RPM, 1539.31 Mbps
+2025-06-06 18:03:40,239 - __main__ - INFO - NQRS metrics for cloudflare: RPM 870.50, Rating poor
+2025-06-06 18:03:40,240 - src.networkquality.prometheus_metrics - WARNING - NetworkQuality metrics already registered, creating without registry
+2025-06-06 18:03:40,240 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 18:03:40,240 - src.networkquality.prometheus_metrics - INFO - Updating Prometheus metrics for NQRS target: cloudflare
+2025-06-06 18:03:40,240 - src.networkquality.prometheus_metrics - INFO - Successfully updated Prometheus metrics for NQRS target: cloudflare
+2025-06-06 18:03:40,240 - src.alerts - INFO - Created alert 3e324c579e5907ba: Network Responsiveness Issue: cloudflare (severity: high)
+2025-06-06 18:08:40,242 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 18:09:09,402 - src.networkquality.bridge - INFO - Parsed metrics - Download: 1016 RPM, 1505.11 Mbps | Upload: 790 RPM, 1522.53 Mbps
+2025-06-06 18:09:09,403 - __main__ - INFO - NQRS metrics for cloudflare: RPM 903.00, Rating poor
+2025-06-06 18:09:09,403 - src.networkquality.prometheus_metrics - INFO - Updating Prometheus metrics for NQRS target: cloudflare
+2025-06-06 18:09:09,403 - src.networkquality.prometheus_metrics - INFO - Successfully updated Prometheus metrics for NQRS target: cloudflare
+2025-06-06 18:23:18,239 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 18:23:18,239 - src.utils.logger - INFO - Log level: 20
+2025-06-06 18:23:18,239 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 18:23:18,239 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 18:23:18,241 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 18:23:18,241 - src.config - INFO - Configuration validation completed.
+2025-06-06 18:23:18,241 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 18:23:18,241 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 18:23:18,241 - __main__ - INFO - Detecting environment...
+2025-06-06 18:23:18,243 - __main__ - INFO -   Platform: linux
+2025-06-06 18:23:18,243 - __main__ - INFO -   Is container: True
+2025-06-06 18:23:18,243 - __main__ - INFO -   Is cloud: False
+2025-06-06 18:23:18,243 - __main__ - INFO -   Is edge device: False
+2025-06-06 18:23:18,243 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 18:23:18,244 - src.utils.database - INFO - Database tables created
+2025-06-06 18:23:18,245 - src.utils.database - INFO - Database indexes created
+2025-06-06 18:23:18,245 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 18:23:18,245 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 18:23:18,245 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 18:23:18,245 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 18:23:18,245 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 18:23:18,736 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 18:23:18,736 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 18:23:18,736 - __main__ - INFO - Loaded existing AI models
+2025-06-06 18:23:18,736 - __main__ - INFO - AI detection system initialized
+2025-06-06 18:23:18,736 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 18:23:18,736 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 18:23:18,736 - src.alerts - INFO - Alert management system started
+2025-06-06 18:23:18,736 - __main__ - INFO - Alerting system initialized
+2025-06-06 18:23:18,737 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 18:23:18,737 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 18:23:18,737 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized
+2025-06-06 18:23:18,738 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 18:23:18,738 - __main__ - INFO - NetworkQuality metrics support added to aggregator
+2025-06-06 18:23:18,738 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 18:23:18,738 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 18:23:18,739 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 18:23:18,739 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 18:23:18,742 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 18:23:18,743 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 18:23:18,743 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 18:23:18,743 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 18:23:18,743 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 18:23:18,743 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 18:23:18,743 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 18:23:18,743 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 18:23:18,743 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 18:23:18,743 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 18:23:18,743 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 18:23:18,743 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 18:23:18,743 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 18:23:18,743 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 18:23:18,743 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 18:23:18,744 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 18:23:18,744 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 18:23:18,744 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 18:23:18,744 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 18:23:18,744 - __main__ - INFO - =====================================================
+2025-06-06 18:23:18,744 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 18:23:18,744 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 18:23:18,744 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 18:23:39,940 - src.networkquality.bridge - INFO - Parsed metrics - Download: 1088 RPM, 1503.89 Mbps | Upload: 738 RPM, 1539.31 Mbps
+2025-06-06 18:23:39,940 - __main__ - INFO - NQRS metrics for cloudflare: RPM 913.00, Rating fair
+2025-06-06 18:23:39,940 - __main__ - ERROR - Cannot initialize NetworkQuality metrics: Duplicated timeseries in CollectorRegistry: {'networkquality_rpm_download'}
+2025-06-06 18:39:46,503 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 18:39:46,504 - src.utils.logger - INFO - Log level: 20
+2025-06-06 18:39:46,504 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 18:39:46,504 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 18:39:46,506 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 18:39:46,506 - src.config - INFO - Configuration validation completed.
+2025-06-06 18:39:46,506 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 18:39:46,506 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 18:39:46,506 - __main__ - INFO - Detecting environment...
+2025-06-06 18:39:46,508 - __main__ - INFO -   Platform: linux
+2025-06-06 18:39:46,508 - __main__ - INFO -   Is container: True
+2025-06-06 18:39:46,508 - __main__ - INFO -   Is cloud: False
+2025-06-06 18:39:46,508 - __main__ - INFO -   Is edge device: False
+2025-06-06 18:39:46,508 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 18:39:46,509 - src.utils.database - INFO - Database tables created
+2025-06-06 18:39:46,510 - src.utils.database - INFO - Database indexes created
+2025-06-06 18:39:46,510 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 18:39:46,510 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 18:39:46,510 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 18:39:46,510 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 18:39:46,510 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 18:39:47,000 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 18:39:47,000 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 18:39:47,000 - __main__ - INFO - Loaded existing AI models
+2025-06-06 18:39:47,000 - __main__ - INFO - AI detection system initialized
+2025-06-06 18:39:47,000 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 18:39:47,000 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 18:39:47,000 - src.alerts - INFO - Alert management system started
+2025-06-06 18:39:47,000 - __main__ - INFO - Alerting system initialized
+2025-06-06 18:39:47,000 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 18:39:47,000 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 18:39:47,001 - src.networkquality.prometheus_metrics - INFO - Initializing NetworkQuality metrics with registry: True
+2025-06-06 18:39:47,001 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized successfully
+2025-06-06 18:39:47,002 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 18:39:47,002 - __main__ - INFO - NetworkQuality metrics support added to aggregator
+2025-06-06 18:39:47,002 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 18:39:47,002 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 18:39:47,003 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 18:39:47,003 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 18:39:47,006 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 18:39:47,006 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 18:39:47,006 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 18:39:47,006 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 18:39:47,007 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 18:39:47,007 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 18:39:47,007 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 18:39:47,007 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 18:39:47,007 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 18:39:47,007 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 18:39:47,007 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 18:39:47,007 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 18:39:47,007 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 18:39:47,007 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 18:39:47,007 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 18:39:47,007 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 18:39:47,007 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 18:39:47,007 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 18:39:47,007 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 18:39:47,007 - __main__ - INFO - =====================================================
+2025-06-06 18:39:47,007 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 18:39:47,007 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 18:39:47,007 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 18:40:09,187 - src.networkquality.bridge - INFO - Parsed metrics - Download: 1168 RPM, 1503.37 Mbps | Upload: 738 RPM, 1530.92 Mbps
+2025-06-06 18:40:09,187 - src.networkquality.collector - ERROR - Unexpected error during NetworkQuality collection: Invalid format specifier '.1f if rpm_average else 0' for object of type 'float'
+Traceback (most recent call last):
+  File "/opt/network-monitor-ml/src/networkquality/collector.py", line 140, in collect_network_quality
+    metrics = self._process_raw_measurement(raw_measurement, measurement_duration_ms)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/network-monitor-ml/src/networkquality/collector.py", line 335, in _process_raw_measurement
+    logger.info(f"Processed NQ metrics: RPM avg={rpm_average:.1f if rpm_average else 0}, "
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Invalid format specifier '.1f if rpm_average else 0' for object of type 'float'
+2025-06-06 18:40:09,188 - __main__ - WARNING - NQRS measurement for cloudflare resulted in an error: Invalid format specifier '.1f if rpm_average else 0' for object of type 'float'
+2025-06-06 18:43:30,952 - src.utils.logger - INFO - Logging system initialized
+2025-06-06 18:43:30,952 - src.utils.logger - INFO - Log level: 20
+2025-06-06 18:43:30,952 - src.utils.logger - INFO - Log file: data/logs/network_intelligence.log
+2025-06-06 18:43:30,952 - __main__ - INFO - Initializing Enhanced Network Intelligence Monitor...
+2025-06-06 18:43:30,954 - src.config - INFO - Loaded configuration from config.yaml
+2025-06-06 18:43:30,954 - src.config - INFO - Configuration validation completed.
+2025-06-06 18:43:30,954 - __main__ - INFO - Configuration loaded from: config.yaml
+2025-06-06 18:43:30,954 - __main__ - INFO - NetworkQuality-RS enabled: True
+2025-06-06 18:43:30,954 - __main__ - INFO - Detecting environment...
+2025-06-06 18:43:30,955 - __main__ - INFO -   Platform: linux
+2025-06-06 18:43:30,955 - __main__ - INFO -   Is container: True
+2025-06-06 18:43:30,956 - __main__ - INFO -   Is cloud: False
+2025-06-06 18:43:30,956 - __main__ - INFO -   Is edge device: False
+2025-06-06 18:43:30,956 - __main__ - INFO -   Constraints: ['container_limits']
+2025-06-06 18:43:30,957 - src.utils.database - INFO - Database tables created
+2025-06-06 18:43:30,958 - src.utils.database - INFO - Database indexes created
+2025-06-06 18:43:30,958 - src.utils.database - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 18:43:30,958 - __main__ - INFO - Ensured 'network_quality_rs_metrics' table exists.
+2025-06-06 18:43:30,958 - __main__ - INFO - Database initialized: data/database/network_intelligence.db
+2025-06-06 18:43:30,958 - src.collector - INFO - Enhanced network collector initialized
+2025-06-06 18:43:30,958 - __main__ - INFO - Enhanced network collector initialized
+2025-06-06 18:43:31,446 - src.lstm_auto - INFO - Enhanced LSTM anomaly detector initialized
+2025-06-06 18:43:31,447 - ai - INFO - Model enhanced_lstm loaded from data/models
+2025-06-06 18:43:31,447 - __main__ - INFO - Loaded existing AI models
+2025-06-06 18:43:31,447 - __main__ - INFO - AI detection system initialized
+2025-06-06 18:43:31,447 - __main__ - INFO - Mimir integration disabled or Mimir config missing.
+2025-06-06 18:43:31,447 - src.alerts - INFO - Loaded 1 escalation rules
+2025-06-06 18:43:31,447 - src.alerts - INFO - Alert management system started
+2025-06-06 18:43:31,447 - __main__ - INFO - Alerting system initialized
+2025-06-06 18:43:31,447 - src.dynamic_thresh - INFO - Initialized dynamic thresholds for 10 metrics
+2025-06-06 18:43:31,447 - __main__ - INFO - Dynamic threshold management initialized
+2025-06-06 18:43:31,448 - src.networkquality.prometheus_metrics - INFO - Initializing NetworkQuality metrics with registry: True
+2025-06-06 18:43:31,448 - src.networkquality.prometheus_metrics - INFO - NetworkQuality Prometheus metrics initialized successfully
+2025-06-06 18:43:31,448 - src.prom_export - INFO - Prometheus metrics server started on 0.0.0.0:11455
+2025-06-06 18:43:31,449 - __main__ - INFO - NetworkQuality metrics support added to aggregator
+2025-06-06 18:43:31,449 - src.prom_export - INFO - Metrics aggregator started
+2025-06-06 18:43:31,449 - __main__ - INFO - Prometheus metrics server configured on port 11455
+2025-06-06 18:43:31,450 - __main__ - INFO - Enhanced API server initialized
+2025-06-06 18:43:31,450 - __main__ - INFO - WebSocket config: host=0.0.0.0, port=11450
+2025-06-06 18:43:31,453 - websockets.server - INFO - server listening on 0.0.0.0:11450
+2025-06-06 18:43:31,453 - src.websocket_server - INFO - WebSocket server started on ws://0.0.0.0:11450
+2025-06-06 18:43:31,453 - src.websocket_server - INFO - WebSocket endpoint: ws://0.0.0.0:11450/ws
+2025-06-06 18:43:31,453 - src.websocket_server - INFO - Available channels: ['metrics', 'anomalies', 'alerts', 'health']
+2025-06-06 18:43:31,453 - __main__ - INFO - WebSocket server initialized and started on ws://0.0.0.0:11450
+2025-06-06 18:43:31,453 - __main__ - INFO - Initializing NetworkQuality-RS collector...
+2025-06-06 18:43:31,453 - __main__ - INFO - NetworkQuality-RS collector initialized.
+2025-06-06 18:43:31,454 - __main__ - INFO - Edge optimization not enabled or deployment config missing.
+2025-06-06 18:43:31,454 - __main__ - INFO - Integration verification setup completed.
+2025-06-06 18:43:31,454 - __main__ - INFO - Enhanced Network Intelligence Monitor initialization complete
+2025-06-06 18:43:31,454 - __main__ - INFO - Starting Enhanced Network Intelligence Monitor...
+2025-06-06 18:43:31,454 - __main__ - INFO - Enhanced Network Intelligence Monitor started successfully
+2025-06-06 18:43:31,454 - __main__ - INFO - === Enhanced Network Intelligence Monitor Started ===
+2025-06-06 18:43:31,454 - __main__ - INFO - API Server: http://0.0.0.0:5000
+2025-06-06 18:43:31,454 - __main__ - INFO - Metrics Export (for Alloy): http://0.0.0.0:11455/metrics
+2025-06-06 18:43:31,454 - __main__ - INFO - WebSocket Server: ws://0.0.0.0:11450/ws
+2025-06-06 18:43:31,454 - __main__ - INFO - Targets: 8.8.8.8, 1.1.1.1, google.com
+2025-06-06 18:43:31,454 - __main__ - INFO - NetworkQuality-RS Monitoring: Enabled
+2025-06-06 18:43:31,454 - __main__ - INFO - NetworkQuality-RS Server: (uses default Cloudflare endpoints)
+2025-06-06 18:43:31,454 - __main__ - INFO - =====================================================
+2025-06-06 18:43:31,454 - __main__ - INFO - Main (enhanced_collector) monitoring loop started
+2025-06-06 18:43:31,454 - __main__ - INFO - NetworkQuality-RS monitoring loop started.
+2025-06-06 18:43:31,454 - src.networkquality.collector - INFO - Collecting NetworkQuality metrics using Cloudflare endpoints...
+2025-06-06 18:43:51,603 - src.networkquality.bridge - INFO - Parsed metrics - Download: 987 RPM, 1502.47 Mbps | Upload: 895 RPM, 1535.12 Mbps
+2025-06-06 18:43:51,603 - src.networkquality.collector - INFO - Processed NQ metrics: RPM avg=941.0, bufferbloat=105.5ms (severe), quality_score=376.4, rating=fair
+2025-06-06 18:43:51,603 - __main__ - INFO - NQRS metrics for cloudflare: RPM 941.00, Rating fair
+2025-06-06 18:43:51,604 - __main__ - INFO - NetworkQuality Prometheus metrics initialized with main registry
