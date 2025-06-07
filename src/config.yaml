@@ -16,7 +16,7 @@ alerts:
   enabled: true
   smtp_port: 587
   smtp_server: null
-  webhook_url: null
+  webhook_url: https://webhook.site/f3cd2fa1-8c50-4c2c-834f-cb97c44d1cd7
 api:
   cors_enabled: true
   debug: true
@@ -83,7 +83,7 @@ networkquality:
       good: 750
       poor: 200
     rpm:
-      excellent: 800
-      fair: 300
-      good: 600
-      poor: 100  
+      excellent: 8000
+      fair: 6000
+      good: 5000
+      poor: 1500  

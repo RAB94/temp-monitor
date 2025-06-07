@@ -36,8 +36,10 @@ from src.dynamic_thresh import DynamicThresholdManager, setup_dynamic_thresholds
 from src.edge_opt import EdgeOptimizer, create_edge_optimizer
 from src.websocket_server import WebSocketManager, WebSocketIntegration
 from src.api.server import APIServer
+from src.ai_prometheus_metrics import AIModelPrometheusMetrics
 # New imports for networkquality-rs
 from src.networkquality.collector import NetworkQualityCollector, ResponsivenessMetrics
+from src.webhook_sender import create_webhook_sender
 
 logger = logging.getLogger(__name__)
 
@@ -313,8 +315,56 @@ class EnhancedNetworkIntelligenceMonitor:
             
             self.alert_manager = create_alert_manager(alert_config)
             logger.info("Alerting system initialized")
+        if self.config.alerts.webhook_url:
+            webhook_config = {
+                'enabled': True,
+                'url': self.config.alerts.webhook_url,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Authorization': f"Bearer {os.getenv('WEBHOOK_SECRET', 'default-secret')}"
+                },
+                'timeout_seconds': 15,
+                'retry_attempts': 3,
+                'retry_delay_seconds': 5
+            }
+            
+            self.webhook_sender = create_webhook_sender({'webhook_alerting': webhook_config})
+            
+            # Integrate webhook sender with alert manager
+            if self.webhook_sender:
+                # Import datetime here to ensure it's available in the closure
+                from datetime import datetime
+                
+                # Override the notification manager's webhook sending
+                original_send = self.alert_manager.notification_manager._send_webhook
+                
+                async def enhanced_webhook_send(alert, channel, template):
+                    # Use the dedicated webhook sender
+                    success = self.webhook_sender.send_custom_alert({
+                        'alert_type': 'network_anomaly',
+                        'timestamp': datetime.now().isoformat(),  # datetime is now available
+                        'alert_data': {
+                            'id': alert.id,
+                            'title': alert.title,
+                            'description': alert.description,
+                            'severity': alert.severity.value,
+                            'status': alert.status.value,
+                            'target': alert.target,
+                            'metric_name': alert.metric_name,
+                            'current_value': alert.current_value,
+                            'threshold': alert.threshold,
+                            'tags': alert.tags,
+                            'context': alert.context
+                        }
+                    })
+                    return success
+                
+                self.alert_manager.notification_manager._send_webhook = enhanced_webhook_send
+                logger.info("Enhanced webhook sender integrated with alert manager")           
         else:
             logger.info("Alerting system disabled or alerts config missing.")
+
+
 
     async def _initialize_dynamic_thresholds(self):
         if self.config:
@@ -326,63 +376,289 @@ class EnhancedNetworkIntelligenceMonitor:
 
 
     async def _initialize_metrics_export(self):
-        if self.config and self.config.metrics:
+        """Initialize Prometheus metrics export for Alloy with AI metrics integration"""
+        
+        if not self.config or not self.config.metrics:
+            logger.warning("Metrics configuration not found, skipping metrics export initialization.")
+            return
+        
+        logger.info("Initializing Prometheus metrics export system...")
+        
+        try:
+            # Extract metrics configuration
             metrics_conf = self.config.metrics
-            self.metrics_server = PrometheusMetricsServer(port=metrics_conf.port, host=metrics_conf.host)
+            metrics_port = metrics_conf.port
+            metrics_host = metrics_conf.host
+            batch_size = metrics_conf.batch_size
+            enable_aggregation = metrics_conf.enable_aggregation
             
+            logger.info(f"📊 Metrics configuration: host={metrics_host}, port={metrics_port}, "
+                       f"batch_size={batch_size}, aggregation={enable_aggregation}")
+            
+            # Create Prometheus metrics server
+            self.metrics_server = PrometheusMetricsServer(port=metrics_port, host=metrics_host)
+            
+            # Initialize AI model metrics with the same registry
+            try:
+                from src.ai_prometheus_metrics import AIModelPrometheusMetrics
+                self.ai_metrics = AIModelPrometheusMetrics(registry=self.metrics_server.registry)
+                logger.info("✅ AI model Prometheus metrics initialized with main registry")
+                
+                # Set initial AI model information if detector exists
+                if self.ai_detector and self.config.ai:
+                    # Calculate model parameters if possible
+                    model_params = 0
+                    model_size_bytes = 0
+                    
+                    if hasattr(self.ai_detector, 'model') and self.ai_detector.model:
+                        # Count model parameters
+                        model_params = sum(p.numel() for p in self.ai_detector.model.parameters())
+                        # Estimate model size (assuming float32)
+                        model_size_bytes = model_params * 4
+                        
+                        logger.info(f"🤖 AI Model Stats: {model_params:,} parameters, "
+                                   f"{model_size_bytes / 1024 / 1024:.2f} MB")
+                    
+                    # Update model info metrics
+                    model_info = {
+                        'version': '1.0.0',
+                        'architecture': 'lstm_autoencoder',
+                        'input_size': self.config.ai.input_size,
+                        'hidden_size': self.config.ai.hidden_size,
+                        'num_layers': self.config.ai.num_layers,
+                        'sequence_length': self.config.ai.sequence_length,
+                        'quantized': self.config.deployment.edge_optimization if self.config.deployment else False,
+                        'parameters': model_params,
+                        'size_bytes': model_size_bytes
+                    }
+                    
+                    self.ai_metrics.update_model_info('enhanced_lstm', model_info)
+                    
+                    # Set initial model health
+                    model_creation_time = getattr(self.ai_detector, 'model_creation_time', time.time())
+                    model_age = time.time() - model_creation_time
+                    initial_health = 100.0 if self.ai_detector.is_trained else 50.0
+                    
+                    self.ai_metrics.update_model_health('enhanced_lstm', initial_health, model_age)
+                    
+                    # Set last trained timestamp if model is trained
+                    if self.ai_detector.is_trained:
+                        self.ai_metrics.model_last_trained.labels(model_type='enhanced_lstm').set(model_creation_time)
+                    
+                    logger.info(f"📊 AI metrics initialized - Model trained: {self.ai_detector.is_trained}, "
+                               f"Health: {initial_health:.1f}%, Age: {model_age/3600:.1f} hours")
+                else:
+                    logger.warning("⚠️ AI detector not available, AI metrics will be limited")
+                    
+            except ImportError as e:
+                logger.error(f"Failed to import AI metrics module: {e}")
+                self.ai_metrics = None
+            except Exception as e:
+                logger.error(f"Error initializing AI metrics: {e}")
+                self.ai_metrics = None
+            
+            # Start the metrics server
             try:
                 self.metrics_server.start()
+                logger.info(f"✅ Prometheus metrics server started on http://{metrics_host}:{metrics_port}/metrics")
+                
+                # Test the metrics endpoint
+                import aiohttp
+                async with aiohttp.ClientSession() as session:
+                    try:
+                        test_url = f"http://{metrics_host}:{metrics_port}/health"
+                        async with session.get(test_url, timeout=5) as response:
+                            if response.status == 200:
+                                logger.info("✅ Metrics server health check passed")
+                            else:
+                                logger.warning(f"⚠️ Metrics server health check returned status {response.status}")
+                    except Exception as e:
+                        logger.debug(f"Metrics server health check failed (server may still be starting): {e}")
+                        
             except Exception as e:
                 logger.error(f"Failed to start metrics server: {e}")
+                self.metrics_server = None
                 return
-
-            # Create the aggregator
-            self.metrics_aggregator = MetricsAggregator(self.metrics_server, batch_size=metrics_conf.batch_size)
             
-            # Initialize NetworkQuality metrics support if enabled
-            if self.config.networkquality and self.config.networkquality.enabled:
-                # Import and add the method directly to MetricsAggregator
-                def add_networkquality_metrics(self, nq_metrics_data):
-                    """Add NetworkQuality metrics to Prometheus export"""
+            # Create metrics aggregator if aggregation is enabled
+            if enable_aggregation:
+                self.metrics_aggregator = MetricsAggregator(self.metrics_server, batch_size=batch_size)
+                
+                # Initialize NetworkQuality metrics support if enabled
+                if self.config.networkquality and self.config.networkquality.enabled:
+                    logger.info("🌐 Initializing NetworkQuality metrics support...")
+                    
                     try:
-                        # Lazy initialization with proper singleton pattern
-                        if not hasattr(self, 'nq_metrics'):
-                            from src.networkquality.prometheus_metrics import NetworkQualityPrometheusMetrics
-                            
-                            # Always use the main registry
-                            registry = self.metrics_server.metrics.registry
-                            
+                        # Import NetworkQuality metrics at runtime
+                        from src.networkquality.prometheus_metrics import NetworkQualityPrometheusMetrics
+                        
+                        # Create method to add NetworkQuality metrics
+                        def add_networkquality_metrics(self, nq_metrics_data):
+                            """Add NetworkQuality metrics to Prometheus export"""
                             try:
-                                self.nq_metrics = NetworkQualityPrometheusMetrics(registry=registry)
-                                logger.info("NetworkQuality Prometheus metrics initialized with main registry")
-                            except ValueError as ve:
-                                logger.error(f"Cannot initialize NetworkQuality metrics: {ve}")
-                                self.nq_metrics = None
-                                return
+                                # Lazy initialization of NQ metrics handler
+                                if not hasattr(self, '_nq_metrics_handler'):
+                                    # Try to get existing instance or create new one
+                                    try:
+                                        # Use the existing registry from the metrics server
+                                        registry = self.metrics_server.registry if hasattr(self.metrics_server, 'registry') else None
+                                        self._nq_metrics_handler = NetworkQualityPrometheusMetrics(registry=registry)
+                                        logger.debug("NetworkQuality metrics handler initialized")
+                                    except ValueError as ve:
+                                        # Metrics might already exist in registry
+                                        logger.debug(f"NetworkQuality metrics already registered: {ve}")
+                                        # Try to use existing instance
+                                        if hasattr(self.metrics_server, 'nq_metrics'):
+                                            self._nq_metrics_handler = self.metrics_server.nq_metrics
+                                        else:
+                                            logger.error("Cannot initialize NetworkQuality metrics handler")
+                                            return
+                                
+                                # Update metrics
+                                if self._nq_metrics_handler:
+                                    data = nq_metrics_data.to_dict() if hasattr(nq_metrics_data, 'to_dict') else nq_metrics_data
+                                    self._nq_metrics_handler.update_metrics(data)
+                                    
+                                    # Log significant quality issues
+                                    if data.get('quality_rating') in ['poor', 'error']:
+                                        logger.warning(f"⚠️ NetworkQuality issue detected: {data.get('target_host')} - "
+                                                     f"Rating: {data.get('quality_rating')}, RPM: {data.get('rpm_average')}")
+                                        
+                                    logger.debug(f"Updated NetworkQuality metrics for {data.get('target_host', 'unknown')}")
+                                
+                            except Exception as e:
+                                logger.error(f"Error in add_networkquality_metrics: {e}", exc_info=True)
                         
-                        # Update metrics if handler exists
-                        if self.nq_metrics:
-                            data = nq_metrics_data.to_dict() if hasattr(nq_metrics_data, 'to_dict') else nq_metrics_data
-                            self.nq_metrics.update_metrics(data)
-                            logger.debug(f"Updated NetworkQuality metrics for {data.get('target_host', 'unknown')}")
+                        # Bind the method to the aggregator instance
+                        import types
+                        self.metrics_aggregator.add_networkquality_metrics = types.MethodType(
+                            add_networkquality_metrics, 
+                            self.metrics_aggregator
+                        )
                         
+                        logger.info("✅ NetworkQuality metrics support successfully integrated")
+                        
+                        # Initialize NetworkQuality metrics on the server as well
+                        if hasattr(self.metrics_server, 'nq_metrics'):
+                            logger.info("📊 NetworkQuality metrics already initialized on server")
+                        else:
+                            try:
+                                self.metrics_server.nq_metrics = NetworkQualityPrometheusMetrics(
+                                    registry=self.metrics_server.registry
+                                )
+                                logger.info("✅ NetworkQuality metrics initialized on metrics server")
+                            except ValueError:
+                                logger.debug("NetworkQuality metrics already exist in registry")
+                        
+                    except ImportError as e:
+                        logger.error(f"Failed to import NetworkQuality metrics module: {e}")
                     except Exception as e:
-                        logger.error(f"Error in add_networkquality_metrics: {e}")
+                        logger.error(f"Error setting up NetworkQuality metrics support: {e}")
                 
-                # Bind the method to the aggregator instance
-                import types
-                self.metrics_aggregator.add_networkquality_metrics = types.MethodType(
-                    add_networkquality_metrics, 
-                    self.metrics_aggregator
-                )
-                
-                logger.info("NetworkQuality metrics support added to aggregator")
+                # Start the aggregator
+                try:
+                    self.metrics_aggregator.start()
+                    logger.info(f"✅ Metrics aggregator started with batch size {batch_size}")
+                    
+                    # Log aggregator configuration
+                    logger.info(f"📊 Aggregator queues: metrics={batch_size}, "
+                               f"anomalies=50, alerts=50, health=20")
+                    
+                except Exception as e:
+                    logger.error(f"Failed to start metrics aggregator: {e}")
+                    self.metrics_aggregator = None
+            else:
+                logger.info("ℹ️ Metrics aggregation disabled - metrics will be updated immediately")
+                self.metrics_aggregator = None
             
-            # Start the aggregator
-            self.metrics_aggregator.start()
-            logger.info(f"Prometheus metrics server configured on port {metrics_conf.port}")
-        else:
-            logger.warning("Metrics configuration not found, skipping metrics export.")
+            # Set up custom metric collectors if available
+            if self.metrics_server:
+                # Register custom collectors for system metrics
+                try:
+                    import psutil
+                    
+                    # System resource metrics
+                    def get_system_metrics():
+                        """Collect system resource metrics"""
+                        try:
+                            cpu_percent = psutil.cpu_percent(interval=0.1)
+                            memory = psutil.virtual_memory()
+                            disk = psutil.disk_usage('/')
+                            
+                            if hasattr(self.metrics_server.metrics, 'collector_health_status'):
+                                # Update system health based on resources
+                                if cpu_percent > 90 or memory.percent > 90:
+                                    health = 'unhealthy'
+                                elif cpu_percent > 70 or memory.percent > 70:
+                                    health = 'degraded'
+                                else:
+                                    health = 'healthy'
+                                
+                                self.metrics_server.metrics.collector_health_status.labels(
+                                    component='system'
+                                ).state(health)
+                            
+                            return {
+                                'cpu_percent': cpu_percent,
+                                'memory_percent': memory.percent,
+                                'disk_percent': disk.percent
+                            }
+                        except Exception as e:
+                            logger.debug(f"Error collecting system metrics: {e}")
+                            return {}
+                    
+                    # Register periodic system metrics collection
+                    async def update_system_metrics():
+                        """Periodically update system metrics"""
+                        while self.running:
+                            try:
+                                system_metrics = get_system_metrics()
+                                if system_metrics:
+                                    logger.debug(f"System resources - CPU: {system_metrics['cpu_percent']:.1f}%, "
+                                               f"Memory: {system_metrics['memory_percent']:.1f}%")
+                                await asyncio.sleep(60)  # Update every minute
+                            except asyncio.CancelledError:
+                                break
+                            except Exception as e:
+                                logger.debug(f"Error in system metrics update: {e}")
+                                await asyncio.sleep(60)
+                    
+                    # Start system metrics task
+                    asyncio.create_task(update_system_metrics())
+                    logger.info("✅ System resource metrics collector started")
+                    
+                except ImportError:
+                    logger.debug("psutil not available, system metrics collection disabled")
+                except Exception as e:
+                    logger.warning(f"Error setting up system metrics collection: {e}")
+            
+            # Log final initialization summary
+            logger.info("="*60)
+            logger.info("📊 PROMETHEUS METRICS EXPORT INITIALIZED")
+            logger.info(f"   Endpoint: http://{metrics_host}:{metrics_port}/metrics")
+            logger.info(f"   AI Metrics: {'Enabled' if self.ai_metrics else 'Disabled'}")
+            logger.info(f"   NetworkQuality Metrics: {'Enabled' if self.config.networkquality and self.config.networkquality.enabled else 'Disabled'}")
+            logger.info(f"   Aggregation: {'Enabled' if self.metrics_aggregator else 'Disabled'}")
+            logger.info(f"   Available at: http://{metrics_host}:{metrics_port}/metrics")
+            logger.info("="*60)
+            
+        except Exception as e:
+            logger.error(f"Critical error in metrics export initialization: {e}", exc_info=True)
+            # Clean up any partially initialized components
+            if hasattr(self, 'metrics_server') and self.metrics_server:
+                try:
+                    self.metrics_server.stop()
+                except:
+                    pass
+            if hasattr(self, 'metrics_aggregator') and self.metrics_aggregator:
+                try:
+                    self.metrics_aggregator.stop()
+                except:
+                    pass
+            
+            self.metrics_server = None
+            self.metrics_aggregator = None
+            self.ai_metrics = None
 
     async def _initialize_api_server(self):
         if self.config:
@@ -554,31 +830,473 @@ class EnhancedNetworkIntelligenceMonitor:
         logger.info("=====================================================")
 
     async def _main_monitoring_loop(self):
+        """Main monitoring loop with AI training and comprehensive metrics tracking"""
         logger.info("Main (enhanced_collector) monitoring loop started")
+        
+        # Initialize timing variables
+        last_train_time = 0
+        last_health_check = 0
+        train_interval = self.config.ai.train_interval if self.config and self.config.ai else 3600
+        
+        # Initialize AI metrics if not already done
+        if not hasattr(self, 'ai_metrics') and self.metrics_server:
+            from src.ai_prometheus_metrics import AIModelPrometheusMetrics
+            self.ai_metrics = AIModelPrometheusMetrics(registry=self.metrics_server.registry)
+            
+            # Set initial model info
+            if self.ai_detector and self.config and self.config.ai:
+                model_info = {
+                    'version': '1.0.0',
+                    'architecture': 'lstm_autoencoder',
+                    'input_size': self.config.ai.input_size,
+                    'hidden_size': self.config.ai.hidden_size,
+                    'num_layers': self.config.ai.num_layers,
+                    'quantized': self.config.deployment.edge_optimization if self.config.deployment else False
+                }
+                self.ai_metrics.update_model_info('enhanced_lstm', model_info)
+        
         while self.running:
             if not self.config or not self.config.monitoring or not self.enhanced_collector:
                 logger.debug("Main loop: Config or enhanced_collector not ready, sleeping.")
                 await asyncio.sleep(5)
                 continue
+                
             try:
+                cycle_start = time.time()
+                
+                # Collect metrics from all targets
                 for target in self.config.monitoring.targets:
-                    if not self.running: break
-                    metrics = await self.enhanced_collector.collect_enhanced_metrics(target)
-                    if metrics and self.database:
-                        await self.database.store_metrics(metrics.to_dict())
-                        if self.metrics_aggregator:
-                           self.metrics_aggregator.add_enhanced_metrics(metrics)
-                        self.performance_stats['total_measurements'] += 1
-                if not self.running: break
-                await asyncio.sleep(self.config.monitoring.interval)
+                    if not self.running:
+                        break
+                        
+                    try:
+                        # Collect enhanced metrics
+                        collection_start = time.time()
+                        metrics = await self.enhanced_collector.collect_enhanced_metrics(target)
+                        collection_time = time.time() - collection_start
+                        
+                        if metrics and self.database:
+                            # Store metrics in database
+                            await self.database.store_metrics(metrics.to_dict())
+                            
+                            # Update Prometheus metrics
+                            if self.metrics_aggregator:
+                                self.metrics_aggregator.add_enhanced_metrics(metrics)
+                            
+                            # Update dynamic thresholds
+                            if self.threshold_manager:
+                                for metric_name, value in metrics.to_dict().items():
+                                    if isinstance(value, (int, float)) and value >= 0:
+                                        self.threshold_manager.add_measurement(metric_name, value)
+                                        
+                                        # Track threshold changes in AI metrics
+                                        if self.ai_metrics and hasattr(self.threshold_manager, 'thresholds'):
+                                            threshold_value = self.threshold_manager.thresholds.get(metric_name)
+                                            if threshold_value:
+                                                self.ai_metrics.update_threshold_metrics(
+                                                    metric_name, 
+                                                    threshold_value.current_value if hasattr(threshold_value, 'current_value') else threshold_value,
+                                                    'dynamic'
+                                                )
+                            
+                            # AI anomaly detection
+                            if self.ai_detector:
+                                inference_start = time.time()
+                                
+                                try:
+                                    anomaly_result = await self.ai_detector.detect_anomaly(metrics)
+                                    inference_time = time.time() - inference_start
+                                    
+                                    # Update AI inference metrics
+                                    if self.ai_metrics:
+                                        self.ai_metrics.update_inference_metrics('enhanced_lstm', inference_time)
+                                    
+                                    # Log AI activity
+                                    logger.debug(f"🧠 AI inference completed in {inference_time:.3f}s for {target}")
+                                    
+                                    if anomaly_result.is_anomaly:
+                                        logger.info(f"🚨 AI ANOMALY DETECTED for {target}: "
+                                                  f"score={anomaly_result.anomaly_score:.3f}, "
+                                                  f"confidence={anomaly_result.confidence:.2f}, "
+                                                  f"severity={anomaly_result.severity}, "
+                                                  f"pattern={anomaly_result.temporal_pattern}")
+                                        
+                                        # Update anomaly metrics
+                                        if self.ai_metrics:
+                                            self.ai_metrics.update_anomaly_metrics(
+                                                'enhanced_lstm',
+                                                target,
+                                                anomaly_result.anomaly_score,
+                                                anomaly_result.confidence,
+                                                anomaly_result.severity
+                                            )
+                                        
+                                        # Store anomaly in database
+                                        await self.database.store_anomaly(
+                                            metrics.timestamp,
+                                            {
+                                                'target_host': target,
+                                                'anomaly_score': anomaly_result.anomaly_score,
+                                                'confidence': anomaly_result.confidence,
+                                                'severity': anomaly_result.severity,
+                                                'temporal_pattern': anomaly_result.temporal_pattern,
+                                                'baseline_values': anomaly_result.baseline_values,
+                                                'thresholds': anomaly_result.thresholds,
+                                                'feature_contributions': anomaly_result.feature_contributions,
+                                                'recommendation': anomaly_result.recommendation,
+                                                'attention_weights': anomaly_result.attention_weights
+                                            }
+                                        )
+                                        
+                                        # Send alert
+                                        if self.alert_manager:
+                                            from src.alerts import AlertSeverity
+                                            
+                                            severity_map = {
+                                                'critical': AlertSeverity.CRITICAL,
+                                                'high': AlertSeverity.HIGH,
+                                                'medium': AlertSeverity.MEDIUM,
+                                                'low': AlertSeverity.LOW,
+                                                'info': AlertSeverity.INFO
+                                            }
+                                            
+                                            alert = await self.alert_manager.create_alert(
+                                                title=f"AI Network Anomaly: {target}",
+                                                description=anomaly_result.recommendation,
+                                                severity=severity_map.get(anomaly_result.severity.lower(), AlertSeverity.MEDIUM),
+                                                source="ai_detector",
+                                                metric_name="anomaly_score",
+                                                current_value=anomaly_result.anomaly_score,
+                                                threshold=self.ai_detector.thresholds.get('reconstruction_error', 0.5),
+                                                target=target,
+                                                context={
+                                                    'confidence': anomaly_result.confidence,
+                                                    'temporal_pattern': anomaly_result.temporal_pattern,
+                                                    'feature_contributions': anomaly_result.feature_contributions,
+                                                    'sequence_score': anomaly_result.sequence_score
+                                                }
+                                            )
+                                            
+                                            self.performance_stats['alerts_sent'] += 1
+                                        
+                                        # Send webhook notification if configured
+                                        if hasattr(self, 'webhook_sender') and self.webhook_sender:
+                                            # Extract top contributing features
+                                            top_features = sorted(
+                                                anomaly_result.feature_contributions.items(),
+                                                key=lambda x: x[1],
+                                                reverse=True
+                                            )[:3]
+                                            
+                                            insights = [
+                                                f"Anomaly detected with {anomaly_result.confidence:.0%} confidence",
+                                                f"Temporal pattern: {anomaly_result.temporal_pattern}",
+                                                f"Top contributing factors: {', '.join([f[0] for f in top_features])}"
+                                            ]
+                                            
+                                            recommendations = [
+                                                anomaly_result.recommendation,
+                                                "Review recent network changes",
+                                                "Check for correlated anomalies in the region"
+                                            ]
+                                            
+                                            webhook_sent = self.webhook_sender.send_model_anomaly_alert(
+                                                device=target,
+                                                domain=target,
+                                                metric="ai_anomaly_score",
+                                                value=anomaly_result.anomaly_score,
+                                                severity=anomaly_result.severity,
+                                                confidence=anomaly_result.confidence,
+                                                baseline_value=anomaly_result.baseline_values.get('overall_mean', 0),
+                                                deviation_factor=anomaly_result.anomaly_score / max(anomaly_result.baseline_values.get('overall_mean', 0.1), 0.1),
+                                                insights=insights,
+                                                recommendations=recommendations,
+                                                test_results={
+                                                    'sequence_score': anomaly_result.sequence_score,
+                                                    'attention_variance': sum(anomaly_result.attention_weights.values()) / len(anomaly_result.attention_weights) if anomaly_result.attention_weights else 0,
+                                                    'temporal_pattern': anomaly_result.temporal_pattern
+                                                }
+                                            )
+                                            
+                                            if webhook_sent:
+                                                logger.info(f"📤 Webhook notification sent for AI anomaly on {target}")
+                                        
+                                        # Update Prometheus anomaly metrics
+                                        if self.metrics_aggregator:
+                                            self.metrics_aggregator.add_anomaly_metrics(anomaly_result, target)
+                                        
+                                        self.performance_stats['anomalies_detected'] += 1
+                                    else:
+                                        logger.debug(f"✅ AI: Normal behavior for {target} (score: {anomaly_result.anomaly_score:.3f})")
+                                    
+                                    # Update baseline metrics periodically
+                                    if hasattr(anomaly_result, 'baseline_values') and self.ai_metrics:
+                                        deviations = {}
+                                        for feature, contrib in anomaly_result.feature_contributions.items():
+                                            deviations[feature] = contrib
+                                        
+                                        self.ai_metrics.update_baseline_metrics(
+                                            'adaptive',
+                                            'ai_detector',
+                                            deviations
+                                        )
+                                    
+                                except Exception as e:
+                                    logger.error(f"Error in AI anomaly detection for {target}: {e}")
+                            
+                            self.performance_stats['total_measurements'] += 1
+                            self.network_logger.log_metrics_collected(target, metrics.to_dict())
+                            
+                            # Log collection performance
+                            logger.debug(f"📊 Metrics collected for {target} in {collection_time:.3f}s")
+                            
+                    except Exception as e:
+                        logger.error(f"Error collecting metrics for {target}: {e}")
+                        self.network_logger.log_connection_failure(target, "enhanced", str(e))
+                
+                # Periodic AI training
+                current_time = time.time()
+                if (self.ai_detector and 
+                    self.config.ai.auto_train and 
+                    current_time - last_train_time > train_interval):
+                    
+                    logger.info("🧠 Starting AI model training...")
+                    training_start = time.time()
+                    
+                    try:
+                        # Get training data from database
+                        training_data = await self.database.get_metrics_for_training(
+                            hours=self.config.ai.training_hours if self.config.ai else 24
+                        )
+                        
+                        if len(training_data) >= 50:
+                            # Get initial model state for comparison
+                            initial_loss = None
+                            if hasattr(self.ai_detector, 'model') and self.ai_detector.model:
+                                # Calculate initial loss on a sample
+                                sample_batch = training_data[:10]
+                                initial_loss = await self._calculate_model_loss(sample_batch)
+                            
+                            # Perform online training
+                            await self.ai_detector.train_online(training_data)
+                            
+                            training_duration = time.time() - training_start
+                            
+                            # Calculate final loss
+                            final_loss = None
+                            if hasattr(self.ai_detector, 'model') and self.ai_detector.model:
+                                final_loss = await self._calculate_model_loss(sample_batch if initial_loss else training_data[:10])
+                            
+                            # Update AI training metrics
+                            if self.ai_metrics:
+                                self.ai_metrics.update_training_metrics(
+                                    'enhanced_lstm',
+                                    'online',
+                                    training_duration,
+                                    len(training_data),
+                                    final_loss if final_loss is not None else 0.05
+                                )
+                                
+                                # Update online learning metrics
+                                if hasattr(self.ai_detector, 'optimizer') and self.ai_detector.optimizer:
+                                    current_lr = self.ai_detector.optimizer.param_groups[0]['lr']
+                                    self.ai_metrics.update_online_learning_metrics(
+                                        'enhanced_lstm',
+                                        current_lr
+                                    )
+                                
+                                # Update model health
+                                model_age = current_time - self.ai_detector.model_creation_time if hasattr(self.ai_detector, 'model_creation_time') else 0
+                                health_score = self._calculate_model_health_score()
+                                self.ai_metrics.update_model_health(
+                                    'enhanced_lstm',
+                                    health_score,
+                                    model_age
+                                )
+                            
+                            self.performance_stats['model_trainings'] += 1
+                            last_train_time = current_time
+                            
+                            # Log training results
+                            improvement = ((initial_loss - final_loss) / initial_loss * 100) if initial_loss and final_loss else 0
+                            logger.info(f"✅ AI training completed: {len(training_data)} samples in {training_duration:.2f}s")
+                            if initial_loss and final_loss:
+                                logger.info(f"📈 Model improvement: {improvement:.1f}% (loss: {initial_loss:.4f} → {final_loss:.4f})")
+                            
+                            # Save model checkpoint
+                            if self.ai_detector:
+                                try:
+                                    self.ai_detector.save_models()
+                                    logger.info("💾 AI model checkpoint saved")
+                                except Exception as e:
+                                    logger.error(f"Failed to save model checkpoint: {e}")
+                        else:
+                            logger.info(f"⏸️  Insufficient training data: {len(training_data)} samples (need >= 50)")
+                        
+                    except Exception as e:
+                        logger.error(f"Error in AI training: {e}")
+                
+                # Periodic health check
+                if current_time - last_health_check > 300:  # Every 5 minutes
+                    self.performance_stats['system_health_score'] = self._calculate_system_health()
+                    
+                    # Log AI model status
+                    if self.ai_detector and hasattr(self.ai_detector, 'is_trained'):
+                        logger.info(f"🤖 AI Model Status: trained={self.ai_detector.is_trained}, "
+                                  f"trainings={self.performance_stats['model_trainings']}, "
+                                  f"anomalies_detected={self.performance_stats['anomalies_detected']}")
+                    
+                    last_health_check = current_time
+                
+                # Update average collection time
+                cycle_time = time.time() - cycle_start
+                self.performance_stats['average_collection_time'] = (
+                    (self.performance_stats['average_collection_time'] * 0.9) + 
+                    (cycle_time * 0.1)
+                )
+                
+                # Sleep until next collection
+                sleep_time = max(1, self.config.monitoring.interval - cycle_time)
+                
+                if not self.running:
+                    break
+                    
+                await asyncio.sleep(sleep_time)
+                
             except asyncio.CancelledError:
                 logger.info("Main monitoring loop cancelled.")
                 break
             except Exception as e:
                 logger.exception(f"Error in main monitoring loop: {e}")
-                await asyncio.sleep(60)
+                await asyncio.sleep(60)  # Error backoff
+        
         logger.info("Main (enhanced_collector) monitoring loop stopped")
 
+
+    async def _calculate_model_loss(self, training_data):
+        """Calculate current model loss on sample data"""
+        try:
+            if not self.ai_detector or not hasattr(self.ai_detector, 'model'):
+                return None
+            
+            # Prepare a small batch of data
+            import torch
+            import numpy as np
+            
+            # Extract features from training data
+            features_list = []
+            for data_point in training_data[:10]:  # Use first 10 samples
+                features = self.ai_detector._extract_enhanced_features(data_point)
+                features_list.append(features)
+            
+            # Create sequence
+            if len(features_list) >= self.ai_detector.sequence_length:
+                sequence = np.array(features_list[:self.ai_detector.sequence_length])
+                
+                # Scale and convert to tensor
+                sequence_scaled = self.ai_detector.scaler.transform(
+                    sequence.reshape(-1, self.ai_detector.input_size)
+                )
+                sequence_scaled = sequence_scaled.reshape(
+                    1, self.ai_detector.sequence_length, self.ai_detector.input_size
+                )
+                sequence_tensor = torch.FloatTensor(sequence_scaled).to(self.ai_detector.device)
+                
+                # Calculate loss
+                self.ai_detector.model.eval()
+                with torch.no_grad():
+                    reconstructed, _ = self.ai_detector.model(sequence_tensor)
+                    loss = torch.nn.functional.mse_loss(reconstructed, sequence_tensor)
+                    return loss.item()
+            
+            return 0.1  # Default if not enough data
+            
+        except Exception as e:
+            logger.error(f"Error calculating model loss: {e}")
+            return 0.1
+
+    def _calculate_model_health_score(self) -> float:
+        """Calculate AI model health score based on various factors"""
+        score = 100.0
+        
+        try:
+            if not self.ai_detector:
+                return 0.0
+                
+            # Check if model is trained
+            if not hasattr(self.ai_detector, 'is_trained') or not self.ai_detector.is_trained:
+                score -= 50
+            
+            # Check model age (penalize if too old without retraining)
+            if hasattr(self.ai_detector, 'model_creation_time'):
+                age_hours = (time.time() - self.ai_detector.model_creation_time) / 3600
+                if age_hours > 168:  # 1 week
+                    score -= 20
+                elif age_hours > 72:  # 3 days
+                    score -= 10
+            
+            # Check training frequency
+            if self.performance_stats['model_trainings'] == 0:
+                score -= 20
+            
+            # Check anomaly detection effectiveness
+            if self.performance_stats['total_measurements'] > 100:
+                anomaly_rate = self.performance_stats['anomalies_detected'] / self.performance_stats['total_measurements']
+                if anomaly_rate > 0.5:  # Too many anomalies
+                    score -= 15
+                elif anomaly_rate < 0.001:  # Too few anomalies
+                    score -= 10
+            
+            # Check for recent successful inferences
+            if hasattr(self.ai_detector, 'last_inference_time'):
+                time_since_inference = time.time() - self.ai_detector.last_inference_time
+                if time_since_inference > 600:  # 10 minutes
+                    score -= 15
+                    
+        except Exception as e:
+            logger.error(f"Error calculating model health: {e}")
+            score = 50.0
+        
+        return max(0.0, score)
+
+    async def _create_ai_alert(self, target: str, metrics, anomaly_result):
+        """Create alert from AI anomaly detection"""
+        
+        if self.alert_manager:
+            await self.alert_manager.create_alert(
+                title=f"AI Anomaly Detected: {target}",
+                description=anomaly_result.recommendation,
+                severity=AlertSeverity.HIGH if anomaly_result.severity in ['critical', 'high'] else AlertSeverity.MEDIUM,
+                source="ai_detector",
+                metric_name="anomaly_score",
+                current_value=anomaly_result.anomaly_score,
+                threshold=self.ai_detector.thresholds.get('reconstruction_error', 0.5),
+                target=target,
+                context={
+                    'confidence': anomaly_result.confidence,
+                    'temporal_pattern': anomaly_result.temporal_pattern,
+                    'feature_contributions': anomaly_result.feature_contributions,
+                    'attention_weights': anomaly_result.attention_weights
+                }
+            )
+            
+            # Send webhook notification via dedicated sender
+            if self.webhook_sender:
+                self.webhook_sender.send_model_anomaly_alert(
+                    device=target,
+                    domain=target,
+                    metric="anomaly_score",
+                    value=anomaly_result.anomaly_score,
+                    severity=anomaly_result.severity,
+                    confidence=anomaly_result.confidence,
+                    insights=[anomaly_result.recommendation],
+                    recommendations=self._generate_ai_recommendations(anomaly_result),
+                    test_results={
+                        'anomaly_score': anomaly_result.anomaly_score,
+                        'sequence_score': anomaly_result.sequence_score,
+                        'temporal_pattern': anomaly_result.temporal_pattern
+                    }
+                )
 
     async def _store_nq_metrics(self, metrics: ResponsivenessMetrics):
         """Store NetworkQuality metrics in the database"""

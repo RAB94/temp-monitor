@@ -323,6 +323,19 @@ class DynamicThresholdManager:
     def add_measurement(self, metric_name: str, value: float, timestamp: float = None):
         """Add a measurement for threshold analysis"""
         
+        # Skip non-metric fields
+        skip_fields = {
+            'timestamp', 'target_host', 'source_interface', 'network_type',
+            'measurement_duration', 'created_at', 'updated_at', 'id'
+        }
+        
+        if metric_name in skip_fields:
+            return
+        
+        # Skip if value is not a valid metric value
+        if not isinstance(value, (int, float)) or value < 0:
+            return
+        
         if timestamp is None:
             timestamp = time.time()
         
@@ -332,7 +345,7 @@ class DynamicThresholdManager:
         # Initialize threshold if needed
         if metric_name not in self.thresholds:
             self._initialize_threshold(metric_name, value)
-    
+
     def record_alert(self, metric_name: str, value: float, threshold: float,
                     is_true_positive: Optional[bool] = None, severity: str = "medium"):
         """Record an alert for analysis"""

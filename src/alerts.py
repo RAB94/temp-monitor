@@ -28,6 +28,7 @@ import hashlib
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -433,9 +434,24 @@ class NotificationManager:
                 logger.error("Webhook URL not configured")
                 return False
             
-            # Prepare payload
+            # Prepare payload with proper serialization
+            alert_dict = asdict(alert)
+            
+            # Convert enums to strings
+            alert_dict['severity'] = alert.severity.value
+            alert_dict['status'] = alert.status.value
+            
+            # Convert timestamps to ISO format - FIX: Use datetime imported at top
+            alert_dict['created_at'] = datetime.fromtimestamp(alert.created_at).isoformat()
+            alert_dict['updated_at'] = datetime.fromtimestamp(alert.updated_at).isoformat()
+            
+            if alert.acknowledged_at:
+                alert_dict['acknowledged_at'] = datetime.fromtimestamp(alert.acknowledged_at).isoformat()
+            if alert.resolved_at:
+                alert_dict['resolved_at'] = datetime.fromtimestamp(alert.resolved_at).isoformat()
+            
             payload = {
-                'alert': asdict(alert),
+                'alert': alert_dict,
                 'message': self._format_alert_message(alert, template),
                 'timestamp': time.time()
             }
@@ -453,7 +469,7 @@ class NotificationManager:
         except Exception as e:
             logger.error(f"Failed to send webhook notification: {e}")
             return False
-    
+
     async def _send_slack(self, alert: Alert, channel: NotificationChannel,
                          template: str) -> bool:
         """Send Slack notification"""
